@@ -49,8 +49,11 @@ class PDFGenerator {
             const cvFont = getComputedStyle(document.documentElement)
                 .getPropertyValue('--cv-font-family').trim();
 
-            // Render at a fixed high-quality scale for crisp text/images.
-            const RENDER_SCALE = 2;
+            // Render at a higher-quality scale for crisp, HD text/images in
+            // the downloaded PDF. 3x is noticeably sharper than 2x,
+            // especially for small text and certificate photos, at the
+            // cost of a slightly larger file / longer processing time.
+            const RENDER_SCALE = 3;
 
             const canvas = await html2canvas(previewElement, {
                 scale: RENDER_SCALE,
@@ -114,7 +117,8 @@ class PDFGenerator {
         const pdf = new jspdf.jsPDF({
             orientation: 'portrait',
             unit: 'mm',
-            format: 'a4'
+            format: 'a4',
+            compress: true
         });
 
         const pdfWidth = pdf.internal.pageSize.getWidth();   // 210mm
@@ -150,13 +154,17 @@ class PDFGenerator {
                 0, 0, pageCanvas.width, sliceHeightPx                   // dest rect
             );
 
-            const imgData = pageCanvas.toDataURL('image/jpeg', 0.95);
+            // PNG instead of JPEG: JPEG's lossy compression is what was
+            // making text edges and certificate photos look blurry/burem.
+            // PNG is lossless so text and images stay sharp; the extra file
+            // size is worth it for a document this small (a few pages).
+            const imgData = pageCanvas.toDataURL('image/png');
             const sliceHeightMm = sliceHeightPx * pxToMm;
 
             if (!isFirstPage) {
                 pdf.addPage();
             }
-            pdf.addImage(imgData, 'JPEG', margin, margin, contentWidthMm, sliceHeightMm);
+            pdf.addImage(imgData, 'PNG', margin, margin, contentWidthMm, sliceHeightMm);
 
             renderedHeightPx += sliceHeightPx;
             isFirstPage = false;
