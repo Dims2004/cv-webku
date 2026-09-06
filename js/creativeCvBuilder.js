@@ -5,7 +5,7 @@ class CreativeCvBuilder {
     constructor() {
         this.photoDataUrl = null;
         this.bindEvents();
-        //this.populateSampleData();
+        this.populateSampleData();
     }
 
     bindEvents() {
@@ -30,30 +30,28 @@ class CreativeCvBuilder {
     }
 
     // ============ SAMPLE DATA ============
+    // Form Creative CV dimulai kosong, tanpa data contoh apa pun. Tiap
+    // section multi-entry tetap diberi satu baris kosong (bukan dihapus
+    // total) supaya user langsung tahu di mana harus mengisi.
     populateSampleData() {
-        document.getElementById('creativeFullName').value = 'Dimas Febrianto';
-        document.getElementById('creativePosition').value = 'Mahasiswa Teknik Telekomunikasi';
-        document.getElementById('creativePhone').value = '(+62)85923164876';
-        document.getElementById('creativeEmail').value = 'febridimas905@gmail.com';
-        document.getElementById('creativeLinkedin').value = 'linkedin.com/in/dimas-febrianto';
-        document.getElementById('creativeInstagram').value = '@dimsbiant_';
-        document.getElementById('creativeAboutMe').value =
-            'Mahasiswa Teknik Telekomunikasi dengan minat pada jaringan, Internet of Things (IoT), dan pengembangan perangkat lunak. Terbiasa mengerjakan proyek berbasis ESP32, MQTT, dan Python, serta memiliki kemampuan problem solving dan kerja sama tim yang baik.';
+        document.getElementById('creativeFullName').value = '';
+        document.getElementById('creativePosition').value = '';
+        document.getElementById('creativePhone').value = '';
+        document.getElementById('creativeEmail').value = '';
+        document.getElementById('creativeLinkedin').value = '';
+        document.getElementById('creativeInstagram').value = '';
+        document.getElementById('creativeAboutMe').value = '';
 
         const experiences = [
-            { company: 'PT Graha Sarana Gresik', position: 'Mahasiswa Kerja Praktik (Web Developer)', location: 'Gresik, Jawa Timur', period: 'Juli 2025 - Agustus 2025', description: 'Melakukan analisis kebutuhan sistem informasi pergudangan.\nMerancang sistem wearable pergudangan untuk monitoring stok.\nMengolah data historis keluar-masuk barang untuk fitur prediksi permintaan.' },
-            { company: 'HIMA Informatika', position: 'Anggota Departemen Kewirausahaan', location: 'Surabaya, Jawa Timur', period: 'Februari 2024 - Februari 2025', description: 'Berpartisipasi dalam perencanaan program kerja kewirausahaan.\nMembantu penyelenggaraan seminar dan pelatihan.' }
+            { company: '', position: '', location: '', period: '', description: '' }
         ];
 
         const educations = [
-            { major: 'Sarjana Informatika', institution: 'Universitas Telkom', location: 'Surabaya, Jawa Timur', period: '2022-2026' },
-            { major: 'Teknik Jaringan Akses Telekomunikasi', institution: 'SMK Telkom', location: 'Sidoarjo, Jawa Timur', period: '2019-2022' }
+            { major: '', institution: '', location: '', period: '' }
         ];
 
         const skills = [
-            { category: 'IoT', items: 'ESP32, MQTT, sistem monitoring berbasis sensor' },
-            { category: 'Pemrograman', items: 'Python, JavaScript' },
-            { category: 'Data & AI', items: 'Pengolahan data, analisis data, machine learning' }
+            { category: '', items: '' }
         ];
 
         const expContainer = document.getElementById('creativeExperienceContainer');
@@ -231,7 +229,7 @@ class CreativeCvBuilder {
         const removeBtn = document.getElementById('removeCreativePhotoBtn');
         if (!fileInput || !preview || !removeBtn) return;
 
-        fileInput.addEventListener('change', (e) => {
+        fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
@@ -242,21 +240,28 @@ class CreativeCvBuilder {
                 return;
             }
 
-            if (file.size > 2 * 1024 * 1024) {
-                this.showToast('Ukuran file terlalu besar. Maksimal 2MB', 'error');
+            // Batas ukuran file ASLI (sebelum dikompres) dinaikkan ke 15MB
+            // karena foto dari kamera HP wajar berukuran beberapa MB.
+            // Gambar tetap otomatis diperkecil di bawah supaya tetap ringan.
+            if (file.size > 15 * 1024 * 1024) {
+                this.showToast('Ukuran file terlalu besar. Maksimal 15MB', 'error');
                 fileInput.value = '';
                 return;
             }
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.photoDataUrl = e.target.result;
+            this.showToast('Memproses foto profil...', 'info');
+
+            try {
+                this.photoDataUrl = await this.compressImageFile(file, 800, 0.85);
                 preview.innerHTML = `<img src="${this.photoDataUrl}" alt="Foto profil">`;
                 removeBtn.classList.remove('hidden');
                 this.updatePreview();
                 this.showToast('Foto profil berhasil diupload', 'success');
-            };
-            reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Gagal memproses foto profil:', error);
+                this.showToast('Gagal memproses foto. Coba gunakan foto lain', 'error');
+                fileInput.value = '';
+            }
         });
 
         removeBtn.addEventListener('click', () => {
@@ -266,6 +271,40 @@ class CreativeCvBuilder {
             fileInput.value = '';
             this.updatePreview();
             this.showToast('Foto profil dihapus', 'info');
+        });
+    }
+
+    // ============ IMAGE COMPRESSION ============
+    // Membaca sebuah File gambar, memperkecil sisi terpanjangnya ke maxWidth,
+    // lalu mengekspornya sebagai JPEG dengan kualitas tertentu supaya foto
+    // besar dari kamera HP tidak membuat halaman berat atau gagal diproses.
+    compressImageFile(file, maxWidth = 800, quality = 0.85) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = () => reject(new Error('Gagal membaca file'));
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onerror = () => reject(new Error('Gagal memuat gambar'));
+                img.onload = () => {
+                    const scale = Math.min(1, maxWidth / img.width);
+                    const targetWidth = Math.round(img.width * scale);
+                    const targetHeight = Math.round(img.height * scale);
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+                    try {
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         });
     }
 
