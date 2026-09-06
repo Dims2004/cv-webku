@@ -21,10 +21,6 @@ this.loadCvFont();
 this.setupFileUpload();
 
 // Buat sertifikasi kosong dan pasang event upload
-const certContainer = document.getElementById('certificationContainer');
-if (certContainer) {
-    certContainer.innerHTML = '';
-    certContainer.appendChild(this.createCertificationItem());
 }
 
 // Jangan isi data contoh otomatis
