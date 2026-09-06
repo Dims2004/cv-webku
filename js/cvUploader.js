@@ -152,69 +152,32 @@ class CVUploader {
     }
 
     getSampleData() {
+        // Tidak lagi mengembalikan data contoh berisi nama/kontak pribadi.
+        // Struktur tetap dipertahankan supaya kode lain yang memanggil
+        // fungsi ini tidak error, tapi semua nilainya kosong.
         return {
             personal: {
-                fullName: 'Dimas Febrianto',
-                position: 'Information Technology Enthusiasts | IT Support | Networking | System Administration | Troubleshooting',
-                email: 'febridimas905@gmail.com',
-                phone: '+6285923164876',
-                linkedin: 'https://linkedin.com/in/dimasfebrianto',
-                portfolio: 'https://portfolio.dimasfebrianto.dev',
-                domicile: 'Sidoarjo'
+                fullName: '',
+                position: '',
+                email: '',
+                phone: '',
+                linkedin: '',
+                portfolio: '',
+                domicile: ''
             },
             about: {
-                aboutMe: 'Fresh Graduate Sarjana Informatika Universitas Telkom Surabaya IPK 3.58 dan alumni SMK Telkom Sidoarjo.',
-                education: 'Sarjana Informatika, Universitas Telkom Surabaya (2020-2024) IPK 3.58\nSMK Telkom Sidoarjo (2017-2020)'
+                aboutMe: '',
+                education: ''
             },
             experience: {
-                experiences: [
-                    {
-                        company: 'PT Digipreneur',
-                        position: 'IT Support',
-                        period: '2023-2024',
-                        description: 'Menyediakan dukungan teknis dan pemeliharaan sistem untuk tim internal.'
-                    },
-                    {
-                        company: 'PT Graha Sarana Gresik',
-                        position: 'Network Administrator',
-                        period: '2022-2023',
-                        description: 'Mengelola infrastruktur jaringan dan melakukan troubleshooting.'
-                    },
-                    {
-                        company: 'HIMA Informatika',
-                        position: 'Ketua Divisi IT',
-                        period: '2021-2023',
-                        description: 'Memimpin divisi IT dalam organisasi kemahasiswaan.'
-                    }
-                ]
+                experiences: []
             },
             projects: {
-                projects: [
-                    {
-                        name: 'IoT Smart Cat Feeder',
-                        description: 'Sistem pemberi makan kucing otomatis berbasis IoT dengan ESP32 dan aplikasi mobile.',
-                        tech: 'ESP32, Arduino, Firebase, Flutter'
-                    },
-                    {
-                        name: 'IoT Smart Watch',
-                        description: 'Jam tangan pintar untuk monitoring kesehatan dengan sensor detak jantung dan suhu.',
-                        tech: 'ESP8266, Arduino, Bluetooth'
-                    },
-                    {
-                        name: 'Sistem Informasi Persediaan Barang',
-                        description: 'Aplikasi web untuk manajemen inventaris barang menggunakan Laravel.',
-                        tech: 'Laravel, MySQL, Bootstrap'
-                    },
-                    {
-                        name: 'Smart School E-Absensi',
-                        description: 'Sistem absensi digital berbasis RFID untuk sekolah.',
-                        tech: 'PHP, MySQL, RFID, Bootstrap'
-                    }
-                ]
+                projects: []
             },
             skills: {
-                skills: 'MikroTik MTCNA, Fiber Optik, Cisco AI, Komdigi Network Administrator, Linux, Windows Server, Python, Java, HTML/CSS, JavaScript, PHP, MySQL',
-                certifications: 'MikroTik MTCNA, Fiber Optic Splicing, Cisco AI Fundamentals, Komdigi Network Administrator'
+                skills: '',
+                certifications: ''
             }
         };
     }
