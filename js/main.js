@@ -19,9 +19,14 @@ class CVBuilderApp {
         this.loadTitleColor();
         this.loadCvFont();
         this.setupFileUpload();
+
+        const certContainer = document.getElementById('certificationContainer');
+if (certContainer) {
+    certContainer.innerHTML = '';
+    certContainer.appendChild(this.createCertificationItem());
+}
         // Initialize with sample data for demo
         //this.populateSampleData();
-    }
 
     hideLoading() {
         const loadingScreen = document.getElementById('loading-screen');
