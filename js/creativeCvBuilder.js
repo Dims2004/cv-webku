@@ -5,7 +5,7 @@ class CreativeCvBuilder {
     constructor() {
         this.photoDataUrl = null;
         this.bindEvents();
-        this.populateSampleData();
+        //this.populateSampleData();
     }
 
     bindEvents() {
