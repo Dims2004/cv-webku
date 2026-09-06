@@ -26,6 +26,12 @@ class CreativeCvBuilder {
         document.getElementById('previewBtnCreative').addEventListener('click', () => this.updatePreview());
         document.getElementById('downloadPDFBtnCreative').addEventListener('click', () => this.downloadPDF());
 
+        // Checkbox "Masih berlangsung/Sekarang" pada Periode: pakai event
+        // delegation di level container supaya berlaku baik untuk item
+        // bawaan (statis) maupun item yang ditambah lewat tombol "Tambah...".
+        this.setupOngoingCheckbox('creativeExperienceContainer', '.work-item', 'creative-exp-period-ongoing', 'creative-exp-period-end');
+        this.setupOngoingCheckbox('creativeEducationContainer', '.education-item', 'creative-edu-period-ongoing', 'creative-edu-period-end');
+
         this.setupPhotoUpload();
     }
 
@@ -43,11 +49,11 @@ class CreativeCvBuilder {
         document.getElementById('creativeAboutMe').value = '';
 
         const experiences = [
-            { company: '', position: '', location: '', period: '', description: '' }
+            { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '' }
         ];
 
         const educations = [
-            { major: '', institution: '', location: '', period: '' }
+            { major: '', institution: '', location: '', periodStart: '', periodEnd: '', ongoing: false }
         ];
 
         const skills = [
@@ -82,9 +88,10 @@ class CreativeCvBuilder {
     }
 
     // ============ PENGALAMAN ============
-    createExperienceItem(data = { company: '', position: '', location: '', period: '', description: '' }) {
+    createExperienceItem(data = { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '' }) {
         const div = document.createElement('div');
         div.className = 'work-item';
+        const isOngoing = !!data.ongoing;
         div.innerHTML = `
             <div class="form-group">
                 <label>Perusahaan / Organisasi</label>
@@ -101,7 +108,15 @@ class CreativeCvBuilder {
                 </div>
                 <div class="form-group">
                     <label>Periode</label>
-                    <input type="text" class="form-input creative-exp-period" value="${this.escapeHtml(data.period)}" placeholder="Bulan YYYY - Bulan YYYY">
+                    <div class="period-picker">
+                        <input type="month" class="form-input creative-exp-period-start" value="${this.escapeHtml(data.periodStart || '')}">
+                        <span class="period-sep">–</span>
+                        <input type="month" class="form-input creative-exp-period-end" value="${this.escapeHtml(data.periodEnd || '')}" ${isOngoing ? 'disabled' : ''}>
+                    </div>
+                    <label class="period-ongoing-label">
+                        <input type="checkbox" class="creative-exp-period-ongoing" ${isOngoing ? 'checked' : ''}>
+                        Masih berlangsung (Sekarang)
+                    </label>
                 </div>
             </div>
             <div class="form-group">
@@ -112,6 +127,11 @@ class CreativeCvBuilder {
                 <i class="fas fa-times"></i> Hapus
             </button>
         `;
+
+        div.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('input', () => this.updatePreview());
+            input.addEventListener('change', () => this.updatePreview());
+        });
 
         div.querySelector('.btn-remove-work').addEventListener('click', () => {
             if (document.querySelectorAll('#creativeExperienceContainer .work-item').length > 1) {
@@ -135,9 +155,10 @@ class CreativeCvBuilder {
     }
 
     // ============ PENDIDIKAN ============
-    createEducationItem(data = { major: '', institution: '', location: '', period: '' }) {
+    createEducationItem(data = { major: '', institution: '', location: '', periodStart: '', periodEnd: '', ongoing: false }) {
         const div = document.createElement('div');
         div.className = 'education-item';
+        const isOngoing = !!data.ongoing;
         div.innerHTML = `
             <div class="form-group">
                 <label>Jurusan / Program</label>
@@ -154,13 +175,26 @@ class CreativeCvBuilder {
                 </div>
                 <div class="form-group">
                     <label>Periode</label>
-                    <input type="text" class="form-input creative-edu-period" value="${this.escapeHtml(data.period)}" placeholder="YYYY-YYYY">
+                    <div class="period-picker">
+                        <select class="form-input creative-edu-period-start">${this.buildYearOptions(data.periodStart)}</select>
+                        <span class="period-sep">–</span>
+                        <select class="form-input creative-edu-period-end" ${isOngoing ? 'disabled' : ''}>${this.buildYearOptions(data.periodEnd)}</select>
+                    </div>
+                    <label class="period-ongoing-label">
+                        <input type="checkbox" class="creative-edu-period-ongoing" ${isOngoing ? 'checked' : ''}>
+                        Masih berkuliah (Sekarang)
+                    </label>
                 </div>
             </div>
             <button type="button" class="btn-remove-edu hidden">
                 <i class="fas fa-times"></i> Hapus
             </button>
         `;
+
+        div.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('input', () => this.updatePreview());
+            input.addEventListener('change', () => this.updatePreview());
+        });
 
         div.querySelector('.btn-remove-edu').addEventListener('click', () => {
             if (document.querySelectorAll('#creativeEducationContainer .education-item').length > 1) {
@@ -308,6 +342,67 @@ class CreativeCvBuilder {
         });
     }
 
+    // ============ ONGOING CHECKBOX ("Masih berlangsung / Sekarang") ============
+    // Event delegation di level container supaya berlaku baik untuk item
+    // bawaan (statis di index.html) maupun item yang ditambah lewat tombol.
+    setupOngoingCheckbox(containerId, itemSelector, ongoingClass, endClass) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.addEventListener('change', (e) => {
+            if (!e.target.classList.contains(ongoingClass)) return;
+            const item = e.target.closest(itemSelector);
+            const endInput = item.querySelector('.' + endClass);
+            endInput.disabled = e.target.checked;
+            if (e.target.checked) endInput.value = '';
+            this.updatePreview();
+        });
+    }
+
+    // ============ YEAR DROPDOWN (untuk Periode Pendidikan) ============
+    // Membuat daftar <option> tahun otomatis (dari tahun depan mundur ke
+    // belakang) supaya user tinggal memilih, tidak perlu mengetik manual.
+    buildYearOptions(selectedValue = '') {
+        const currentYear = new Date().getFullYear();
+        const fromYear = currentYear + 1;
+        const toYear = 1970;
+        let options = '<option value=""></option>';
+        for (let year = fromYear; year >= toYear; year--) {
+            const isSelected = String(year) === String(selectedValue) ? 'selected' : '';
+            options += `<option value="${year}" ${isSelected}>${year}</option>`;
+        }
+        return options;
+    }
+
+    // ============ PERIOD FORMATTING (date picker -> teks "Bulan YYYY") ============
+    // Input type="month" mengembalikan nilai format "YYYY-MM". Fungsi ini
+    // mengubahnya jadi teks berbahasa Indonesia, misalnya "2023-08" -> "Agustus 2023".
+    formatMonthID(value) {
+        if (!value) return '';
+        const bulanID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const [year, month] = value.split('-');
+        const idx = parseInt(month, 10) - 1;
+        if (isNaN(idx) || !bulanID[idx] || !year) return value;
+        return `${bulanID[idx]} ${year}`;
+    }
+
+    // Menggabungkan tanggal mulai/selesai (atau "Sekarang" jika masih
+    // berlangsung) jadi satu string periode, misalnya "Agustus 2023 - Sekarang".
+    formatPeriodID(startValue, endValue, ongoing) {
+        const start = this.formatMonthID(startValue);
+        const end = ongoing ? 'Sekarang' : this.formatMonthID(endValue);
+        if (start && end) return `${start} - ${end}`;
+        return start || end || '';
+    }
+
+    // Menggabungkan tahun mulai/selesai (atau "Sekarang" jika masih
+    // berlangsung) jadi satu string periode, misalnya "2020 - 2024".
+    formatYearPeriodID(startYear, endYear, ongoing) {
+        const end = ongoing ? 'Sekarang' : (endYear || '');
+        if (startYear && end) return `${startYear} - ${end}`;
+        return startYear || end || '';
+    }
+
     // ============ HELPER ============
     escapeHtml(text) {
         if (!text) return '';
@@ -320,22 +415,28 @@ class CreativeCvBuilder {
     collectFormData() {
         const experiences = [];
         document.querySelectorAll('#creativeExperienceContainer .work-item').forEach(item => {
+            const periodStart = item.querySelector('.creative-exp-period-start').value;
+            const periodEnd = item.querySelector('.creative-exp-period-end').value;
+            const ongoing = item.querySelector('.creative-exp-period-ongoing').checked;
             experiences.push({
                 company: item.querySelector('.creative-exp-company').value,
                 position: item.querySelector('.creative-exp-position').value,
                 location: item.querySelector('.creative-exp-location').value,
-                period: item.querySelector('.creative-exp-period').value,
+                period: this.formatPeriodID(periodStart, periodEnd, ongoing),
                 description: item.querySelector('.creative-exp-description').value
             });
         });
 
         const educations = [];
         document.querySelectorAll('#creativeEducationContainer .education-item').forEach(item => {
+            const periodStart = item.querySelector('.creative-edu-period-start').value;
+            const periodEnd = item.querySelector('.creative-edu-period-end').value;
+            const ongoing = item.querySelector('.creative-edu-period-ongoing').checked;
             educations.push({
                 major: item.querySelector('.creative-edu-major').value,
                 institution: item.querySelector('.creative-edu-institution').value,
                 location: item.querySelector('.creative-edu-location').value,
-                period: item.querySelector('.creative-edu-period').value
+                period: this.formatYearPeriodID(periodStart, periodEnd, ongoing)
             });
         });
 
