@@ -13,18 +13,15 @@ class CVBuilderApp {
         // the site entirely once the user goes into the CV builder.
         history.replaceState({ screen: 'welcome' }, '', window.location.pathname + window.location.search);
 
-this.hideLoading();
-this.bindEvents();
-this.loadTheme();
-this.loadTitleColor();
-this.loadCvFont();
-this.setupFileUpload();
-
-// Buat sertifikasi kosong dan pasang event upload
-}
-
-// Jangan isi data contoh otomatis
-// this.populateSampleData();
+        this.hideLoading();
+        this.bindEvents();
+        this.loadTheme();
+        this.loadTitleColor();
+        this.loadCvFont();
+        this.setupFileUpload();
+        // Initialize with sample data for demo
+        this.populateSampleData();
+    }
 
     hideLoading() {
         const loadingScreen = document.getElementById('loading-screen');
@@ -118,40 +115,51 @@ this.setupFileUpload();
         if (backToHomeBtnCreative) {
             backToHomeBtnCreative.addEventListener('click', () => this.showWelcomeScreen());
         }
+
+        // Klik gambar sertifikat di preview untuk membukanya di tab baru.
+        // Pakai event delegation karena elemen ini di-render ulang tiap kali
+        // updatePreview() dipanggil.
+        const cvPreview = document.getElementById('cvPreview');
+        if (cvPreview) {
+            cvPreview.addEventListener('click', (e) => {
+                const target = e.target.closest('[data-cert-image]');
+                if (target) {
+                    const win = window.open();
+                    if (win) {
+                        win.document.write(`<img src="${target.dataset.certImage}" style="max-width:100%;height:auto;">`);
+                    }
+                }
+            });
+        }
     }
 
     populateSampleData() {
+        // Form dimulai kosong (tidak ada data contoh/dummy). Setiap section
+        // multi-entry tetap diberi satu baris kosong supaya user langsung
+        // tahu di mana harus mengetik, tapi tanpa isi apa pun di dalamnya.
         const sampleData = {
-            fullName: 'Dimas Febrianto',
-            position: 'INFORMATION TECHNOLOGY ENTHUSIASTS | INTERNET OF THINGS | DATA SCIENTIST | ARTIFICIAL INTELLIGENCE',
-            email: 'febridimas905@gmail.com',
-            phone: '(+62)85923164876',
-            linkedin: 'linkedin.com/in/dimasfeb',
-            portfolio: 'myportofolio-main1.netlify.app',
-            domicile: 'Kota Sidoarjo, Jawa Timur',
-            aboutMe: 'Fresh graduate Sarjana Informatika dengan latar belakang Teknik Jaringan Akses Telekomunikasi dan minat pada bidang telekomunikasi, networking, serta system integration. Memiliki pengalaman mengembangkan berbagai proyek teknologi selama pendidikan, termasuk sistem berbasis ESP32, MQTT, dan komunikasi data. Terbiasa melakukan troubleshooting, mengembangkan aplikasi berbasis web, serta mengolah data menggunakan Python. Memiliki kemampuan problem solving, komunikasi, kerja sama tim, dan mampu beradaptasi serta mempelajari teknologi baru dengan cepat.',
+            fullName: '',
+            position: '',
+            email: '',
+            phone: '',
+            linkedin: '',
+            portfolio: '',
+            domicile: '',
+            aboutMe: '',
             education: [
-                { institution: 'SMK Telkom Sidoarjo', major: 'Teknik Jaringan Akses Telekomunikasi', location: 'Sidoarjo, Jawa Timur', period: '2019-2022', gpa: '' },
-                { institution: 'Universitas Telkom Surabaya', major: 'Sarjana Informatika', location: 'Surabaya, Jawa Timur', period: '2022-2026', gpa: 'GPA: 3.58' }
+                { institution: '', major: '', location: '', period: '', gpa: '' }
             ],
             internships: [
-                { company: 'PT Digipreneur', position: 'Web Developer (Wordpress)', location: 'Surabaya, Jawa Timur', period: 'Juni 2021 – Desember 2021', description: '• Mengembangkan dan mengelola website berbasis WordPress sesuai kebutuhan konten dan tampilan.\n• Mengoptimalkan konten halaman website melalui penyusunan dan penyesuaian teks sesuai kebutuhan.\n• Melakukan web scraping untuk mengumpulkan dan mengolah data sesuai kebutuhan proyek.\n• Melakukan quality checking pada halaman website untuk memastikan fungsi tampilan dan konten berjalan sesuai.' }
+                { company: '', position: '', location: '', period: '', description: '' }
             ],
             workExperiences: [],
             organizations: [],
             projects: [],
             skills: [
-                { category: 'Networking', items: 'Computer Networking, TCP/IP, Routing, Switching, MikroTik, Network Troubleshooting' },
-                { category: 'IT Support', items: 'Computer Troubleshooting, Hardware Troubleshooting, Software Troubleshooting, Operating Systems' },
-                { category: 'Programming', items: 'Python, PHP, JavaScript, Flask' },
-                { category: 'IoT', items: 'ESP32, MQTT, Firebase, Sensor Integration' },
-                { category: 'Tools', items: 'Linux, Git, Docker, XAMPP' },
-                { category: 'AI & Data', items: 'Machine Learning, KNN, OpenCV, MediaPipe' }
+                { category: '', items: '' }
             ],
             certifications: [
-                { name: 'MikroTik MTCNA', issuer: 'MikroTik Academy', year: '2023', image: null },
-                { name: 'Cisco AI Fundamentals', issuer: 'Cisco Networking Academy', year: '2024', image: null },
-                { name: 'Komdigi Network Administrator', issuer: 'Kominfo', year: '2024', image: null }
+                { name: '', issuer: '', year: '', image: null }
             ]
         };
 
@@ -587,32 +595,39 @@ this.setupFileUpload();
         const preview = div.querySelector('.cert-preview');
         const removeBtn = div.querySelector('.btn-remove-cert-image');
         
-        fileInput.addEventListener('change', (e) => {
+        fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
-            if (file) {
-                // Validate file type
-                const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-                if (!validTypes.includes(file.type)) {
-                    this.showToast('Format file tidak didukung. Gunakan JPG, JPEG, atau PNG', 'error');
-                    fileInput.value = '';
-                    return;
-                }
-                
-                // Validate file size (max 2MB)
-                if (file.size > 2 * 1024 * 1024) {
-                    this.showToast('Ukuran file terlalu besar. Maksimal 2MB', 'error');
-                    fileInput.value = '';
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    preview.innerHTML = `<img src="${e.target.result}" alt="Sertifikat">`;
-                    removeBtn.classList.remove('hidden');
-                    this.updatePreview();
-                    this.showToast('Gambar sertifikat berhasil diupload', 'success');
-                };
-                reader.readAsDataURL(file);
+            if (!file) return;
+
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                this.showToast('Format file tidak didukung. Gunakan JPG, JPEG, atau PNG', 'error');
+                fileInput.value = '';
+                return;
+            }
+
+            // Batas ukuran file asli sebelum dikompres. Foto sertifikat dari
+            // kamera HP biasanya 3-8MB, jadi batas dinaikkan ke 15MB. Gambar
+            // tetap akan dikompres/diperkecil otomatis di bawah supaya ringan.
+            if (file.size > 15 * 1024 * 1024) {
+                this.showToast('Ukuran file terlalu besar. Maksimal 15MB', 'error');
+                fileInput.value = '';
+                return;
+            }
+
+            this.showToast('Memproses gambar sertifikat...', 'info');
+
+            try {
+                const compressedDataUrl = await this.compressImageFile(file, 1200, 0.82);
+                preview.innerHTML = `<img src="${compressedDataUrl}" alt="Sertifikat">`;
+                removeBtn.classList.remove('hidden');
+                this.updatePreview();
+                this.showToast('Gambar sertifikat berhasil diupload', 'success');
+            } catch (error) {
+                console.error('Gagal memproses gambar sertifikat:', error);
+                this.showToast('Gagal memproses gambar. Coba gunakan foto lain', 'error');
+                fileInput.value = '';
             }
         });
         
@@ -651,6 +666,41 @@ this.setupFileUpload();
         document.querySelectorAll('#cvForm .certification-item .btn-remove-cert').forEach(btn => btn.classList.remove('hidden'));
         this.updatePreview();
         this.showToast('Sertifikasi ditambahkan', 'success');
+    }
+
+    // ============ IMAGE COMPRESSION ============
+    // Membaca sebuah File gambar, memperkecil sisi terpanjangnya ke maxWidth,
+    // lalu mengekspornya sebagai JPEG dengan kualitas tertentu. Ini mencegah
+    // foto besar dari kamera HP (beberapa MB) membuat halaman berat atau
+    // gagal diproses, tanpa harus menolak upload penggunanya.
+    compressImageFile(file, maxWidth = 1200, quality = 0.82) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = () => reject(new Error('Gagal membaca file'));
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onerror = () => reject(new Error('Gagal memuat gambar'));
+                img.onload = () => {
+                    const scale = Math.min(1, maxWidth / img.width);
+                    const targetWidth = Math.round(img.width * scale);
+                    const targetHeight = Math.round(img.height * scale);
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+                    try {
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
     }
 
     // ============ HELPER METHODS ============
@@ -925,7 +975,7 @@ this.setupFileUpload();
                             ${cert.year ? `<span class="cert-year"> (${this.escapeHtml(cert.year)})</span>` : ''}
                         </div>
                         ${cert.image ? `
-                            <div class="preview-cert-image" onclick="window.open('${cert.image}', '_blank')">
+                            <div class="preview-cert-image" data-cert-image="${this.escapeHtml(cert.image)}">
                                 <img src="${cert.image}" alt="${this.escapeHtml(cert.name)}">
                             </div>
                         ` : ''}
