@@ -112,7 +112,7 @@
                                     </h3>
                                     <div class="form-group">
                                         <label for="fullName">Nama Lengkap</label>
-                                        <input type="text" id="fullName" placeholder="namamu" class="form-input">
+                                        <input type="text" id="fullName" placeholder="nama" class="form-input">
                                     </div>
                                     <div class="form-group">
                                         <label for="position">Posisi / Jabatan</label>
@@ -122,7 +122,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="email">Email</label>
-                                        <input type="email" id="email" placeholder="" class="form-input">
+                                        <input type="email" id="email" placeholder="nama akun" class="form-input">
                                     </div>
                                     <div class="form-group">
                                         <label for="phone">Telepon</label>
@@ -130,7 +130,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="linkedin">LinkedIn</label>
-                                        <input type="url" id="linkedin" placeholder="" class="form-input">
+                                        <input type="url" id="linkedin" placeholder="akun linkdln" class="form-input">
                                     </div>
                                     <div class="form-group">
                                         <label for="portfolio">Portofolio</label>
@@ -139,7 +139,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="domicile">Domisili</label>
-                                        <input type="text" id="domicile" placeholder="kota, provinsi"
+                                        <input type="text" id="domicile" placeholder="Kota, provinsi"
                                             class="form-input">
                                     </div>
                                 </div>
@@ -308,24 +308,31 @@
                                         <div class="organization-item">
                                             <div class="form-group">
                                                 <label>Organisasi</label>
-                                                <input type="text" class="form-input org-name"
-                                                    placeholder="Nama organisasi">
+                                                <input type="text" class="form-input org-name" maxlength="60"
+                                                    placeholder="Nama organisasi (maks. 60 karakter)">
                                             </div>
                                             <div class="form-group">
                                                 <label>Posisi</label>
-                                                <input type="text" class="form-input org-position"
+                                                <input type="text" class="form-input org-position" maxlength="60"
                                                     placeholder="Posisi/jabatan">
                                             </div>
                                             <div class="form-row">
                                                 <div class="form-group">
                                                     <label>Lokasi</label>
-                                                    <input type="text" class="form-input org-location"
+                                                    <input type="text" class="form-input org-location" maxlength="60"
                                                         placeholder="Kota, Provinsi">
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Periode</label>
-                                                    <input type="text" class="form-input org-period"
-                                                        placeholder="Bulan YYYY – Bulan YYYY">
+                                                    <div class="period-picker">
+                                                        <input type="month" class="form-input org-period-start">
+                                                        <span class="period-sep">–</span>
+                                                        <input type="month" class="form-input org-period-end">
+                                                    </div>
+                                                    <label class="period-ongoing-label">
+                                                        <input type="checkbox" class="org-period-ongoing">
+                                                        Masih berlangsung (Sekarang)
+                                                    </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -729,7 +736,7 @@
         <!-- Footer -->
         <footer class="app-footer">
             <div class="container">
-                <p>&copy; 2026 Insyallah Amanah.</p>
+                <p>&copy; 2024 CV Builder. All rights reserved.</p>
             </div>
         </footer>
     </div>
