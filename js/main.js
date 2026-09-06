@@ -13,20 +13,22 @@ class CVBuilderApp {
         // the site entirely once the user goes into the CV builder.
         history.replaceState({ screen: 'welcome' }, '', window.location.pathname + window.location.search);
 
-        this.hideLoading();
-        this.bindEvents();
-        this.loadTheme();
-        this.loadTitleColor();
-        this.loadCvFont();
-        this.setupFileUpload();
+this.hideLoading();
+this.bindEvents();
+this.loadTheme();
+this.loadTitleColor();
+this.loadCvFont();
+this.setupFileUpload();
 
-        const certContainer = document.getElementById('certificationContainer');
+// Buat sertifikasi kosong dan pasang event upload
+const certContainer = document.getElementById('certificationContainer');
 if (certContainer) {
     certContainer.innerHTML = '';
     certContainer.appendChild(this.createCertificationItem());
 }
-        // Initialize with sample data for demo
-        //this.populateSampleData();
+
+// Jangan isi data contoh otomatis
+// this.populateSampleData();
 
     hideLoading() {
         const loadingScreen = document.getElementById('loading-screen');
