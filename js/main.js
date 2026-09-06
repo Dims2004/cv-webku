@@ -20,7 +20,7 @@ class CVBuilderApp {
         this.loadCvFont();
         this.setupFileUpload();
         // Initialize with sample data for demo
-        this.populateSampleData();
+        //this.populateSampleData();
     }
 
     hideLoading() {
