@@ -116,6 +116,21 @@ class CVBuilderApp {
             backToHomeBtnCreative.addEventListener('click', () => this.showWelcomeScreen());
         }
 
+        // Checkbox "Masih berlangsung" pada Pengalaman Organisasi: pakai
+        // event delegation di level container supaya berlaku baik untuk item
+        // bawaan (statis di index.html) maupun item yang ditambah lewat tombol.
+        const organizationContainer = document.getElementById('organizationContainer');
+        if (organizationContainer) {
+            organizationContainer.addEventListener('change', (e) => {
+                if (!e.target.classList.contains('org-period-ongoing')) return;
+                const item = e.target.closest('.organization-item');
+                const endInput = item.querySelector('.org-period-end');
+                endInput.disabled = e.target.checked;
+                if (e.target.checked) endInput.value = '';
+                this.updatePreview();
+            });
+        }
+
         // Klik gambar sertifikat di preview untuk membukanya di tab baru.
         // Pakai event delegation karena elemen ini di-render ulang tiap kali
         // updatePreview() dipanggil.
@@ -395,26 +410,35 @@ class CVBuilderApp {
     }
 
     // ============ ORGANIZATION ============
-    createOrganizationItem(data = { name: '', position: '', location: '', period: '', description: '' }) {
+    createOrganizationItem(data = { name: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '' }) {
         const div = document.createElement('div');
         div.className = 'organization-item';
+        const isOngoing = !!data.ongoing;
         div.innerHTML = `
             <div class="form-group">
                 <label>Organisasi</label>
-                <input type="text" class="form-input org-name" value="${this.escapeHtml(data.name)}" placeholder="Nama organisasi">
+                <input type="text" class="form-input org-name" maxlength="60" value="${this.escapeHtml(data.name)}" placeholder="Nama organisasi (maks. 60 karakter)">
             </div>
             <div class="form-group">
                 <label>Posisi</label>
-                <input type="text" class="form-input org-position" value="${this.escapeHtml(data.position)}" placeholder="Posisi/jabatan">
+                <input type="text" class="form-input org-position" maxlength="60" value="${this.escapeHtml(data.position)}" placeholder="Posisi/jabatan">
             </div>
             <div class="form-row">
                 <div class="form-group">
                     <label>Lokasi</label>
-                    <input type="text" class="form-input org-location" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi">
+                    <input type="text" class="form-input org-location" maxlength="60" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi">
                 </div>
                 <div class="form-group">
                     <label>Periode</label>
-                    <input type="text" class="form-input org-period" value="${this.escapeHtml(data.period)}" placeholder="Bulan YYYY – Bulan YYYY">
+                    <div class="period-picker">
+                        <input type="month" class="form-input org-period-start" value="${this.escapeHtml(data.periodStart || '')}">
+                        <span class="period-sep">–</span>
+                        <input type="month" class="form-input org-period-end" value="${this.escapeHtml(data.periodEnd || '')}" ${isOngoing ? 'disabled' : ''}>
+                    </div>
+                    <label class="period-ongoing-label">
+                        <input type="checkbox" class="org-period-ongoing" ${isOngoing ? 'checked' : ''}>
+                        Masih berlangsung (Sekarang)
+                    </label>
                 </div>
             </div>
             <div class="form-group">
@@ -425,11 +449,11 @@ class CVBuilderApp {
                 <i class="fas fa-times"></i> Hapus
             </button>
         `;
-        
+
         div.querySelectorAll('input, textarea').forEach(input => {
             input.addEventListener('input', () => this.updatePreview());
         });
-        
+
         div.querySelector('.btn-remove-org').addEventListener('click', () => {
             if (document.querySelectorAll('#cvForm .organization-item').length > 1) {
                 div.remove();
@@ -439,7 +463,7 @@ class CVBuilderApp {
                 this.showToast('Minimal harus ada satu pengalaman organisasi', 'error');
             }
         });
-        
+
         return div;
     }
 
@@ -666,6 +690,28 @@ class CVBuilderApp {
         document.querySelectorAll('#cvForm .certification-item .btn-remove-cert').forEach(btn => btn.classList.remove('hidden'));
         this.updatePreview();
         this.showToast('Sertifikasi ditambahkan', 'success');
+    }
+
+    // ============ PERIOD FORMATTING (date picker -> teks "Bulan YYYY") ============
+    // Input type="month" mengembalikan nilai format "YYYY-MM". Fungsi ini
+    // mengubahnya jadi teks berbahasa Indonesia, misalnya "2023-08" -> "Agustus 2023".
+    formatMonthID(value) {
+        if (!value) return '';
+        const bulanID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const [year, month] = value.split('-');
+        const idx = parseInt(month, 10) - 1;
+        if (isNaN(idx) || !bulanID[idx] || !year) return value;
+        return `${bulanID[idx]} ${year}`;
+    }
+
+    // Menggabungkan tanggal mulai/selesai (atau "Sekarang" jika masih berlangsung)
+    // jadi satu string periode, misalnya "Agustus 2023 - Sekarang".
+    formatPeriodID(startValue, endValue, ongoing) {
+        const start = this.formatMonthID(startValue);
+        const end = ongoing ? 'Sekarang' : this.formatMonthID(endValue);
+        if (start && end) return `${start} - ${end}`;
+        return start || end || '';
     }
 
     // ============ IMAGE COMPRESSION ============
@@ -1088,11 +1134,14 @@ class CVBuilderApp {
 
         const organizations = [];
         document.querySelectorAll('#cvForm .organization-item').forEach(item => {
+            const periodStart = item.querySelector('.org-period-start').value;
+            const periodEnd = item.querySelector('.org-period-end').value;
+            const ongoing = item.querySelector('.org-period-ongoing').checked;
             organizations.push({
                 name: item.querySelector('.org-name').value,
                 position: item.querySelector('.org-position').value,
                 location: item.querySelector('.org-location').value,
-                period: item.querySelector('.org-period').value,
+                period: this.formatPeriodID(periodStart, periodEnd, ongoing),
                 description: item.querySelector('.org-description').value
             });
         });
