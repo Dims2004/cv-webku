@@ -778,6 +778,26 @@
 
     <!-- Toast Notification -->
     <div id="toastContainer" class="toast-container"></div>
+    <!-- Welcome Popup: muncul otomatis saat pertama kali membuka website -->
+<div id="welcomeModal" class="modal-overlay hidden">
+    <div class="modal-box">
+        <button id="closeWelcomeModal" class="modal-close" aria-label="Tutup">
+            <i class="fas fa-times"></i>
+        </button>
+        <h2 class="modal-title">🙏 Terima Kasih Sudah Mampir!</h2>
+        <p class="modal-subtitle">
+            Website ini bisa digunakan sepenuhnya <strong>gratis</strong>, semoga bermanfaat
+            dan membawa keberkahan untuk perjalanan karier Anda.<br><br>
+            Semua data CV Anda diproses langsung di browser sendiri — tidak disimpan
+            maupun dikirim ke server atau repository mana pun, jadi privasi Anda
+            sepenuhnya terjaga.
+        </p>
+        <button type="button" id="welcomeModalOkBtn" class="btn-primary">
+            <i class="fas fa-check"></i>
+            Mengerti, Mulai Sekarang
+        </button>
+    </div>
+</div>
 
     <!-- CV Type Selection Modal -->
     <div id="cvTypeModal" class="modal-overlay hidden">
