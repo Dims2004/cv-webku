@@ -141,6 +141,28 @@ class CVBuilderApp {
                 }
             });
         }
+
+        // --- Welcome popup (muncul sekali per browser saat pertama kali buka) ---
+        const welcomeModal = document.getElementById('welcomeModal');
+        if (welcomeModal) {
+            const WELCOME_KEY = 'cvbuilder_welcome_shown';
+            if (!localStorage.getItem(WELCOME_KEY)) {
+                setTimeout(() => {
+                    welcomeModal.classList.remove('hidden');
+                }, 1300); // muncul setelah loading screen selesai
+            }
+
+            const closeWelcome = () => {
+                welcomeModal.classList.add('hidden');
+                localStorage.setItem(WELCOME_KEY, '1');
+            };
+
+            document.getElementById('closeWelcomeModal').addEventListener('click', closeWelcome);
+            document.getElementById('welcomeModalOkBtn').addEventListener('click', closeWelcome);
+            welcomeModal.addEventListener('click', (e) => {
+                if (e.target.id === 'welcomeModal') closeWelcome();
+            });
+        }
     }
 
     populateSampleData() {
