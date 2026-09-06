@@ -183,8 +183,15 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Periode</label>
-                                                    <input type="text" class="form-input edu-period"
-                                                        placeholder="YYYY-YYYY">
+                                                    <div class="period-picker">
+                                                        <select class="form-input edu-period-start"></select>
+                                                        <span class="period-sep">–</span>
+                                                        <select class="form-input edu-period-end"></select>
+                                                    </div>
+                                                    <label class="period-ongoing-label">
+                                                        <input type="checkbox" class="edu-period-ongoing">
+                                                        Masih berkuliah (Sekarang)
+                                                    </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -230,8 +237,15 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Periode</label>
-                                                    <input type="text" class="form-input int-period"
-                                                        placeholder="Bulan YYYY – Bulan YYYY">
+                                                    <div class="period-picker">
+                                                        <input type="month" class="form-input int-period-start">
+                                                        <span class="period-sep">–</span>
+                                                        <input type="month" class="form-input int-period-end">
+                                                    </div>
+                                                    <label class="period-ongoing-label">
+                                                        <input type="checkbox" class="int-period-ongoing">
+                                                        Masih magang (Sekarang)
+                                                    </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -277,8 +291,15 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Periode</label>
-                                                    <input type="text" class="form-input work-period"
-                                                        placeholder="Bulan YYYY – Bulan YYYY">
+                                                    <div class="period-picker">
+                                                        <input type="month" class="form-input work-period-start">
+                                                        <span class="period-sep">–</span>
+                                                        <input type="month" class="form-input work-period-end">
+                                                    </div>
+                                                    <label class="period-ongoing-label">
+                                                        <input type="checkbox" class="work-period-ongoing">
+                                                        Masih bekerja di sini (Sekarang)
+                                                    </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -436,7 +457,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label>Tahun</label>
-                                                <input type="text" class="form-input cert-year" placeholder="YYYY">
+                                                <select class="form-input cert-year"></select>
                                             </div>
                                             <div class="form-group">
                                                 <label>Upload Sertifikat (JPG, JPEG, PNG)</label>
@@ -626,8 +647,15 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Periode</label>
-                                                    <input type="text" class="form-input creative-exp-period"
-                                                        placeholder="Bulan YYYY - Bulan YYYY">
+                                                    <div class="period-picker">
+                                                        <input type="month" class="form-input creative-exp-period-start">
+                                                        <span class="period-sep">–</span>
+                                                        <input type="month" class="form-input creative-exp-period-end">
+                                                    </div>
+                                                    <label class="period-ongoing-label">
+                                                        <input type="checkbox" class="creative-exp-period-ongoing">
+                                                        Masih berlangsung (Sekarang)
+                                                    </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -672,8 +700,15 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Periode</label>
-                                                    <input type="text" class="form-input creative-edu-period"
-                                                        placeholder="YYYY-YYYY">
+                                                    <div class="period-picker">
+                                                        <select class="form-input creative-edu-period-start"></select>
+                                                        <span class="period-sep">–</span>
+                                                        <select class="form-input creative-edu-period-end"></select>
+                                                    </div>
+                                                    <label class="period-ongoing-label">
+                                                        <input type="checkbox" class="creative-edu-period-ongoing">
+                                                        Masih berkuliah (Sekarang)
+                                                    </label>
                                                 </div>
                                             </div>
                                             <button type="button" class="btn-remove-edu hidden">
