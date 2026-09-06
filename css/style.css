@@ -680,6 +680,7 @@ body.dark-theme .btn-remove-skill:hover {
     padding: 30px;
     box-shadow: var(--shadow-sm);
     transition: var(--transition);
+    overflow: hidden;
 }
 
 body.dark-theme .cv-preview {
@@ -692,6 +693,14 @@ body.dark-theme .cv-preview {
     font-family: var(--cv-font-family, var(--font-family));
     color: #1a1a2e;
     max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.cv-preview-content * {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 body.dark-theme .cv-preview-content {
@@ -978,6 +987,42 @@ body.dark-theme .preview-skills-bullet-list {
 
 .preview-skills-bullet-list li strong {
     font-weight: 700;
+}
+
+/* ============ PERIOD DATE PICKER (Mulai - Selesai / Sekarang) ============ */
+.period-picker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.period-picker .form-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.period-sep {
+    color: var(--text-muted);
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.period-ongoing-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--text-secondary, var(--text-muted));
+    cursor: pointer;
+    font-weight: 400;
+}
+
+.period-ongoing-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
 }
 
 /* ============ CERTIFICATE UPLOAD ============ */
