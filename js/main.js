@@ -73,8 +73,9 @@ class CVBuilderApp {
         });
 
         // Form inputs - auto update preview
-        document.querySelectorAll('#cvForm input:not(.cert-file-input), #cvForm textarea').forEach(input => {
+        document.querySelectorAll('#cvForm input:not(.cert-file-input), #cvForm textarea, #cvForm select').forEach(input => {
             input.addEventListener('input', () => this.updatePreview());
+            input.addEventListener('change', () => this.updatePreview());
         });
 
         // Add buttons
@@ -116,20 +117,14 @@ class CVBuilderApp {
             backToHomeBtnCreative.addEventListener('click', () => this.showWelcomeScreen());
         }
 
-        // Checkbox "Masih berlangsung" pada Pengalaman Organisasi: pakai
-        // event delegation di level container supaya berlaku baik untuk item
-        // bawaan (statis di index.html) maupun item yang ditambah lewat tombol.
-        const organizationContainer = document.getElementById('organizationContainer');
-        if (organizationContainer) {
-            organizationContainer.addEventListener('change', (e) => {
-                if (!e.target.classList.contains('org-period-ongoing')) return;
-                const item = e.target.closest('.organization-item');
-                const endInput = item.querySelector('.org-period-end');
-                endInput.disabled = e.target.checked;
-                if (e.target.checked) endInput.value = '';
-                this.updatePreview();
-            });
-        }
+        // Checkbox "Masih berlangsung/Sekarang" pada tiap section periode:
+        // pakai event delegation di level container supaya berlaku baik
+        // untuk item bawaan (statis di index.html) maupun item yang
+        // ditambah lewat tombol "Tambah...".
+        this.setupOngoingCheckbox('educationContainer', '.education-item', 'edu-period-ongoing', 'edu-period-end');
+        this.setupOngoingCheckbox('internshipContainer', '.internship-item', 'int-period-ongoing', 'int-period-end');
+        this.setupOngoingCheckbox('workContainer', '.work-item', 'work-period-ongoing', 'work-period-end');
+        this.setupOngoingCheckbox('organizationContainer', '.organization-item', 'org-period-ongoing', 'org-period-end');
 
         // Klik gambar sertifikat di preview untuk membukanya di tab baru.
         // Pakai event delegation karena elemen ini di-render ulang tiap kali
@@ -162,10 +157,10 @@ class CVBuilderApp {
             domicile: '',
             aboutMe: '',
             education: [
-                { institution: '', major: '', location: '', period: '', gpa: '' }
+                { institution: '', major: '', location: '', periodStart: '', periodEnd: '', ongoing: false, gpa: '' }
             ],
             internships: [
-                { company: '', position: '', location: '', period: '', description: '' }
+                { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '' }
             ],
             workExperiences: [],
             organizations: [],
@@ -236,9 +231,10 @@ class CVBuilderApp {
     }
 
     // ============ EDUCATION ============
-    createEducationItem(data = { institution: '', major: '', location: '', period: '', gpa: '' }) {
+    createEducationItem(data = { institution: '', major: '', location: '', periodStart: '', periodEnd: '', ongoing: false, gpa: '' }) {
         const div = document.createElement('div');
         div.className = 'education-item';
+        const isOngoing = !!data.ongoing;
         div.innerHTML = `
             <div class="form-group">
                 <label>Institusi</label>
@@ -255,7 +251,15 @@ class CVBuilderApp {
                 </div>
                 <div class="form-group">
                     <label>Periode</label>
-                    <input type="text" class="form-input edu-period" value="${this.escapeHtml(data.period)}" placeholder="YYYY-YYYY">
+                    <div class="period-picker">
+                        <select class="form-input edu-period-start">${this.buildYearOptions(data.periodStart)}</select>
+                        <span class="period-sep">–</span>
+                        <select class="form-input edu-period-end" ${isOngoing ? 'disabled' : ''}>${this.buildYearOptions(data.periodEnd)}</select>
+                    </div>
+                    <label class="period-ongoing-label">
+                        <input type="checkbox" class="edu-period-ongoing" ${isOngoing ? 'checked' : ''}>
+                        Masih berkuliah (Sekarang)
+                    </label>
                 </div>
             </div>
             <div class="form-group">
@@ -267,8 +271,9 @@ class CVBuilderApp {
             </button>
         `;
         
-        div.querySelectorAll('input').forEach(input => {
+        div.querySelectorAll('input, select').forEach(input => {
             input.addEventListener('input', () => this.updatePreview());
+            input.addEventListener('change', () => this.updatePreview());
         });
         
         div.querySelector('.btn-remove-edu').addEventListener('click', () => {
@@ -294,9 +299,10 @@ class CVBuilderApp {
     }
 
     // ============ INTERNSHIP ============
-    createInternshipItem(data = { company: '', position: '', location: '', period: '', description: '' }) {
+    createInternshipItem(data = { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '' }) {
         const div = document.createElement('div');
         div.className = 'internship-item';
+        const isOngoing = !!data.ongoing;
         div.innerHTML = `
             <div class="form-group">
                 <label>Perusahaan</label>
@@ -313,7 +319,15 @@ class CVBuilderApp {
                 </div>
                 <div class="form-group">
                     <label>Periode</label>
-                    <input type="text" class="form-input int-period" value="${this.escapeHtml(data.period)}" placeholder="Bulan YYYY – Bulan YYYY">
+                    <div class="period-picker">
+                        <input type="month" class="form-input int-period-start" value="${this.escapeHtml(data.periodStart || '')}">
+                        <span class="period-sep">–</span>
+                        <input type="month" class="form-input int-period-end" value="${this.escapeHtml(data.periodEnd || '')}" ${isOngoing ? 'disabled' : ''}>
+                    </div>
+                    <label class="period-ongoing-label">
+                        <input type="checkbox" class="int-period-ongoing" ${isOngoing ? 'checked' : ''}>
+                        Masih magang (Sekarang)
+                    </label>
                 </div>
             </div>
             <div class="form-group">
@@ -327,6 +341,7 @@ class CVBuilderApp {
         
         div.querySelectorAll('input, textarea').forEach(input => {
             input.addEventListener('input', () => this.updatePreview());
+            input.addEventListener('change', () => this.updatePreview());
         });
         
         div.querySelector('.btn-remove-int').addEventListener('click', () => {
@@ -352,9 +367,10 @@ class CVBuilderApp {
     }
 
     // ============ WORK EXPERIENCE ============
-    createWorkItem(data = { company: '', position: '', location: '', period: '', description: '' }) {
+    createWorkItem(data = { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '' }) {
         const div = document.createElement('div');
         div.className = 'work-item';
+        const isOngoing = !!data.ongoing;
         div.innerHTML = `
             <div class="form-group">
                 <label>Perusahaan</label>
@@ -371,7 +387,15 @@ class CVBuilderApp {
                 </div>
                 <div class="form-group">
                     <label>Periode</label>
-                    <input type="text" class="form-input work-period" value="${this.escapeHtml(data.period)}" placeholder="Bulan YYYY – Bulan YYYY">
+                    <div class="period-picker">
+                        <input type="month" class="form-input work-period-start" value="${this.escapeHtml(data.periodStart || '')}">
+                        <span class="period-sep">–</span>
+                        <input type="month" class="form-input work-period-end" value="${this.escapeHtml(data.periodEnd || '')}" ${isOngoing ? 'disabled' : ''}>
+                    </div>
+                    <label class="period-ongoing-label">
+                        <input type="checkbox" class="work-period-ongoing" ${isOngoing ? 'checked' : ''}>
+                        Masih bekerja di sini (Sekarang)
+                    </label>
                 </div>
             </div>
             <div class="form-group">
@@ -385,6 +409,7 @@ class CVBuilderApp {
         
         div.querySelectorAll('input, textarea').forEach(input => {
             input.addEventListener('input', () => this.updatePreview());
+            input.addEventListener('change', () => this.updatePreview());
         });
         
         div.querySelector('.btn-remove-work').addEventListener('click', () => {
@@ -589,7 +614,7 @@ class CVBuilderApp {
             </div>
             <div class="form-group">
                 <label>Tahun</label>
-                <input type="text" class="form-input cert-year" value="${this.escapeHtml(data.year || '')}" placeholder="YYYY">
+                <select class="form-input cert-year">${this.buildYearOptions(data.year)}</select>
             </div>
             <div class="form-group">
                 <label>Upload Sertifikat (JPG, JPEG, PNG)</label>
@@ -676,8 +701,9 @@ class CVBuilderApp {
         });
         
         // Auto update preview on input
-        div.querySelectorAll('input:not(.cert-file-input), textarea').forEach(input => {
+        div.querySelectorAll('input:not(.cert-file-input), textarea, select').forEach(input => {
             input.addEventListener('input', () => this.updatePreview());
+            input.addEventListener('change', () => this.updatePreview());
         });
         
         return div;
@@ -690,6 +716,47 @@ class CVBuilderApp {
         document.querySelectorAll('#cvForm .certification-item .btn-remove-cert').forEach(btn => btn.classList.remove('hidden'));
         this.updatePreview();
         this.showToast('Sertifikasi ditambahkan', 'success');
+    }
+
+    // ============ ONGOING CHECKBOX ("Masih berlangsung / Sekarang") ============
+    // Dipasang lewat event delegation di level container (bukan langsung di
+    // tiap item) supaya tetap berfungsi untuk item bawaan yang statis di
+    // index.html maupun item yang baru ditambahkan lewat tombol "Tambah...".
+    // Saat dicentang: field tanggal akhir dinonaktifkan & dikosongkan.
+    setupOngoingCheckbox(containerId, itemSelector, ongoingClass, endClass) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.addEventListener('change', (e) => {
+            if (!e.target.classList.contains(ongoingClass)) return;
+            const item = e.target.closest(itemSelector);
+            const endInput = item.querySelector('.' + endClass);
+            endInput.disabled = e.target.checked;
+            if (e.target.checked) endInput.value = '';
+            this.updatePreview();
+        });
+    }
+
+    // ============ YEAR DROPDOWN (untuk Periode Pendidikan & Tahun Sertifikasi) ============
+    // Membuat daftar <option> tahun secara otomatis (dari tahun depan mundur
+    // ke belakang) supaya user tinggal memilih, tidak perlu mengetik manual.
+    buildYearOptions(selectedValue = '') {
+        const currentYear = new Date().getFullYear();
+        const fromYear = currentYear + 1;
+        const toYear = 1970;
+        let options = '<option value=""></option>';
+        for (let year = fromYear; year >= toYear; year--) {
+            const isSelected = String(year) === String(selectedValue) ? 'selected' : '';
+            options += `<option value="${year}" ${isSelected}>${year}</option>`;
+        }
+        return options;
+    }
+
+    // Menggabungkan tahun mulai/selesai (atau "Sekarang" jika masih
+    // berlangsung) jadi satu string periode, misalnya "2020 - 2024".
+    formatYearPeriodID(startYear, endYear, ongoing) {
+        const end = ongoing ? 'Sekarang' : (endYear || '');
+        if (startYear && end) return `${startYear} - ${end}`;
+        return startYear || end || '';
     }
 
     // ============ PERIOD FORMATTING (date picker -> teks "Bulan YYYY") ============
@@ -1101,33 +1168,42 @@ class CVBuilderApp {
     collectFormData() {
         const education = [];
         document.querySelectorAll('#cvForm .education-item').forEach(item => {
+            const periodStart = item.querySelector('.edu-period-start').value;
+            const periodEnd = item.querySelector('.edu-period-end').value;
+            const ongoing = item.querySelector('.edu-period-ongoing').checked;
             education.push({
                 institution: item.querySelector('.edu-institution').value,
                 major: item.querySelector('.edu-major').value,
                 location: item.querySelector('.edu-location').value,
-                period: item.querySelector('.edu-period').value,
+                period: this.formatYearPeriodID(periodStart, periodEnd, ongoing),
                 gpa: item.querySelector('.edu-gpa').value
             });
         });
 
         const internships = [];
         document.querySelectorAll('#cvForm .internship-item').forEach(item => {
+            const periodStart = item.querySelector('.int-period-start').value;
+            const periodEnd = item.querySelector('.int-period-end').value;
+            const ongoing = item.querySelector('.int-period-ongoing').checked;
             internships.push({
                 company: item.querySelector('.int-company').value,
                 position: item.querySelector('.int-position').value,
                 location: item.querySelector('.int-location').value,
-                period: item.querySelector('.int-period').value,
+                period: this.formatPeriodID(periodStart, periodEnd, ongoing),
                 description: item.querySelector('.int-description').value
             });
         });
 
         const workExperiences = [];
         document.querySelectorAll('#cvForm .work-item').forEach(item => {
+            const periodStart = item.querySelector('.work-period-start').value;
+            const periodEnd = item.querySelector('.work-period-end').value;
+            const ongoing = item.querySelector('.work-period-ongoing').checked;
             workExperiences.push({
                 company: item.querySelector('.work-company').value,
                 position: item.querySelector('.work-position').value,
                 location: item.querySelector('.work-location').value,
-                period: item.querySelector('.work-period').value,
+                period: this.formatPeriodID(periodStart, periodEnd, ongoing),
                 description: item.querySelector('.work-description').value
             });
         });
