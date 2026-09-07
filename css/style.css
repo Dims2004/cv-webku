@@ -237,6 +237,7 @@ body.dark-theme .app-header {
     height: 110px;
     object-fit: cover;
     border-radius: 20px;
+    margin: 0 auto;
 }
 
 .welcome-content h1 {
