@@ -145,8 +145,7 @@ body.dark-theme .app-header {
 .logo img {
     width: 38px;
     height: 38px;
-    object-fit: cover;
-    border-radius: 8px;
+    object-fit: contain;
 }
 
 .header-actions {
@@ -235,8 +234,7 @@ body.dark-theme .app-header {
 .welcome-icon img {
     width: 110px;
     height: 110px;
-    object-fit: cover;
-    border-radius: 20px;
+    object-fit: contain;
     margin: 0 auto;
 }
 
@@ -350,8 +348,7 @@ body.dark-theme .app-header {
 .form-header h2 img {
     width: 28px;
     height: 28px;
-    object-fit: cover;
-    border-radius: 6px;
+    object-fit: contain;
     flex-shrink: 0;
 }
 
