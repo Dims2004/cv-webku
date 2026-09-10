@@ -26,6 +26,12 @@ class CreativeCvBuilder {
         document.getElementById('previewBtnCreative').addEventListener('click', () => this.updatePreview());
         document.getElementById('downloadPDFBtnCreative').addEventListener('click', () => this.downloadPDF());
 
+        const colorPicker = document.getElementById('creativeColorPicker');
+        if (colorPicker) {
+            colorPicker.addEventListener('input', (e) => this.setAccentColor(e.target.value));
+            this.loadAccentColor();
+        }
+
         // Checkbox "Masih berlangsung/Sekarang" pada Periode: pakai event
         // delegation di level container supaya berlaku baik untuk item
         // bawaan (statis) maupun item yang ditambah lewat tombol "Tambah...".
@@ -46,7 +52,12 @@ class CreativeCvBuilder {
         document.getElementById('creativeEmail').value = '';
         document.getElementById('creativeLinkedin').value = '';
         document.getElementById('creativeInstagram').value = '';
+        document.getElementById('creativeAddress').value = '';
         document.getElementById('creativeAboutMe').value = '';
+        document.getElementById('creativeLanguages').value = '';
+        document.getElementById('creativeTraining').value = '';
+        document.getElementById('creativeCertifications').value = '';
+        document.getElementById('creativeAchievements').value = '';
 
         const experiences = [
             { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '' }
@@ -411,6 +422,31 @@ class CreativeCvBuilder {
         return div.innerHTML;
     }
 
+    // Memecah textarea "satu item per baris" (Bahasa, Pelatihan, Sertifikasi,
+    // Pencapaian) menjadi array string bersih, tanpa baris kosong.
+    parseLines(text) {
+        if (!text) return [];
+        return text.split('\n').map(l => l.trim()).filter(l => l);
+    }
+
+    // ============ WARNA AKSEN (sidebar, judul bagian) ============
+    // Sama seperti CV ATS: warna disimpan lewat CSS custom property supaya
+    // gampang dipakai di banyak selector CSS sekaligus, dan disimpan ke
+    // localStorage supaya pilihan warna tidak hilang saat refresh.
+    setAccentColor(color) {
+        document.documentElement.style.setProperty('--creative-accent-color', color);
+        localStorage.setItem('creativeAccentColor', color);
+    }
+
+    loadAccentColor() {
+        const savedColor = localStorage.getItem('creativeAccentColor');
+        const picker = document.getElementById('creativeColorPicker');
+        const color = savedColor || (picker ? picker.value : '#14b8a6');
+
+        document.documentElement.style.setProperty('--creative-accent-color', color);
+        if (picker) picker.value = color;
+    }
+
     // ============ COLLECT FORM DATA ============
     collectFormData() {
         const experiences = [];
@@ -451,6 +487,11 @@ class CreativeCvBuilder {
 
         return {
             fullName: document.getElementById('creativeFullName').value,
+            address: document.getElementById('creativeAddress').value,
+            languages: this.parseLines(document.getElementById('creativeLanguages').value),
+            training: this.parseLines(document.getElementById('creativeTraining').value),
+            certifications: this.parseLines(document.getElementById('creativeCertifications').value),
+            achievements: this.parseLines(document.getElementById('creativeAchievements').value),
             position: document.getElementById('creativePosition').value,
             phone: document.getElementById('creativePhone').value,
             email: document.getElementById('creativeEmail').value,
@@ -465,19 +506,43 @@ class CreativeCvBuilder {
     }
 
     // ============ UPDATE PREVIEW ============
+    // Layout: sidebar berwarna di kiri (foto, kontak, skills, bahasa,
+    // pencapaian) + konten utama putih di kanan (nama, tentang saya,
+    // pendidikan, pengalaman kerja, pelatihan, sertifikasi). Warna sidebar
+    // diatur lewat --creative-accent-color (lihat setAccentColor) supaya
+    // bisa diganti bebas dari color picker, bukan warna teal yang di-hardcode.
     updatePreview() {
         const preview = document.getElementById('creativeCvPreview');
         if (!preview) return;
         const data = this.collectFormData();
 
-        // Contact list (icons row)
+        // Kontak (sidebar, satu baris per item dengan ikon)
         const contactParts = [];
-        if (data.phone) contactParts.push(`<span><i class="fas fa-phone"></i> ${this.escapeHtml(data.phone)}</span>`);
-        if (data.linkedin) contactParts.push(`<span><i class="fab fa-linkedin"></i> ${this.escapeHtml(data.linkedin)}</span>`);
-        if (data.email) contactParts.push(`<span><i class="fas fa-envelope"></i> ${this.escapeHtml(data.email)}</span>`);
-        if (data.instagram) contactParts.push(`<span><i class="fab fa-instagram"></i> ${this.escapeHtml(data.instagram)}</span>`);
+        if (data.email) contactParts.push(`<li><i class="fas fa-envelope"></i> <span>${this.escapeHtml(data.email)}</span></li>`);
+        if (data.phone) contactParts.push(`<li><i class="fas fa-phone"></i> <span>${this.escapeHtml(data.phone)}</span></li>`);
+        if (data.address) contactParts.push(`<li><i class="fas fa-map-marker-alt"></i> <span>${this.escapeHtml(data.address)}</span></li>`);
+        if (data.linkedin) contactParts.push(`<li><i class="fab fa-linkedin"></i> <span>${this.escapeHtml(data.linkedin)}</span></li>`);
+        if (data.instagram) contactParts.push(`<li><i class="fab fa-instagram"></i> <span>${this.escapeHtml(data.instagram)}</span></li>`);
 
-        // Pengalaman
+        // Keahlian (sidebar): jika kategori diisi, tampil "Kategori: item".
+        // Jika kategori kosong, tiap skill jadi bullet tersendiri (flat list,
+        // seperti contoh referensi) alih-alih digabung dalam satu baris.
+        let skillsHTML = '';
+        data.skills.forEach(skill => {
+            if (!skill.category && !skill.items) return;
+            const itemsList = skill.items ? skill.items.split(',').map(s => s.trim()).filter(s => s) : [];
+            if (skill.category) {
+                skillsHTML += `<li><strong>${this.escapeHtml(skill.category)}:</strong> ${this.escapeHtml(itemsList.join(', '))}</li>`;
+            } else {
+                itemsList.forEach(it => { skillsHTML += `<li>${this.escapeHtml(it)}</li>`; });
+            }
+        });
+
+        // Bahasa & Pencapaian (sidebar)
+        const languagesHTML = data.languages.map(l => `<li>${this.escapeHtml(l)}</li>`).join('');
+        const achievementsHTML = data.achievements.map(a => `<li>${this.escapeHtml(a)}</li>`).join('');
+
+        // Pengalaman Kerja (konten utama)
         let expHTML = '';
         data.experiences.forEach(exp => {
             if (!exp.company && !exp.position) return;
@@ -499,65 +564,90 @@ class CreativeCvBuilder {
             `;
         });
 
-        // Pendidikan
+        // Pendidikan (konten utama)
         let eduHTML = '';
         data.educations.forEach(edu => {
             if (!edu.major && !edu.institution) return;
             eduHTML += `
                 <div class="creative-edu-entry">
-                    <strong>${this.escapeHtml(edu.major || '')}</strong>
-                    <div class="creative-item-sub">${this.escapeHtml(edu.institution || '')}${edu.location ? ' — ' + this.escapeHtml(edu.location) : ''}</div>
+                    <div>${this.escapeHtml(edu.major || '')}</div>
+                    <strong>${this.escapeHtml(edu.institution || '')}${edu.location ? ' — ' + this.escapeHtml(edu.location) : ''}</strong>
                     <div class="creative-item-period">${this.escapeHtml(edu.period || '')}</div>
                 </div>
             `;
         });
 
-        // Keahlian
-        let skillsHTML = '';
-        data.skills.forEach(skill => {
-            if (!skill.category && !skill.items) return;
-            const itemsList = skill.items ? skill.items.split(',').map(s => s.trim()).filter(s => s) : [];
-            const categoryPart = skill.category ? `<strong>${this.escapeHtml(skill.category)}:</strong> ` : '';
-            skillsHTML += `<li>${categoryPart}${this.escapeHtml(itemsList.join(', '))}</li>`;
-        });
+        // Pelatihan & Sertifikasi (konten utama)
+        const trainingHTML = data.training.map(t => `<li>${this.escapeHtml(t)}</li>`).join('');
+        const certificationsHTML = data.certifications.map(c => `<li>${this.escapeHtml(c)}</li>`).join('');
 
         const photoHTML = data.photo
             ? `<img src="${data.photo}" alt="Foto profil">`
             : `<i class="fas fa-user"></i>`;
 
         preview.innerHTML = `
-            <div class="creative-preview-content">
-                <div class="creative-header">
-                    <div class="creative-photo">${photoHTML}</div>
-                    <div class="creative-header-info">
-                        <h1>${this.escapeHtml(data.fullName || 'NAMA LENGKAP')}</h1>
-                        <div class="creative-position">${this.escapeHtml(data.position || 'Posisi / Jabatan')}</div>
-                        <div class="creative-contact-list">${contactParts.join('')}</div>
-                    </div>
-                </div>
-                <div class="creative-divider"></div>
+            <div class="creative-preview-content creative-sidebar-layout">
+                <aside class="creative-sidebar">
+                    <div class="creative-sidebar-photo">${photoHTML}</div>
 
-                ${data.aboutMe ? `
-                <div class="creative-section">
-                    <h2 class="creative-section-title">Profil Singkat</h2>
-                    <p class="creative-about-text">${this.escapeHtml(data.aboutMe)}</p>
-                </div>` : ''}
+                    ${contactParts.length ? `
+                    <div class="creative-sidebar-section">
+                        <h3>Kontak</h3>
+                        <ul class="creative-sidebar-list creative-contact-sidebar-list">${contactParts.join('')}</ul>
+                    </div>` : ''}
 
-                <div class="creative-columns">
-                    <div class="creative-col-left">
-                        ${expHTML ? `
-                        <h2 class="creative-section-title">Pengalaman</h2>
-                        ${expHTML}` : ''}
-                    </div>
-                    <div class="creative-col-right">
-                        ${eduHTML ? `
+                    ${skillsHTML ? `
+                    <div class="creative-sidebar-section">
+                        <h3>Skills</h3>
+                        <ul class="creative-sidebar-list">${skillsHTML}</ul>
+                    </div>` : ''}
+
+                    ${languagesHTML ? `
+                    <div class="creative-sidebar-section">
+                        <h3>Bahasa</h3>
+                        <ul class="creative-sidebar-list">${languagesHTML}</ul>
+                    </div>` : ''}
+
+                    ${achievementsHTML ? `
+                    <div class="creative-sidebar-section">
+                        <h3>Pencapaian</h3>
+                        <ul class="creative-sidebar-list">${achievementsHTML}</ul>
+                    </div>` : ''}
+                </aside>
+
+                <main class="creative-main">
+                    <h1>${this.escapeHtml(data.fullName || 'Nama Lengkap')}</h1>
+                    ${data.position ? `<div class="creative-position">${this.escapeHtml(data.position)}</div>` : ''}
+
+                    ${data.aboutMe ? `
+                    <div class="creative-section">
+                        <h2 class="creative-section-title">Tentang Saya</h2>
+                        <p class="creative-about-text">${this.escapeHtml(data.aboutMe)}</p>
+                    </div>` : ''}
+
+                    ${eduHTML ? `
+                    <div class="creative-section">
                         <h2 class="creative-section-title">Pendidikan</h2>
-                        ${eduHTML}` : ''}
-                        ${skillsHTML ? `
-                        <h2 class="creative-section-title">Keahlian</h2>
-                        <ul class="creative-skills-list">${skillsHTML}</ul>` : ''}
+                        ${eduHTML}
+                    </div>` : ''}
+
+                    <div class="creative-section">
+                        <h2 class="creative-section-title">Pengalaman Kerja</h2>
+                        ${expHTML}
                     </div>
-                </div>
+
+                    ${trainingHTML ? `
+                    <div class="creative-section">
+                        <h2 class="creative-section-title">Pelatihan</h2>
+                        <ul class="creative-main-list">${trainingHTML}</ul>
+                    </div>` : ''}
+
+                    ${certificationsHTML ? `
+                    <div class="creative-section">
+                        <h2 class="creative-section-title">Sertifikasi</h2>
+                        <ul class="creative-main-list">${certificationsHTML}</ul>
+                    </div>` : ''}
+                </main>
             </div>
         `;
     }
