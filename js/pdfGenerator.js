@@ -97,6 +97,24 @@ class PDFGenerator {
                         clonedPreview.style.maxWidth = '750px';
                     }
 
+                    // --- CV Creative: samakan tinggi sidebar & konten utama ---
+                    // html2canvas tidak selalu mendukung "align-items: stretch"
+                    // milik flexbox untuk sibling yang tingginya auto, jadi
+                    // sidebar berwarna bisa ter-capture pendek sesuai isinya
+                    // sendiri saja, bukan menyamai kolom kanan yang lebih
+                    // panjang. Diukur & disamakan di sini, PERSIS pada lebar
+                    // 750px yang dipakai untuk capture (bukan lebar layar asli
+                    // pengguna), supaya hasilnya akurat apa pun device-nya.
+                    const clonedSidebar = clonedDoc.querySelector('.creative-sidebar');
+                    const clonedMain = clonedDoc.querySelector('.creative-main');
+                    if (clonedSidebar && clonedMain) {
+                        clonedSidebar.style.minHeight = '';
+                        clonedMain.style.minHeight = '';
+                        const tallest = Math.max(clonedSidebar.scrollHeight, clonedMain.scrollHeight);
+                        clonedSidebar.style.minHeight = tallest + 'px';
+                        clonedMain.style.minHeight = tallest + 'px';
+                    }
+
                     // Force the heading colors explicitly on the clone, since
                     // relying on the --cv-title-color variable being cloned
                     // correctly is unreliable across html2canvas versions.
