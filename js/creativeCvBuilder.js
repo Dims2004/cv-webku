@@ -650,6 +650,40 @@ class CreativeCvBuilder {
                 </main>
             </div>
         `;
+
+        this.syncSidebarHeight();
+    }
+
+    // ============ SAMAKAN TINGGI SIDEBAR & KONTEN UTAMA ============
+    // html2canvas (dipakai saat export PDF) tidak selalu mendukung
+    // "align-items: stretch" milik CSS flexbox untuk sibling yang tingginya
+    // auto — akibatnya sidebar berwarna bisa berhenti pendek sesuai isinya
+    // sendiri, bukan mengikuti kolom kanan yang lebih panjang (persis bug
+    // yang bikin PDF-nya terlihat pincang). Diperbaiki di sini dengan
+    // memaksa kedua kolom punya tinggi yang sama secara eksplisit lewat
+    // JavaScript, setelah browser selesai satu kali layout/paint.
+    syncSidebarHeight() {
+        requestAnimationFrame(() => {
+            const sidebar = document.querySelector('#creativeCvPreview .creative-sidebar');
+            const main = document.querySelector('#creativeCvPreview .creative-main');
+            if (!sidebar || !main) return;
+
+            sidebar.style.minHeight = '';
+            main.style.minHeight = '';
+
+            const tallest = Math.max(sidebar.scrollHeight, main.scrollHeight);
+            sidebar.style.minHeight = tallest + 'px';
+            main.style.minHeight = tallest + 'px';
+
+            // Foto profil kadang belum selesai di-decode browser saat frame
+            // ini berjalan; begitu selesai, ukurannya bisa berubah sedikit
+            // dan tinggi hasil sync di atas jadi tidak akurat lagi. Sync
+            // ulang sekali begitu foto benar-benar siap.
+            const photoImg = sidebar.querySelector('.creative-sidebar-photo img');
+            if (photoImg && !photoImg.complete) {
+                photoImg.addEventListener('load', () => this.syncSidebarHeight(), { once: true });
+            }
+        });
     }
 
     // ============ DOWNLOAD PDF ============
