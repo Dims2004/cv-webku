@@ -55,13 +55,48 @@ class PDFGenerator {
             // cost of a slightly larger file / longer processing time.
             const RENDER_SCALE = 3;
 
+            // --- Fix for "PDF berantakan kalau download dari HP" ---
+            // html2canvas re-lays-out the page inside a hidden clone before
+            // capturing it. By default that clone uses the REAL device's
+            // viewport width. On a phone that's ~360-430px, which is well
+            // inside the @media (max-width: 768px) / (max-width: 480px)
+            // breakpoints in responsive.css. Those breakpoints shrink the
+            // preview's font sizes with !important and stack the contact
+            // row vertically — a layout meant for on-screen reading on a
+            // small screen, not for an exported document. That's exactly
+            // why a PDF downloaded from a phone looks different (and
+            // broken/squeezed) compared to one downloaded from a desktop
+            // browser, even though the underlying CV data is identical.
+            //
+            // The fix is to tell html2canvas to lay out its clone inside a
+            // virtual "desktop-sized" window via windowWidth/windowHeight,
+            // regardless of the real device's screen size. That makes every
+            // device (phone, tablet, laptop) render the exact same
+            // desktop/ATS layout before capture, so the resulting PDF is
+            // identical no matter where it was downloaded from.
+            const DESKTOP_VIEWPORT_WIDTH = 1400;  // matches .container max-width in style.css, comfortably above every mobile breakpoint (1024/768/480px)
+            const DESKTOP_VIEWPORT_HEIGHT = 1400; // tall + not "landscape", so it doesn't trip the max-height:600 landscape breakpoint either
+
             const canvas = await html2canvas(previewElement, {
                 scale: RENDER_SCALE,
                 useCORS: true,
                 allowTaint: true,
                 backgroundColor: '#ffffff',
                 logging: false,
+                windowWidth: DESKTOP_VIEWPORT_WIDTH,
+                windowHeight: DESKTOP_VIEWPORT_HEIGHT,
                 onclone: (clonedDoc) => {
+                    // Belt-and-suspenders on top of the windowWidth trick
+                    // above: pin the preview element itself to a fixed
+                    // desktop-style width in the clone, so its layout can
+                    // never depend on whatever width its parent grid
+                    // happens to compute on a given device.
+                    const clonedPreview = clonedDoc.getElementById(previewElementId);
+                    if (clonedPreview) {
+                        clonedPreview.style.width = '750px';
+                        clonedPreview.style.maxWidth = '750px';
+                    }
+
                     // Force the heading colors explicitly on the clone, since
                     // relying on the --cv-title-color variable being cloned
                     // correctly is unreliable across html2canvas versions.
