@@ -115,6 +115,28 @@ class PDFGenerator {
                         clonedMain.style.minHeight = tallest + 'px';
                     }
 
+                    // --- Fix for "foto melebihi batas atas saat PDF diunduh" ---
+                    // Pin the ATS header photo box to a fixed pixel size
+                    // explicitly on the clone, on top of the fixed height
+                    // already set in style.css. This guards against any
+                    // html2canvas version/quirk that doesn't fully respect
+                    // a CSS height on a flex child, which previously let
+                    // the photo render taller than the header and overflow
+                    // past its top edge.
+                    const clonedPhotoBox = clonedDoc.querySelector('.preview-photo-box');
+                    if (clonedPhotoBox) {
+                        const boxSize = clonedPhotoBox.getBoundingClientRect().width || 96;
+                        clonedPhotoBox.style.width = boxSize + 'px';
+                        clonedPhotoBox.style.height = boxSize + 'px';
+                        clonedPhotoBox.style.flexShrink = '0';
+                        const clonedPhotoImg = clonedPhotoBox.querySelector('img');
+                        if (clonedPhotoImg) {
+                            clonedPhotoImg.style.width = '100%';
+                            clonedPhotoImg.style.height = '100%';
+                            clonedPhotoImg.style.objectFit = 'cover';
+                        }
+                    }
+
                     // Force the heading colors explicitly on the clone, since
                     // relying on the --cv-title-color variable being cloned
                     // correctly is unreliable across html2canvas versions.
