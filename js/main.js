@@ -20,6 +20,14 @@ class CVBuilderApp {
         this.setupFileUpload();
         this.setupATSPhotoUpload();
         this.populateSampleData();
+
+        // Re-render preview ketika bahasa berubah
+        document.addEventListener('languageChanged', () => {
+            this.updatePreview();
+            if (window.creativeCv && typeof window.creativeCv.updatePreview === 'function') {
+                window.creativeCv.updatePreview();
+            }
+        });
     }
 
     hideLoading() {
@@ -45,6 +53,7 @@ class CVBuilderApp {
         document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
         document.getElementById('previewBtn').addEventListener('click', () => this.updatePreview());
         document.getElementById('downloadPDFBtn').addEventListener('click', () => this.downloadPDF());
+        document.getElementById('downloadWordBtn').addEventListener('click', () => this.downloadWord());
         document.getElementById('titleColorPicker').addEventListener('input', (e) => this.setTitleColor(e.target.value));
         document.getElementById('fontPicker').addEventListener('change', (e) => this.setCvFont(e.target.value));
 
@@ -233,20 +242,20 @@ class CVBuilderApp {
         const isOngoing = !!data.ongoing;
         div.innerHTML = `
             <div class="form-group">
-                <label>Institusi</label>
-                <input type="text" class="form-input edu-institution" value="${this.escapeHtml(data.institution)}" placeholder="Nama institusi">
+                <label data-i18n="labelInstitution">Institusi</label>
+                <input type="text" class="form-input edu-institution" value="${this.escapeHtml(data.institution)}" placeholder="Nama institusi" data-i18n-placeholder="phInstitution">
             </div>
             <div class="form-group">
-                <label>Jurusan / Program</label>
-                <input type="text" class="form-input edu-major" value="${this.escapeHtml(data.major)}" placeholder="Jurusan / Program studi">
+                <label data-i18n="labelMajor">Jurusan / Program</label>
+                <input type="text" class="form-input edu-major" value="${this.escapeHtml(data.major)}" placeholder="Jurusan / Program studi" data-i18n-placeholder="phMajor">
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Lokasi</label>
-                    <input type="text" class="form-input edu-location" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi">
+                    <label data-i18n="labelLocation">Lokasi</label>
+                    <input type="text" class="form-input edu-location" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi" data-i18n-placeholder="phLocation">
                 </div>
                 <div class="form-group">
-                    <label>Periode</label>
+                    <label data-i18n="labelPeriod">Periode</label>
                     <div class="period-picker">
                         <select class="form-input edu-period-start">${this.buildYearOptions(data.periodStart)}</select>
                         <span class="period-sep">–</span>
@@ -254,26 +263,26 @@ class CVBuilderApp {
                     </div>
                     <label class="period-ongoing-label">
                         <input type="checkbox" class="edu-period-ongoing" ${isOngoing ? 'checked' : ''}>
-                        Masih berkuliah (Sekarang)
+                        <span data-i18n="ongoingStudy">Masih berkuliah (Sekarang)</span>
                     </label>
                 </div>
             </div>
             <div class="form-group">
-                <label>GPA / Prestasi (Opsional)</label>
-                <input type="text" class="form-input edu-gpa" value="${this.escapeHtml(data.gpa)}" placeholder="GPA: 3.58 atau prestasi lainnya">
+                <label data-i18n="labelGpa">GPA / Prestasi (Opsional)</label>
+                <input type="text" class="form-input edu-gpa" value="${this.escapeHtml(data.gpa)}" placeholder="GPA: 3.58 atau prestasi lainnya" data-i18n-placeholder="phGpa">
             </div>
             <div class="form-group link-field-group">
-                <label>Link Ijazah (Opsional)</label>
-                <input type="text" class="form-input edu-link-ijazah-title" value="${this.escapeHtml(data.linkIjazahTitle)}" placeholder="Judul link (contoh: Lihat Ijazah)">
-                <input type="url" class="form-input edu-link-ijazah" value="${this.escapeHtml(data.linkIjazah)}" placeholder="Link Google Drive/Dropbox ke scan ijazah">
+                <label data-i18n="labelLinkIjazah">Link Ijazah (Opsional)</label>
+                <input type="text" class="form-input edu-link-ijazah-title" value="${this.escapeHtml(data.linkIjazahTitle)}" placeholder="Judul link (contoh: Lihat Ijazah)" data-i18n-placeholder="phLinkTitleCertificate">
+                <input type="url" class="form-input edu-link-ijazah" value="${this.escapeHtml(data.linkIjazah)}" placeholder="Link Google Drive/Dropbox ke scan ijazah" data-i18n-placeholder="phLinkCertificate">
             </div>
             <div class="form-group link-field-group">
-                <label>Link Transkrip Nilai (Opsional)</label>
-                <input type="text" class="form-input edu-link-transkrip-title" value="${this.escapeHtml(data.linkTranskripTitle)}" placeholder="Judul link (contoh: Lihat Transkrip Nilai)">
-                <input type="url" class="form-input edu-link-transkrip" value="${this.escapeHtml(data.linkTranskrip)}" placeholder="Link Google Drive/Dropbox ke scan transkrip">
+                <label data-i18n="labelLinkTranscript">Link Transkrip Nilai (Opsional)</label>
+                <input type="text" class="form-input edu-link-transkrip-title" value="${this.escapeHtml(data.linkTranskripTitle)}" placeholder="Judul link (contoh: Lihat Transkrip Nilai)" data-i18n-placeholder="phLinkTranscriptTitle">
+                <input type="url" class="form-input edu-link-transkrip" value="${this.escapeHtml(data.linkTranskrip)}" placeholder="Link Google Drive/Dropbox ke scan transkrip" data-i18n-placeholder="phLinkTranscript">
             </div>
             <button type="button" class="btn-remove-edu hidden">
-                <i class="fas fa-times"></i> Hapus
+                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
             </button>
         `;
         
@@ -286,12 +295,13 @@ class CVBuilderApp {
             if (document.querySelectorAll('#cvForm .education-item').length > 1) {
                 div.remove();
                 this.updatePreview();
-                this.showToast('Pendidikan dihapus', 'info');
+                this.showToast(this.t('delete') + ' ' + this.t('educationSection'), 'info');
             } else {
-                this.showToast('Minimal harus ada satu pendidikan', 'error');
+                this.showToast('Minimal satu pendidikan', 'error');
             }
         });
-        
+
+        if (window.i18n) window.i18n.applyTranslations();
         return div;
     }
 
@@ -301,7 +311,7 @@ class CVBuilderApp {
         container.appendChild(item);
         document.querySelectorAll('#cvForm .education-item .btn-remove-edu').forEach(btn => btn.classList.remove('hidden'));
         this.updatePreview();
-        this.showToast('Pendidikan ditambahkan', 'success');
+        this.showToast(this.t('addEducation'), 'success');
     }
 
     createInternshipItem(data = { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '', link: '', linkTitle: '' }) {
@@ -310,20 +320,20 @@ class CVBuilderApp {
         const isOngoing = !!data.ongoing;
         div.innerHTML = `
             <div class="form-group">
-                <label>Perusahaan</label>
-                <input type="text" class="form-input int-company" value="${this.escapeHtml(data.company)}" placeholder="Nama perusahaan">
+                <label data-i18n="labelCompany">Perusahaan</label>
+                <input type="text" class="form-input int-company" value="${this.escapeHtml(data.company)}" placeholder="Nama perusahaan" data-i18n-placeholder="phCompany">
             </div>
             <div class="form-group">
-                <label>Posisi</label>
-                <input type="text" class="form-input int-position" value="${this.escapeHtml(data.position)}" placeholder="Posisi magang">
+                <label data-i18n="labelPosition">Posisi</label>
+                <input type="text" class="form-input int-position" value="${this.escapeHtml(data.position)}" placeholder="Posisi magang" data-i18n-placeholder="phPositionInternship">
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Lokasi</label>
-                    <input type="text" class="form-input int-location" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi">
+                    <label data-i18n="labelLocation">Lokasi</label>
+                    <input type="text" class="form-input int-location" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi" data-i18n-placeholder="phLocation">
                 </div>
                 <div class="form-group">
-                    <label>Periode</label>
+                    <label data-i18n="labelPeriod">Periode</label>
                     <div class="period-picker">
                         <input type="month" class="form-input int-period-start" value="${this.escapeHtml(data.periodStart || '')}">
                         <span class="period-sep">–</span>
@@ -331,21 +341,21 @@ class CVBuilderApp {
                     </div>
                     <label class="period-ongoing-label">
                         <input type="checkbox" class="int-period-ongoing" ${isOngoing ? 'checked' : ''}>
-                        Masih magang (Sekarang)
+                        <span data-i18n="ongoingInternship">Masih magang (Sekarang)</span>
                     </label>
                 </div>
             </div>
             <div class="form-group">
-                <label>Deskripsi</label>
-                <textarea class="form-textarea int-description" rows="3" placeholder="Deskripsi pekerjaan...">${this.escapeHtml(data.description)}</textarea>
+                <label data-i18n="labelDescription">Deskripsi</label>
+                <textarea class="form-textarea int-description" rows="3" placeholder="Deskripsi pekerjaan..." data-i18n-placeholder="phDescription">${this.escapeHtml(data.description)}</textarea>
             </div>
             <div class="form-group link-field-group">
-                <label>Link Sertifikat/Referensi Magang (Opsional)</label>
-                <input type="text" class="form-input int-link-title" value="${this.escapeHtml(data.linkTitle)}" placeholder="Judul link (contoh: Lihat Sertifikat Magang)">
-                <input type="url" class="form-input int-link" value="${this.escapeHtml(data.link)}" placeholder="Link sertifikat/surat referensi magang">
+                <label data-i18n="labelLinkInternship">Link Sertifikat/Referensi Magang (Opsional)</label>
+                <input type="text" class="form-input int-link-title" value="${this.escapeHtml(data.linkTitle)}" placeholder="Judul link (contoh: Lihat Sertifikat Magang)" data-i18n-placeholder="phLinkInternshipTitle">
+                <input type="url" class="form-input int-link" value="${this.escapeHtml(data.link)}" placeholder="Link sertifikat/surat referensi magang" data-i18n-placeholder="phLinkInternship">
             </div>
             <button type="button" class="btn-remove-int hidden">
-                <i class="fas fa-times"></i> Hapus
+                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
             </button>
         `;
         
@@ -358,12 +368,13 @@ class CVBuilderApp {
             if (document.querySelectorAll('#cvForm .internship-item').length > 1) {
                 div.remove();
                 this.updatePreview();
-                this.showToast('Pengalaman magang dihapus', 'info');
+                this.showToast(this.t('delete'), 'info');
             } else {
-                this.showToast('Minimal harus ada satu pengalaman magang', 'error');
+                this.showToast('Minimal satu magang', 'error');
             }
         });
-        
+
+        if (window.i18n) window.i18n.applyTranslations();
         return div;
     }
 
@@ -373,7 +384,7 @@ class CVBuilderApp {
         container.appendChild(item);
         document.querySelectorAll('#cvForm .internship-item .btn-remove-int').forEach(btn => btn.classList.remove('hidden'));
         this.updatePreview();
-        this.showToast('Pengalaman magang ditambahkan', 'success');
+        this.showToast(this.t('addInternship'), 'success');
     }
 
     createWorkItem(data = { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '', link: '', linkTitle: '' }) {
@@ -382,20 +393,20 @@ class CVBuilderApp {
         const isOngoing = !!data.ongoing;
         div.innerHTML = `
             <div class="form-group">
-                <label>Perusahaan</label>
-                <input type="text" class="form-input work-company" value="${this.escapeHtml(data.company)}" placeholder="Nama perusahaan">
+                <label data-i18n="labelCompany">Perusahaan</label>
+                <input type="text" class="form-input work-company" value="${this.escapeHtml(data.company)}" placeholder="Nama perusahaan" data-i18n-placeholder="phCompany">
             </div>
             <div class="form-group">
-                <label>Posisi</label>
-                <input type="text" class="form-input work-position" value="${this.escapeHtml(data.position)}" placeholder="Posisi/jabatan">
+                <label data-i18n="labelPosition">Posisi</label>
+                <input type="text" class="form-input work-position" value="${this.escapeHtml(data.position)}" placeholder="Posisi/jabatan" data-i18n-placeholder="phPositionJob">
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Lokasi</label>
-                    <input type="text" class="form-input work-location" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi">
+                    <label data-i18n="labelLocation">Lokasi</label>
+                    <input type="text" class="form-input work-location" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi" data-i18n-placeholder="phLocation">
                 </div>
                 <div class="form-group">
-                    <label>Periode</label>
+                    <label data-i18n="labelPeriod">Periode</label>
                     <div class="period-picker">
                         <input type="month" class="form-input work-period-start" value="${this.escapeHtml(data.periodStart || '')}">
                         <span class="period-sep">–</span>
@@ -403,21 +414,21 @@ class CVBuilderApp {
                     </div>
                     <label class="period-ongoing-label">
                         <input type="checkbox" class="work-period-ongoing" ${isOngoing ? 'checked' : ''}>
-                        Masih bekerja di sini (Sekarang)
+                        <span data-i18n="ongoingWork">Masih bekerja di sini (Sekarang)</span>
                     </label>
                 </div>
             </div>
             <div class="form-group">
-                <label>Deskripsi</label>
-                <textarea class="form-textarea work-description" rows="3" placeholder="Deskripsi pekerjaan...">${this.escapeHtml(data.description)}</textarea>
+                <label data-i18n="labelDescription">Deskripsi</label>
+                <textarea class="form-textarea work-description" rows="3" placeholder="Deskripsi pekerjaan..." data-i18n-placeholder="phDescription">${this.escapeHtml(data.description)}</textarea>
             </div>
             <div class="form-group link-field-group">
-                <label>Link Referensi/Surat Kerja (Opsional)</label>
-                <input type="text" class="form-input work-link-title" value="${this.escapeHtml(data.linkTitle)}" placeholder="Judul link (contoh: Lihat Surat Referensi)">
-                <input type="url" class="form-input work-link" value="${this.escapeHtml(data.link)}" placeholder="Link surat referensi/pengalaman kerja">
+                <label data-i18n="labelLinkWork">Link Referensi/Surat Kerja (Opsional)</label>
+                <input type="text" class="form-input work-link-title" value="${this.escapeHtml(data.linkTitle)}" placeholder="Judul link (contoh: Lihat Surat Referensi)" data-i18n-placeholder="phLinkWorkTitle">
+                <input type="url" class="form-input work-link" value="${this.escapeHtml(data.link)}" placeholder="Link surat referensi/pengalaman kerja" data-i18n-placeholder="phLinkWork">
             </div>
             <button type="button" class="btn-remove-work hidden">
-                <i class="fas fa-times"></i> Hapus
+                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
             </button>
         `;
         
@@ -430,12 +441,13 @@ class CVBuilderApp {
             if (document.querySelectorAll('#cvForm .work-item').length > 1) {
                 div.remove();
                 this.updatePreview();
-                this.showToast('Pengalaman kerja dihapus', 'info');
+                this.showToast(this.t('delete'), 'info');
             } else {
-                this.showToast('Minimal harus ada satu pengalaman kerja', 'error');
+                this.showToast('Minimal satu pengalaman kerja', 'error');
             }
         });
-        
+
+        if (window.i18n) window.i18n.applyTranslations();
         return div;
     }
 
@@ -445,7 +457,7 @@ class CVBuilderApp {
         container.appendChild(item);
         document.querySelectorAll('#cvForm .work-item .btn-remove-work').forEach(btn => btn.classList.remove('hidden'));
         this.updatePreview();
-        this.showToast('Pengalaman kerja ditambahkan', 'success');
+        this.showToast(this.t('addWork'), 'success');
     }
 
     createOrganizationItem(data = { name: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '' }) {
@@ -454,20 +466,20 @@ class CVBuilderApp {
         const isOngoing = !!data.ongoing;
         div.innerHTML = `
             <div class="form-group">
-                <label>Organisasi</label>
-                <input type="text" class="form-input org-name" maxlength="60" value="${this.escapeHtml(data.name)}" placeholder="Nama organisasi (maks. 60 karakter)">
+                <label data-i18n="labelOrganization">Organisasi</label>
+                <input type="text" class="form-input org-name" maxlength="60" value="${this.escapeHtml(data.name)}" placeholder="Nama organisasi (maks. 60 karakter)" data-i18n-placeholder="phOrganization">
             </div>
             <div class="form-group">
-                <label>Posisi</label>
-                <input type="text" class="form-input org-position" maxlength="60" value="${this.escapeHtml(data.position)}" placeholder="Posisi/jabatan">
+                <label data-i18n="labelPosition">Posisi</label>
+                <input type="text" class="form-input org-position" maxlength="60" value="${this.escapeHtml(data.position)}" placeholder="Posisi/jabatan" data-i18n-placeholder="phPositionJob">
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Lokasi</label>
-                    <input type="text" class="form-input org-location" maxlength="60" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi">
+                    <label data-i18n="labelLocation">Lokasi</label>
+                    <input type="text" class="form-input org-location" maxlength="60" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi" data-i18n-placeholder="phLocation">
                 </div>
                 <div class="form-group">
-                    <label>Periode</label>
+                    <label data-i18n="labelPeriod">Periode</label>
                     <div class="period-picker">
                         <input type="month" class="form-input org-period-start" value="${this.escapeHtml(data.periodStart || '')}">
                         <span class="period-sep">–</span>
@@ -475,16 +487,16 @@ class CVBuilderApp {
                     </div>
                     <label class="period-ongoing-label">
                         <input type="checkbox" class="org-period-ongoing" ${isOngoing ? 'checked' : ''}>
-                        Masih berlangsung (Sekarang)
+                        <span data-i18n="ongoingOrg">Masih berlangsung (Sekarang)</span>
                     </label>
                 </div>
             </div>
             <div class="form-group">
-                <label>Deskripsi</label>
-                <textarea class="form-textarea org-description" rows="3" placeholder="Deskripsi kegiatan...">${this.escapeHtml(data.description)}</textarea>
+                <label data-i18n="labelDescription">Deskripsi</label>
+                <textarea class="form-textarea org-description" rows="3" placeholder="Deskripsi kegiatan..." data-i18n-placeholder="phDescriptionActivity">${this.escapeHtml(data.description)}</textarea>
             </div>
             <button type="button" class="btn-remove-org hidden">
-                <i class="fas fa-times"></i> Hapus
+                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
             </button>
         `;
 
@@ -496,12 +508,13 @@ class CVBuilderApp {
             if (document.querySelectorAll('#cvForm .organization-item').length > 1) {
                 div.remove();
                 this.updatePreview();
-                this.showToast('Pengalaman organisasi dihapus', 'info');
+                this.showToast(this.t('delete'), 'info');
             } else {
-                this.showToast('Minimal harus ada satu pengalaman organisasi', 'error');
+                this.showToast('Minimal satu organisasi', 'error');
             }
         });
 
+        if (window.i18n) window.i18n.applyTranslations();
         return div;
     }
 
@@ -511,7 +524,7 @@ class CVBuilderApp {
         container.appendChild(item);
         document.querySelectorAll('#cvForm .organization-item .btn-remove-org').forEach(btn => btn.classList.remove('hidden'));
         this.updatePreview();
-        this.showToast('Pengalaman organisasi ditambahkan', 'success');
+        this.showToast(this.t('addOrg'), 'success');
     }
 
     createProjectItem(data = { name: '', description: '', tech: '', link: '', linkTitle: '' }) {
@@ -519,24 +532,24 @@ class CVBuilderApp {
         div.className = 'project-item';
         div.innerHTML = `
             <div class="form-group">
-                <label>Nama Proyek</label>
-                <input type="text" class="form-input project-name" value="${this.escapeHtml(data.name)}" placeholder="Nama proyek">
+                <label data-i18n="labelProjectName">Nama Proyek</label>
+                <input type="text" class="form-input project-name" value="${this.escapeHtml(data.name)}" placeholder="Nama proyek" data-i18n-placeholder="phProjectName">
             </div>
             <div class="form-group">
-                <label>Deskripsi</label>
-                <textarea class="form-textarea project-description" rows="3" placeholder="Deskripsi proyek...">${this.escapeHtml(data.description)}</textarea>
+                <label data-i18n="labelDescription">Deskripsi</label>
+                <textarea class="form-textarea project-description" rows="3" placeholder="Deskripsi proyek..." data-i18n-placeholder="phProjectDescription">${this.escapeHtml(data.description)}</textarea>
             </div>
             <div class="form-group">
-                <label>Teknologi / Tools</label>
-                <input type="text" class="form-input project-tech" value="${this.escapeHtml(data.tech)}" placeholder="Teknologi yang digunakan">
+                <label data-i18n="labelTech">Teknologi / Tools</label>
+                <input type="text" class="form-input project-tech" value="${this.escapeHtml(data.tech)}" placeholder="Teknologi yang digunakan" data-i18n-placeholder="phTech">
             </div>
             <div class="form-group link-field-group">
-                <label>Link Proyek (Opsional)</label>
-                <input type="text" class="form-input project-link-title" value="${this.escapeHtml(data.linkTitle)}" placeholder="Judul link (contoh: Lihat Demo / GitHub)">
-                <input type="url" class="form-input project-link" value="${this.escapeHtml(data.link)}" placeholder="Link demo/repository/live proyek">
+                <label data-i18n="labelLinkProject">Link Proyek (Opsional)</label>
+                <input type="text" class="form-input project-link-title" value="${this.escapeHtml(data.linkTitle)}" placeholder="Judul link (contoh: Lihat Demo / GitHub)" data-i18n-placeholder="phLinkProjectTitle">
+                <input type="url" class="form-input project-link" value="${this.escapeHtml(data.link)}" placeholder="Link demo/repository/live proyek" data-i18n-placeholder="phLinkProject">
             </div>
             <button type="button" class="btn-remove-project hidden">
-                <i class="fas fa-times"></i> Hapus
+                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
             </button>
         `;
         
@@ -548,12 +561,13 @@ class CVBuilderApp {
             if (document.querySelectorAll('#cvForm .project-item').length > 1) {
                 div.remove();
                 this.updatePreview();
-                this.showToast('Proyek dihapus', 'info');
+                this.showToast(this.t('delete'), 'info');
             } else {
-                this.showToast('Minimal harus ada satu proyek', 'error');
+                this.showToast('Minimal satu proyek', 'error');
             }
         });
-        
+
+        if (window.i18n) window.i18n.applyTranslations();
         return div;
     }
 
@@ -563,7 +577,7 @@ class CVBuilderApp {
         container.appendChild(item);
         document.querySelectorAll('#cvForm .project-item .btn-remove-project').forEach(btn => btn.classList.remove('hidden'));
         this.updatePreview();
-        this.showToast('Proyek ditambahkan', 'success');
+        this.showToast(this.t('addProject'), 'success');
     }
 
     createSkillCategoryItem(data = { category: '', items: '' }) {
@@ -571,15 +585,15 @@ class CVBuilderApp {
         div.className = 'skill-category-item';
         div.innerHTML = `
             <div class="form-group">
-                <label>Kategori Skill</label>
-                <input type="text" class="form-input skill-category" value="${this.escapeHtml(data.category)}" placeholder="Contoh: Networking, Programming, IT Support, dll">
+                <label data-i18n="labelSkillCategory">Kategori Skill</label>
+                <input type="text" class="form-input skill-category" value="${this.escapeHtml(data.category)}" placeholder="Contoh: Networking, Programming, IT Support, dll" data-i18n-placeholder="phSkillCategory">
             </div>
             <div class="form-group">
-                <label>Daftar Skill</label>
-                <textarea class="form-textarea skill-items" rows="2" placeholder="Pisahkan dengan koma&#10;Contoh: Computer Networking, TCP/IP, Routing, Switching">${this.escapeHtml(data.items)}</textarea>
+                <label data-i18n="labelSkillItems">Daftar Skill</label>
+                <textarea class="form-textarea skill-items" rows="2" placeholder="Pisahkan dengan koma&#10;Contoh: Computer Networking, TCP/IP, Routing, Switching" data-i18n-placeholder="phSkillItems">${this.escapeHtml(data.items)}</textarea>
             </div>
             <button type="button" class="btn-remove-skill hidden">
-                <i class="fas fa-times"></i> Hapus Kategori
+                <i class="fas fa-times"></i> <span data-i18n="deleteCategory">Hapus Kategori</span>
             </button>
         `;
         
@@ -591,12 +605,13 @@ class CVBuilderApp {
             if (document.querySelectorAll('#cvForm .skill-category-item').length > 1) {
                 div.remove();
                 this.updatePreview();
-                this.showToast('Kategori skill dihapus', 'info');
+                this.showToast(this.t('delete'), 'info');
             } else {
-                this.showToast('Minimal harus ada satu kategori skill', 'error');
+                this.showToast('Minimal satu kategori', 'error');
             }
         });
-        
+
+        if (window.i18n) window.i18n.applyTranslations();
         return div;
     }
 
@@ -606,7 +621,7 @@ class CVBuilderApp {
         container.appendChild(item);
         document.querySelectorAll('#cvForm .skill-category-item .btn-remove-skill').forEach(btn => btn.classList.remove('hidden'));
         this.updatePreview();
-        this.showToast('Kategori skill ditambahkan', 'success');
+        this.showToast(this.t('addSkill'), 'success');
     }
 
     createCertificationItem(data = { name: '', issuer: '', year: '', image: null, link: '', linkTitle: '' }) {
@@ -620,42 +635,42 @@ class CVBuilderApp {
         
         div.innerHTML = `
             <div class="form-group">
-                <label>Nama Sertifikasi</label>
-                <input type="text" class="form-input cert-name" value="${this.escapeHtml(data.name || '')}" placeholder="Nama sertifikasi">
+                <label data-i18n="labelCertName">Nama Sertifikasi</label>
+                <input type="text" class="form-input cert-name" value="${this.escapeHtml(data.name || '')}" placeholder="Nama sertifikasi" data-i18n-placeholder="phCertName">
             </div>
             <div class="form-group">
-                <label>Penerbit</label>
-                <input type="text" class="form-input cert-issuer" value="${this.escapeHtml(data.issuer || '')}" placeholder="Lembaga penerbit">
+                <label data-i18n="labelIssuer">Penerbit</label>
+                <input type="text" class="form-input cert-issuer" value="${this.escapeHtml(data.issuer || '')}" placeholder="Lembaga penerbit" data-i18n-placeholder="phIssuer">
             </div>
             <div class="form-group">
-                <label>Tahun</label>
+                <label data-i18n="labelYear">Tahun</label>
                 <select class="form-input cert-year">${this.buildYearOptions(data.year)}</select>
             </div>
             <div class="form-group link-field-group">
-                <label>Link Sertifikat/Verifikasi (Opsional)</label>
-                <input type="text" class="form-input cert-link-title" value="${this.escapeHtml(data.linkTitle)}" placeholder="Judul link (contoh: Lihat Sertifikat)">
-                <input type="url" class="form-input cert-link" value="${this.escapeHtml(data.link)}" placeholder="Link verifikasi/sertifikat online">
+                <label data-i18n="labelLinkCert">Link Sertifikat/Verifikasi (Opsional)</label>
+                <input type="text" class="form-input cert-link-title" value="${this.escapeHtml(data.linkTitle)}" placeholder="Judul link (contoh: Lihat Sertifikat)" data-i18n-placeholder="phLinkCertTitle">
+                <input type="url" class="form-input cert-link" value="${this.escapeHtml(data.link)}" placeholder="Link verifikasi/sertifikat online" data-i18n-placeholder="phLinkCert">
             </div>
             <div class="form-group">
-                <label>Upload Sertifikat (JPG, JPEG, PNG)</label>
+                <label data-i18n="labelUploadCert">Upload Sertifikat (JPG, JPEG, PNG)</label>
                 <div class="cert-upload-area">
                     <div class="cert-preview" id="certPreview_${index}">
-                        ${hasImage ? `<img src="${imageSrc}" alt="Sertifikat">` : `<i class="fas fa-file-image"></i><span>Belum ada gambar</span>`}
+                        ${hasImage ? `<img src="${imageSrc}" alt="Sertifikat">` : `<i class="fas fa-file-image"></i><span data-i18n="noImage">Belum ada gambar</span>`}
                     </div>
                     <div class="cert-upload-controls">
                         <label class="btn-upload-cert">
                             <i class="fas fa-upload"></i>
-                            Pilih Gambar
+                            <span data-i18n="chooseImage">Pilih Gambar</span>
                             <input type="file" class="cert-file-input" accept="image/jpeg,image/jpg,image/png" hidden>
                         </label>
                         <button type="button" class="btn-remove-cert-image ${hasImage ? '' : 'hidden'}">
-                            <i class="fas fa-trash"></i> Hapus
+                            <i class="fas fa-trash"></i> <span data-i18n="delete">Hapus</span>
                         </button>
                     </div>
                 </div>
             </div>
             <button type="button" class="btn-remove-cert hidden">
-                <i class="fas fa-times"></i> Hapus Sertifikasi
+                <i class="fas fa-times"></i> <span data-i18n="deleteCert">Hapus Sertifikasi</span>
             </button>
         `;
         
@@ -669,47 +684,48 @@ class CVBuilderApp {
 
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
             if (!validTypes.includes(file.type)) {
-                this.showToast('Format file tidak didukung. Gunakan JPG, JPEG, atau PNG', 'error');
+                this.showToast('Format file tidak didukung', 'error');
                 fileInput.value = '';
                 return;
             }
 
             if (file.size > 15 * 1024 * 1024) {
-                this.showToast('Ukuran file terlalu besar. Maksimal 15MB', 'error');
+                this.showToast('Maksimal 15MB', 'error');
                 fileInput.value = '';
                 return;
             }
 
-            this.showToast('Memproses gambar sertifikat...', 'info');
+            this.showToast('Memproses gambar...', 'info');
 
             try {
                 const compressedDataUrl = await this.compressImageFile(file, 1200, 0.82);
                 preview.innerHTML = `<img src="${compressedDataUrl}" alt="Sertifikat">`;
                 removeBtn.classList.remove('hidden');
                 this.updatePreview();
-                this.showToast('Gambar sertifikat berhasil diupload', 'success');
+                this.showToast('Berhasil diupload', 'success');
             } catch (error) {
-                console.error('Gagal memproses gambar sertifikat:', error);
-                this.showToast('Gagal memproses gambar. Coba gunakan foto lain', 'error');
+                console.error('Gagal memproses gambar:', error);
+                this.showToast('Gagal memproses gambar', 'error');
                 fileInput.value = '';
             }
         });
         
         removeBtn.addEventListener('click', () => {
-            preview.innerHTML = `<i class="fas fa-file-image"></i><span>Belum ada gambar</span>`;
+            preview.innerHTML = `<i class="fas fa-file-image"></i><span data-i18n="noImage">Belum ada gambar</span>`;
             removeBtn.classList.add('hidden');
             fileInput.value = '';
             this.updatePreview();
-            this.showToast('Gambar sertifikat dihapus', 'info');
+            if (window.i18n) window.i18n.applyTranslations();
+            this.showToast('Gambar dihapus', 'info');
         });
         
         div.querySelector('.btn-remove-cert').addEventListener('click', () => {
             if (document.querySelectorAll('#cvForm .certification-item').length > 1) {
                 div.remove();
                 this.updatePreview();
-                this.showToast('Sertifikasi dihapus', 'info');
+                this.showToast(this.t('delete'), 'info');
             } else {
-                this.showToast('Minimal harus ada satu sertifikasi', 'error');
+                this.showToast('Minimal satu sertifikasi', 'error');
             }
         });
         
@@ -717,7 +733,8 @@ class CVBuilderApp {
             input.addEventListener('input', () => this.updatePreview());
             input.addEventListener('change', () => this.updatePreview());
         });
-        
+
+        if (window.i18n) window.i18n.applyTranslations();
         return div;
     }
 
@@ -727,7 +744,7 @@ class CVBuilderApp {
         container.appendChild(item);
         document.querySelectorAll('#cvForm .certification-item .btn-remove-cert').forEach(btn => btn.classList.remove('hidden'));
         this.updatePreview();
-        this.showToast('Sertifikasi ditambahkan', 'success');
+        this.showToast(this.t('addCert'), 'success');
     }
 
     setupOngoingCheckbox(containerId, itemSelector, ongoingClass, endClass) {
@@ -756,15 +773,14 @@ class CVBuilderApp {
     }
 
     formatYearPeriodID(startYear, endYear, ongoing) {
-        const end = ongoing ? 'Sekarang' : (endYear || '');
+        const end = ongoing ? this.t('now') : (endYear || '');
         if (startYear && end) return `${startYear} - ${end}`;
         return startYear || end || '';
     }
 
     formatMonthID(value) {
         if (!value) return '';
-        const bulanID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const bulanID = window.i18n ? window.i18n.t('months') : [];
         const [year, month] = value.split('-');
         const idx = parseInt(month, 10) - 1;
         if (isNaN(idx) || !bulanID[idx] || !year) return value;
@@ -773,7 +789,7 @@ class CVBuilderApp {
 
     formatPeriodID(startValue, endValue, ongoing) {
         const start = this.formatMonthID(startValue);
-        const end = ongoing ? 'Sekarang' : this.formatMonthID(endValue);
+        const end = ongoing ? this.t('now') : this.formatMonthID(endValue);
         if (start && end) return `${start} - ${end}`;
         return start || end || '';
     }
@@ -813,6 +829,10 @@ class CVBuilderApp {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    t(key) {
+        return window.i18n ? window.i18n.t(key) : key;
     }
 
     formatLinkUrl(url) {
@@ -914,7 +934,7 @@ class CVBuilderApp {
         setTimeout(() => {
             this.populateSampleData();
             this.showCVBuilder();
-            this.showToast('CV berhasil diunggah! Silakan periksa dan edit.', 'success');
+            this.showToast('CV berhasil diunggah!', 'success');
         }, 1500);
     }
 
@@ -996,13 +1016,13 @@ class CVBuilderApp {
 
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
             if (!validTypes.includes(file.type)) {
-                this.showToast('Format file tidak didukung. Gunakan JPG, JPEG, atau PNG', 'error');
+                this.showToast('Format file tidak didukung', 'error');
                 fileInput.value = '';
                 return;
             }
 
             if (file.size > 15 * 1024 * 1024) {
-                this.showToast('Ukuran file terlalu besar. Maksimal 15MB', 'error');
+                this.showToast('Maksimal 15MB', 'error');
                 fileInput.value = '';
                 return;
             }
@@ -1016,25 +1036,27 @@ class CVBuilderApp {
                 this.updatePreview();
                 this.showToast('Foto profil berhasil diupload', 'success');
             } catch (error) {
-                console.error('Gagal memproses foto profil ATS:', error);
-                this.showToast('Gagal memproses foto. Coba gunakan foto lain', 'error');
+                console.error('Gagal memproses foto:', error);
+                this.showToast('Gagal memproses foto', 'error');
                 fileInput.value = '';
             }
         });
 
         removeBtn.addEventListener('click', () => {
             this.atsPhotoDataUrl = null;
-            preview.innerHTML = '<i class="fas fa-user"></i><span>Belum ada foto</span>';
+            preview.innerHTML = '<i class="fas fa-user"></i><span data-i18n="noPhoto">Belum ada foto</span>';
             removeBtn.classList.add('hidden');
             fileInput.value = '';
             this.updatePreview();
-            this.showToast('Foto profil dihapus', 'info');
+            if (window.i18n) window.i18n.applyTranslations();
+            this.showToast('Foto dihapus', 'info');
         });
     }
 
     updatePreview() {
         const preview = document.getElementById('cvPreview');
         const formData = this.collectFormData();
+        const t = (k) => this.t(k);
         
         let educationHTML = '';
         formData.education.forEach(edu => {
@@ -1042,12 +1064,12 @@ class CVBuilderApp {
                 const eduLinks = [];
                 if (edu.linkIjazah) {
                     const href = this.formatLinkUrl(edu.linkIjazah);
-                    const label = this.escapeHtml(edu.linkIjazahTitle) || 'Lihat Ijazah';
+                    const label = this.escapeHtml(edu.linkIjazahTitle) || 'Link';
                     eduLinks.push(`<a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-file-alt"></i> ${label}</a>`);
                 }
                 if (edu.linkTranskrip) {
                     const href = this.formatLinkUrl(edu.linkTranskrip);
-                    const label = this.escapeHtml(edu.linkTranskripTitle) || 'Lihat Transkrip Nilai';
+                    const label = this.escapeHtml(edu.linkTranskripTitle) || 'Link';
                     eduLinks.push(`<a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-file-alt"></i> ${label}</a>`);
                 }
                 educationHTML += `
@@ -1068,7 +1090,7 @@ class CVBuilderApp {
         formData.internships.forEach(int => {
             if (int.company || int.position) {
                 const href = int.link ? this.formatLinkUrl(int.link) : '';
-                const label = this.escapeHtml(int.linkTitle) || 'Lihat Sertifikat/Referensi';
+                const label = this.escapeHtml(int.linkTitle) || 'Link';
                 const linkHTML = href ? `<div class="preview-doc-links"><a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-link"></i> ${label}</a></div>` : '';
                 internshipHTML += `
                     <div class="preview-exp-item">
@@ -1088,7 +1110,7 @@ class CVBuilderApp {
         formData.workExperiences.forEach(work => {
             if (work.company || work.position) {
                 const href = work.link ? this.formatLinkUrl(work.link) : '';
-                const label = this.escapeHtml(work.linkTitle) || 'Lihat Referensi/Surat Kerja';
+                const label = this.escapeHtml(work.linkTitle) || 'Link';
                 const linkHTML = href ? `<div class="preview-doc-links"><a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-link"></i> ${label}</a></div>` : '';
                 workHTML += `
                     <div class="preview-exp-item">
@@ -1124,13 +1146,13 @@ class CVBuilderApp {
         formData.projects.forEach(project => {
             if (project.name) {
                 const href = project.link ? this.formatLinkUrl(project.link) : '';
-                const label = this.escapeHtml(project.linkTitle) || 'Lihat Proyek';
+                const label = this.escapeHtml(project.linkTitle) || 'Link';
                 const linkHTML = href ? `<div class="preview-doc-links"><a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-link"></i> ${label}</a></div>` : '';
                 projectHTML += `
                     <div class="preview-project-item">
                         <div class="project-name">${this.escapeHtml(project.name || '')}</div>
                         ${project.description ? `<div class="project-desc">${this.escapeHtml(project.description)}</div>` : ''}
-                        ${project.tech ? `<div class="project-tech"><strong>Teknologi:</strong> ${this.escapeHtml(project.tech)}</div>` : ''}
+                        ${project.tech ? `<div class="project-tech"><strong>${t('labelTech')}:</strong> ${this.escapeHtml(project.tech)}</div>` : ''}
                         ${linkHTML}
                     </div>
                 `;
@@ -1152,7 +1174,7 @@ class CVBuilderApp {
 
                 skillsHTML = `
                     <div class="preview-section preview-section-skills">
-                        <div class="preview-section-title">Kemampuan</div>
+                        <div class="preview-section-title">${t('pvSkills')}</div>
                         <div class="preview-skills-columns">${columns}</div>
                     </div>
                 `;
@@ -1167,7 +1189,7 @@ class CVBuilderApp {
                 let linkPart = '';
                 if (cert.link) {
                     const href = this.formatLinkUrl(cert.link);
-                    const label = this.escapeHtml(cert.linkTitle) || 'Lihat Sertifikat';
+                    const label = this.escapeHtml(cert.linkTitle) || 'Link';
                     linkPart = ` <a href="${href}" target="_blank" rel="noopener noreferrer" class="preview-doc-link-inline"><i class="fas fa-link"></i> ${label}</a>`;
                 }
                 certHTML += `
@@ -1185,31 +1207,28 @@ class CVBuilderApp {
             }
         });
 
-        // Build contact lines — TANPA ikon di link (sesuai permintaan user)
         const contactLines = [];
-
         if (formData.domicile) {
-            contactLines.push(`<div class="contact-line"><span class="contact-label">Alamat</span><span>: ${this.escapeHtml(formData.domicile)}</span></div>`);
+            contactLines.push(`<div class="contact-line"><span class="contact-label">${t('pvLabelAddress')}</span><span>: ${this.escapeHtml(formData.domicile)}</span></div>`);
         }
         if (formData.phone) {
-            contactLines.push(`<div class="contact-line"><span class="contact-label">Handphone</span><span>: ${this.escapeHtml(formData.phone)}</span></div>`);
+            contactLines.push(`<div class="contact-line"><span class="contact-label">${t('pvLabelPhone')}</span><span>: ${this.escapeHtml(formData.phone)}</span></div>`);
         }
         if (formData.email) {
             const emailHref = this.formatLinkUrl(formData.email);
-            contactLines.push(`<div class="contact-line"><span class="contact-label">Email</span><span>: <a href="${emailHref}">${this.escapeHtml(formData.email)}</a></span></div>`);
+            contactLines.push(`<div class="contact-line"><span class="contact-label">${t('pvLabelEmail')}</span><span>: <a href="${emailHref}">${this.escapeHtml(formData.email)}</a></span></div>`);
         }
         if (formData.linkedin) {
             const href = this.formatLinkUrl(formData.linkedin);
             const label = this.escapeHtml(formData.linkedinTitle) || this.escapeHtml(formData.linkedin);
-            contactLines.push(`<div class="contact-line"><span class="contact-label">LinkedIn</span><span>: <a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a></span></div>`);
+            contactLines.push(`<div class="contact-line"><span class="contact-label">${t('pvLabelLinkedin')}</span><span>: <a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a></span></div>`);
         }
         if (formData.portfolio) {
             const href = this.formatLinkUrl(formData.portfolio);
             const label = this.escapeHtml(formData.portfolioTitle) || this.escapeHtml(formData.portfolio);
-            contactLines.push(`<div class="contact-line"><span class="contact-label">Portofolio</span><span>: <a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a></span></div>`);
+            contactLines.push(`<div class="contact-line"><span class="contact-label">${t('pvLabelPortfolio')}</span><span>: <a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a></span></div>`);
         }
 
-        // Header photo — hanya tampil kalau opsi "Dengan Foto" dipilih
         const photoHTML = (formData.photoOption === 'with' && formData.photo)
             ? `<div class="preview-photo-box"><img src="${formData.photo}" alt="Foto profil"></div>`
             : '';
@@ -1230,31 +1249,31 @@ class CVBuilderApp {
 
                 ${educationHTML ? `
                 <div class="preview-section">
-                    <div class="preview-section-title">Pendidikan</div>
+                    <div class="preview-section-title">${t('pvEducation')}</div>
                     ${educationHTML}
                 </div>` : ''}
 
                 ${internshipHTML ? `
                 <div class="preview-section">
-                    <div class="preview-section-title">Pengalaman Magang</div>
+                    <div class="preview-section-title">${t('pvInternship')}</div>
                     ${internshipHTML}
                 </div>` : ''}
 
                 ${workHTML ? `
                 <div class="preview-section">
-                    <div class="preview-section-title">Pengalaman Kerja</div>
+                    <div class="preview-section-title">${t('pvWork')}</div>
                     ${workHTML}
                 </div>` : ''}
 
                 ${orgHTML ? `
                 <div class="preview-section">
-                    <div class="preview-section-title">Organisasi</div>
+                    <div class="preview-section-title">${t('pvOrg')}</div>
                     ${orgHTML}
                 </div>` : ''}
 
                 ${projectHTML ? `
                 <div class="preview-section">
-                    <div class="preview-section-title">Proyek</div>
+                    <div class="preview-section-title">${t('pvProject')}</div>
                     ${projectHTML}
                 </div>` : ''}
 
@@ -1262,7 +1281,7 @@ class CVBuilderApp {
 
                 ${certHTML ? `
                 <div class="preview-section">
-                    <div class="preview-section-title">Sertifikat</div>
+                    <div class="preview-section-title">${t('pvCert')}</div>
                     <ul class="preview-cert-list">${certHTML}</ul>
                 </div>` : ''}
             </div>
@@ -1414,14 +1433,14 @@ class CVBuilderApp {
                         formData.education.length > 0 || formData.skills.length > 0;
         
         if (!hasData) {
-            this.showToast('Tidak ada data CV untuk diekspor. Silakan isi formulir terlebih dahulu.', 'error');
+            this.showToast('Tidak ada data CV untuk diekspor.', 'error');
             return;
         }
         
         try {
             const downloadBtn = document.getElementById('downloadPDFBtn');
             const originalText = downloadBtn.innerHTML;
-            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             downloadBtn.disabled = true;
             
             pdfGenerator.generatePDF(formData);
@@ -1435,7 +1454,44 @@ class CVBuilderApp {
             this.showToast('Gagal download PDF: ' + error.message, 'error');
             
             const downloadBtn = document.getElementById('downloadPDFBtn');
-            downloadBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF';
+            downloadBtn.innerHTML = '<i class="fas fa-file-pdf"></i>';
+            downloadBtn.disabled = false;
+        }
+    }
+
+    downloadWord() {
+        if (typeof WordGenerator === 'undefined') {
+            this.showToast('Fitur Word tidak tersedia. Silakan refresh halaman.', 'error');
+            return;
+        }
+
+        const formData = this.collectFormData();
+        const hasData = formData.fullName || formData.position || formData.aboutMe ||
+                        formData.education.length > 0 || formData.skills.length > 0;
+
+        if (!hasData) {
+            this.showToast('Tidak ada data CV untuk diekspor.', 'error');
+            return;
+        }
+
+        const wordGen = new WordGenerator();
+        const downloadBtn = document.getElementById('downloadWordBtn');
+        const originalText = downloadBtn.innerHTML;
+
+        try {
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            downloadBtn.disabled = true;
+
+            wordGen.generateWord(formData, { type: 'ats', fileSuffix: 'CV' });
+
+            setTimeout(() => {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            }, 2000);
+        } catch (error) {
+            console.error('Word download error:', error);
+            this.showToast('Gagal download Word: ' + error.message, 'error');
+            downloadBtn.innerHTML = originalText;
             downloadBtn.disabled = false;
         }
     }
