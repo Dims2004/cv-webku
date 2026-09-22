@@ -4,6 +4,10 @@ class CVBuilderApp {
         this.currentScreen = 'welcome';
         this.theme = 'light';
         this.certImageCounter = 0;
+        // ATS profile photo state: kept separately from the form fields
+        // (like the certificate images) since it isn't a plain text input.
+        this.atsPhotoDataUrl = null;
+        this.atsPhotoOption = 'none';
         this.initializeApp();
     }
 
@@ -19,6 +23,7 @@ class CVBuilderApp {
         this.loadTitleColor();
         this.loadCvFont();
         this.setupFileUpload();
+        this.setupATSPhotoUpload();
         // Initialize with sample data for demo
         this.populateSampleData();
     }
@@ -846,6 +851,25 @@ class CVBuilderApp {
         return div.innerHTML;
     }
 
+    // Turns a multi-line description textarea into a proper bullet list
+    // (one <li> per non-empty line) instead of a single <br>-separated
+    // paragraph, matching how job/organization duties are listed on a
+    // classic ATS resume.
+    buildDescriptionListHTML(description) {
+        if (!description) return '';
+        const lines = description.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length === 0) return '';
+        const items = lines.map(line => `<li>${this.escapeHtml(line)}</li>`).join('');
+        return `<ul class="exp-description">${items}</ul>`;
+    }
+
+    // Joins location + period with " • " only when both are present, so a
+    // lone "•" doesn't show up when one of the two fields is left empty.
+    joinMeta(location, period) {
+        const parts = [location, period].map(p => (p || '').trim()).filter(p => p.length > 0);
+        return this.escapeHtml(parts.join(' • '));
+    }
+
     showCVBuilder() {
         this.navigateToScreen('builder', true);
         this.updatePreview();
@@ -983,6 +1007,65 @@ class CVBuilderApp {
 
     setupFileUpload() {}
 
+    // ============ ATS PHOTO (dengan foto / tanpa foto) ============
+    setupATSPhotoUpload() {
+        const radios = document.querySelectorAll('input[name="photoOption"]');
+        const uploadArea = document.getElementById('atsPhotoUploadArea');
+        const fileInput = document.getElementById('atsPhotoInput');
+        const preview = document.getElementById('atsPhotoPreview');
+        const removeBtn = document.getElementById('removeAtsPhotoBtn');
+        if (!radios.length || !uploadArea || !fileInput || !preview || !removeBtn) return;
+
+        radios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                this.atsPhotoOption = e.target.value;
+                uploadArea.classList.toggle('hidden', this.atsPhotoOption !== 'with');
+                this.updatePreview();
+            });
+        });
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                this.showToast('Format file tidak didukung. Gunakan JPG, JPEG, atau PNG', 'error');
+                fileInput.value = '';
+                return;
+            }
+
+            if (file.size > 15 * 1024 * 1024) {
+                this.showToast('Ukuran file terlalu besar. Maksimal 15MB', 'error');
+                fileInput.value = '';
+                return;
+            }
+
+            this.showToast('Memproses foto profil...', 'info');
+
+            try {
+                this.atsPhotoDataUrl = await this.compressImageFile(file, 800, 0.85);
+                preview.innerHTML = `<img src="${this.atsPhotoDataUrl}" alt="Foto profil">`;
+                removeBtn.classList.remove('hidden');
+                this.updatePreview();
+                this.showToast('Foto profil berhasil diupload', 'success');
+            } catch (error) {
+                console.error('Gagal memproses foto profil ATS:', error);
+                this.showToast('Gagal memproses foto. Coba gunakan foto lain', 'error');
+                fileInput.value = '';
+            }
+        });
+
+        removeBtn.addEventListener('click', () => {
+            this.atsPhotoDataUrl = null;
+            preview.innerHTML = '<i class="fas fa-user"></i><span>Belum ada foto</span>';
+            removeBtn.classList.add('hidden');
+            fileInput.value = '';
+            this.updatePreview();
+            this.showToast('Foto profil dihapus', 'info');
+        });
+    }
+
     // ============ UPDATE PREVIEW ============
     updatePreview() {
         const preview = document.getElementById('cvPreview');
@@ -996,7 +1079,7 @@ class CVBuilderApp {
                     <div class="preview-education-item">
                         <div class="edu-header">
                             <span class="edu-institution">${this.escapeHtml(edu.institution || '')}</span>
-                            <span class="edu-meta">${this.escapeHtml(edu.location || '')} • ${this.escapeHtml(edu.period || '')}</span>
+                            <span class="edu-meta">${this.joinMeta(edu.location, edu.period)}</span>
                         </div>
                         <div class="edu-major">${this.escapeHtml(edu.major || '')}</div>
                         ${edu.gpa ? `<div class="edu-gpa">${this.escapeHtml(edu.gpa)}</div>` : ''}
@@ -1013,10 +1096,10 @@ class CVBuilderApp {
                     <div class="preview-exp-item">
                         <div class="exp-header">
                             <span class="exp-company">${this.escapeHtml(int.company || '')}</span>
-                            <span class="exp-meta">${this.escapeHtml(int.location || '')} • ${this.escapeHtml(int.period || '')}</span>
+                            <span class="exp-meta">${this.joinMeta(int.location, int.period)}</span>
                         </div>
                         <div class="exp-position">${this.escapeHtml(int.position || '')}</div>
-                        ${int.description ? `<div class="exp-description">${this.escapeHtml(int.description).replace(/\n/g, '<br>')}</div>` : ''}
+                        ${this.buildDescriptionListHTML(int.description)}
                     </div>
                 `;
             }
@@ -1030,10 +1113,10 @@ class CVBuilderApp {
                     <div class="preview-exp-item">
                         <div class="exp-header">
                             <span class="exp-company">${this.escapeHtml(work.company || '')}</span>
-                            <span class="exp-meta">${this.escapeHtml(work.location || '')} • ${this.escapeHtml(work.period || '')}</span>
+                            <span class="exp-meta">${this.joinMeta(work.location, work.period)}</span>
                         </div>
                         <div class="exp-position">${this.escapeHtml(work.position || '')}</div>
-                        ${work.description ? `<div class="exp-description">${this.escapeHtml(work.description).replace(/\n/g, '<br>')}</div>` : ''}
+                        ${this.buildDescriptionListHTML(work.description)}
                     </div>
                 `;
             }
@@ -1047,10 +1130,10 @@ class CVBuilderApp {
                     <div class="preview-exp-item">
                         <div class="exp-header">
                             <span class="exp-company">${this.escapeHtml(org.name || '')}</span>
-                            <span class="exp-meta">${this.escapeHtml(org.location || '')} • ${this.escapeHtml(org.period || '')}</span>
+                            <span class="exp-meta">${this.joinMeta(org.location, org.period)}</span>
                         </div>
                         <div class="exp-position">${this.escapeHtml(org.position || '')}</div>
-                        ${org.description ? `<div class="exp-description">${this.escapeHtml(org.description).replace(/\n/g, '<br>')}</div>` : ''}
+                        ${this.buildDescriptionListHTML(org.description)}
                     </div>
                 `;
             }
@@ -1070,106 +1153,116 @@ class CVBuilderApp {
             }
         });
 
-        // Build skills HTML: one bullet point per category,
-        // e.g. "• Networking: TCP/IP, Routing, Switching, MikroTik"
+        // Build skills HTML: one column per category (e.g. "Hard Skills" /
+        // "Soft Skills"), each rendered as its own bullet list - mirrors the
+        // classic two-column "KEMAMPUAN" layout on a printed ATS resume.
         let skillsHTML = '';
         if (formData.skills && formData.skills.length > 0) {
-            const hasValidSkills = formData.skills.some(s => s.category || s.items);
-            if (hasValidSkills) {
+            const validSkills = formData.skills.filter(s => s.category || s.items);
+            if (validSkills.length > 0) {
+                const columns = validSkills.map(skill => {
+                    const itemsList = skill.items ? skill.items.split(',').map(s => s.trim()).filter(s => s) : [];
+                    const titleHTML = skill.category ? `<div class="skill-col-title">${this.escapeHtml(skill.category)}</div>` : '';
+                    const itemsHTML = itemsList.length > 0
+                        ? `<ul>${itemsList.map(item => `<li>${this.escapeHtml(item)}</li>`).join('')}</ul>`
+                        : '';
+                    return `<div class="preview-skill-col">${titleHTML}${itemsHTML}</div>`;
+                }).join('');
+
                 skillsHTML = `
                     <div class="preview-section preview-section-skills">
-                        <div class="preview-section-title"><i class="fas fa-cogs"></i>Skills</div>
-                        <ul class="preview-skills-bullet-list">
-                `;
-
-                formData.skills.forEach(skill => {
-                    if (skill.category || skill.items) {
-                        const itemsList = skill.items ? skill.items.split(',').map(s => s.trim()).filter(s => s) : [];
-                        const categoryPart = skill.category ? `<strong>${this.escapeHtml(skill.category)}:</strong> ` : '';
-                        const itemsPart = this.escapeHtml(itemsList.join(', '));
-                        skillsHTML += `<li>${categoryPart}${itemsPart}</li>`;
-                    }
-                });
-
-                skillsHTML += `
-                        </ul>
+                        <div class="preview-section-title">Kemampuan</div>
+                        <div class="preview-skills-columns">${columns}</div>
                     </div>
                 `;
             }
         }
 
-        // Build certifications HTML with images
+        // Build certifications HTML as a plain bullet list, e.g.
+        // "• Microsoft Office" or "• Pelatihan Kurikulum Merdeka - Kemendikbud (2025)"
         let certHTML = '';
         formData.certifications.forEach(cert => {
             if (cert.name) {
+                const issuerPart = cert.issuer ? ` - ${this.escapeHtml(cert.issuer)}` : '';
+                const yearPart = cert.year ? ` (${this.escapeHtml(cert.year)})` : '';
                 certHTML += `
-                    <div class="preview-cert-item">
-                        <div class="cert-info">
-                            <span class="cert-name">${this.escapeHtml(cert.name)}</span>
-                            ${cert.issuer ? `<span class="cert-issuer"> - ${this.escapeHtml(cert.issuer)}</span>` : ''}
-                            ${cert.year ? `<span class="cert-year"> (${this.escapeHtml(cert.year)})</span>` : ''}
-                        </div>
+                    <li class="preview-cert-item">
+                        <span class="cert-info">
+                            <span class="cert-name">${this.escapeHtml(cert.name)}</span>${issuerPart}${yearPart}
+                        </span>
                         ${cert.image ? `
                             <div class="preview-cert-image" data-cert-image="${this.escapeHtml(cert.image)}">
                                 <img src="${cert.image}" alt="${this.escapeHtml(cert.name)}">
                             </div>
                         ` : ''}
-                    </div>
+                    </li>
                 `;
             }
         });
 
-        // Build contact row
-        const contactParts = [];
-        if (formData.email) contactParts.push(`<span><i class="fas fa-envelope"></i> ${this.escapeHtml(formData.email)}</span>`);
-        if (formData.phone) contactParts.push(`<span><i class="fas fa-phone"></i> ${this.escapeHtml(formData.phone)}</span>`);
-        if (formData.linkedin) contactParts.push(`<a href="https://${this.escapeHtml(formData.linkedin)}" target="_blank"><i class="fab fa-linkedin"></i> ${this.escapeHtml(formData.linkedin)}</a>`);
-        if (formData.portfolio) contactParts.push(`<a href="https://${this.escapeHtml(formData.portfolio)}" target="_blank"><i class="fas fa-link"></i> ${this.escapeHtml(formData.portfolio)}</a>`);
-        if (formData.domicile) contactParts.push(`<span><i class="fas fa-map-marker-alt"></i> ${this.escapeHtml(formData.domicile)}</span>`);
+        // Build contact lines - one labeled line per field, e.g.
+        // "Alamat : Yogyakarta" / "Handphone : 08xxxxxxxxxx" / "Email : ..."
+        // instead of an icon row, matching a classic single-column ATS resume.
+        const contactLines = [];
+        if (formData.domicile) contactLines.push(`<div class="contact-line"><span class="contact-label">Alamat</span><span>: ${this.escapeHtml(formData.domicile)}</span></div>`);
+        if (formData.phone) contactLines.push(`<div class="contact-line"><span class="contact-label">Handphone</span><span>: ${this.escapeHtml(formData.phone)}</span></div>`);
+        if (formData.email) contactLines.push(`<div class="contact-line"><span class="contact-label">Email</span><span>: ${this.escapeHtml(formData.email)}</span></div>`);
+        if (formData.linkedin) contactLines.push(`<div class="contact-line"><span class="contact-label">LinkedIn</span><span>: <a href="https://${this.escapeHtml(formData.linkedin)}" target="_blank">${this.escapeHtml(formData.linkedin)}</a></span></div>`);
+        if (formData.portfolio) contactLines.push(`<div class="contact-line"><span class="contact-label">Portofolio</span><span>: <a href="https://${this.escapeHtml(formData.portfolio)}" target="_blank">${this.escapeHtml(formData.portfolio)}</a></span></div>`);
+
+        // Header photo box - only rendered when the user picked "Dengan Foto"
+        // and actually uploaded one, so the layout stays a plain text header
+        // (no empty box) whenever "Tanpa Foto" is selected.
+        const photoHTML = (formData.photoOption === 'with' && formData.photo)
+            ? `<div class="preview-photo-box"><img src="${formData.photo}" alt="Foto profil"></div>`
+            : '';
 
         let html = `
             <div class="cv-preview-content">
                 <div class="preview-header-main">
-                    <h1>${this.escapeHtml(formData.fullName || 'NAMA LENGKAP')}</h1>
-                    <div class="preview-position">${this.escapeHtml(formData.position || 'POSISI / JABATAN')}</div>
-                    <div class="preview-contact-row">
-                        ${contactParts.join(' • ')}
+                    ${photoHTML}
+                    <div class="preview-header-text">
+                        <h1>${this.escapeHtml(formData.fullName || 'NAMA LENGKAP')}</h1>
+                        ${formData.position ? `<div class="preview-position">${this.escapeHtml(formData.position)}</div>` : ''}
+                        <div class="preview-contact-row">
+                            ${contactLines.join('')}
+                        </div>
                     </div>
                 </div>
 
                 ${formData.aboutMe ? `
                 <div class="preview-section">
-                    <div class="preview-section-title"><i class="fas fa-user-edit"></i>Tentang Saya</div>
+                    <div class="preview-section-title">Tentang Saya</div>
                     <div class="preview-about">${this.escapeHtml(formData.aboutMe)}</div>
                 </div>` : ''}
 
                 ${educationHTML ? `
                 <div class="preview-section">
-                    <div class="preview-section-title"><i class="fas fa-graduation-cap"></i>Pendidikan</div>
+                    <div class="preview-section-title">Pendidikan</div>
                     ${educationHTML}
                 </div>` : ''}
 
                 ${internshipHTML ? `
                 <div class="preview-section">
-                    <div class="preview-section-title"><i class="fas fa-laptop"></i>Pengalaman Magang</div>
+                    <div class="preview-section-title">Pengalaman Magang</div>
                     ${internshipHTML}
                 </div>` : ''}
 
                 ${workHTML ? `
                 <div class="preview-section">
-                    <div class="preview-section-title"><i class="fas fa-briefcase"></i>Pengalaman Kerja</div>
+                    <div class="preview-section-title">Pengalaman Kerja</div>
                     ${workHTML}
                 </div>` : ''}
 
                 ${orgHTML ? `
                 <div class="preview-section">
-                    <div class="preview-section-title"><i class="fas fa-users"></i>Pengalaman Organisasi</div>
+                    <div class="preview-section-title">Organisasi</div>
                     ${orgHTML}
                 </div>` : ''}
 
                 ${projectHTML ? `
                 <div class="preview-section">
-                    <div class="preview-section-title"><i class="fas fa-laptop-code"></i>Proyek</div>
+                    <div class="preview-section-title">Proyek</div>
                     ${projectHTML}
                 </div>` : ''}
 
@@ -1177,8 +1270,8 @@ class CVBuilderApp {
 
                 ${certHTML ? `
                 <div class="preview-section">
-                    <div class="preview-section-title"><i class="fas fa-certificate"></i>Sertifikasi</div>
-                    ${certHTML}
+                    <div class="preview-section-title">Sertifikat</div>
+                    <ul class="preview-cert-list">${certHTML}</ul>
                 </div>` : ''}
             </div>
         `;
@@ -1292,7 +1385,9 @@ class CVBuilderApp {
             organizations: organizations,
             projects: projects,
             skills: skills,
-            certifications: certifications
+            certifications: certifications,
+            photoOption: this.atsPhotoOption,
+            photo: this.atsPhotoOption === 'with' ? this.atsPhotoDataUrl : null
         };
     }
 
