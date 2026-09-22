@@ -465,6 +465,12 @@ body.dark-theme .app-header {
     gap: 16px;
 }
 
+/* Pasangan "Judul Link" + "URL Link" (Ijazah, Transkrip, Magang, Kerja,
+   Proyek, Sertifikasi) - dua input ditumpuk rapat di bawah satu label. */
+.link-field-group input + input {
+    margin-top: 8px;
+}
+
 /* ============ ITEMS (Education, Experience, etc.) ============ */
 .education-item,
 .internship-item,
