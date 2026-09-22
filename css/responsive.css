@@ -194,30 +194,36 @@
         min-height: 350px;
     }
 
-    /* Preview Content - Mobile */
-    .preview-header-main h1 {
-        font-size: 20px !important;
-    }
-
-    .preview-header-main .preview-position {
-        font-size: 12px !important;
-    }
-
-    .preview-contact-row {
-        font-size: 11px !important;
-    }
-
-    .preview-contact-row .contact-label {
-        min-width: 68px;
-    }
-
+    /* ===== Preview Content - Mobile ===== */
+    /* Header ATS: foto tetap di kiri, ukurannya dikecilkan proporsional */
     .preview-header-main {
         gap: 12px;
+        flex-wrap: nowrap;
     }
 
     .preview-photo-box {
+        flex: 0 0 72px;
         width: 72px;
-        height: 72px;
+        height: 88px;
+    }
+
+    .preview-header-main h1 {
+        font-size: 17px !important;
+        margin-bottom: 4px;
+    }
+
+    .preview-header-main .preview-position {
+        font-size: 10.5px !important;
+        margin-bottom: 6px;
+    }
+
+    .preview-contact-row {
+        font-size: 10.5px !important;
+        line-height: 1.4;
+    }
+
+    .preview-contact-row .contact-label {
+        min-width: 60px;
     }
 
     .preview-section-title {
@@ -398,12 +404,22 @@
     }
 
     .preview-header-main h1 {
-        font-size: 18px !important;
+        font-size: 15px !important;
+    }
+
+    .preview-photo-box {
+        flex: 0 0 60px;
+        width: 60px;
+        height: 74px;
     }
 
     .preview-contact-row {
-        font-size: 10px !important;
+        font-size: 9.5px !important;
         gap: 2px;
+    }
+
+    .preview-contact-row .contact-label {
+        min-width: 55px;
     }
 
     .preview-section-title {
@@ -643,7 +659,7 @@
     }
 
     .preview-header-main h1 {
-        font-size: 20px !important;
+        font-size: 18px !important;
     }
 
     .preview-contact-row {
