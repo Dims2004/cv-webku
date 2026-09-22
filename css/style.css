@@ -1400,3 +1400,15 @@ body.dark-theme .preview-cert-image { border-color: #334155; }
     body.dark-theme .preview-header-main { border-bottom-color: #000 !important; }
     body.dark-theme .preview-section-title { border-bottom-color: #000 !important; color: #000 !important; }
 }
+/* Word button di form-actions: style sudah di responsive.css, tapi ini
+   sebagai fallback agar konsisten di desktop */
+.btn-word {
+    background: #2b579a;
+    color: white;
+}
+
+.btn-word:hover {
+    background: #1e3f73;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
