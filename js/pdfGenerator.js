@@ -4,11 +4,6 @@ class PDFGenerator {
         this.isGenerating = false;
     }
 
-    // Main PDF generation method.
-    // Captures the CV preview and lays it out across as many A4 pages as needed,
-    // instead of squeezing/cropping everything onto a single page.
-    // options.previewElementId: which preview container to capture (default 'cvPreview', the ATS preview).
-    // options.fileSuffix: appended to the downloaded filename (default 'CV').
     async generatePDF(formData, options = {}) {
         const previewElementId = options.previewElementId || 'cvPreview';
         const fileSuffix = options.fileSuffix || 'CV';
@@ -32,22 +27,15 @@ class PDFGenerator {
         this.showToast('Mengenerate PDF...', 'info');
 
         try {
-            // Make sure every image (certificate badges, etc.) is fully loaded
-            // BEFORE we measure the preview's height.
             await this.waitForImages(previewElement);
             await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-            // Read the color/font currently applied on screen so the PDF
-            // matches exactly what the user picked.
             const titleColor = getComputedStyle(document.documentElement)
                 .getPropertyValue('--cv-title-color').trim() || '#a11d3d';
             const cvFont = getComputedStyle(document.documentElement)
                 .getPropertyValue('--cv-font-family').trim();
 
-            // Render at a higher-quality scale for crisp, HD text/images.
             const RENDER_SCALE = 3;
-
-            // --- Fix for "PDF berantakan kalau download dari HP" ---
             const DESKTOP_VIEWPORT_WIDTH = 1400;
             const DESKTOP_VIEWPORT_HEIGHT = 1400;
 
@@ -60,7 +48,6 @@ class PDFGenerator {
                 windowWidth: DESKTOP_VIEWPORT_WIDTH,
                 windowHeight: DESKTOP_VIEWPORT_HEIGHT,
                 onclone: (clonedDoc) => {
-                    // Pin the preview element to a fixed desktop-style width.
                     const clonedPreview = clonedDoc.getElementById(previewElementId);
                     if (clonedPreview) {
                         clonedPreview.style.width = '750px';
@@ -78,14 +65,16 @@ class PDFGenerator {
                         clonedMain.style.minHeight = tallest + 'px';
                     }
 
-                    // --- Fix foto profil ATS: ukuran tetap saat capture ---
+                    // --- Foto profil ATS: ukuran tetap saat capture ---
+                    // Ukuran baru: 90x110px (kotak, bukan bulat).
                     const clonedPhotoBox = clonedDoc.querySelector('.preview-photo-box');
                     if (clonedPhotoBox) {
-                        clonedPhotoBox.style.width = '96px';
-                        clonedPhotoBox.style.height = '120px';
-                        clonedPhotoBox.style.flex = '0 0 96px';
+                        clonedPhotoBox.style.width = '90px';
+                        clonedPhotoBox.style.height = '110px';
+                        clonedPhotoBox.style.flex = '0 0 90px';
                         clonedPhotoBox.style.overflow = 'hidden';
-                        clonedPhotoBox.style.borderRadius = '2px';
+                        clonedPhotoBox.style.borderRadius = '0';
+                        clonedPhotoBox.style.border = '1px solid #1a1a2e';
 
                         const clonedPhotoImg = clonedPhotoBox.querySelector('img');
                         if (clonedPhotoImg) {
@@ -95,6 +84,29 @@ class PDFGenerator {
                             clonedPhotoImg.style.objectPosition = 'center top';
                             clonedPhotoImg.style.display = 'block';
                         }
+                    }
+
+                    // --- Pastikan header ATS tetap flex row saat capture ---
+                    // html2canvas kadang tidak menghormati display:flex pada
+                    // elemen yang di-clone, sehingga foto & teks bisa tumpang
+                    // tindih atau foto jadi full-width. Pin eksplisit di sini.
+                    const clonedHeader = clonedDoc.querySelector('.preview-header-main');
+                    if (clonedHeader) {
+                        clonedHeader.style.display = 'flex';
+                        clonedHeader.style.flexDirection = 'row';
+                        clonedHeader.style.alignItems = 'flex-start';
+                        clonedHeader.style.gap = '16px';
+                        clonedHeader.style.borderBottom = '1.5px solid #1a1a2e';
+                        clonedHeader.style.paddingBottom = '12px';
+                        clonedHeader.style.marginBottom = '14px';
+                    }
+
+                    const clonedHeaderText = clonedDoc.querySelector('.preview-header-text');
+                    if (clonedHeaderText) {
+                        clonedHeaderText.style.flex = '1';
+                        clonedHeaderText.style.minWidth = '0';
+                        clonedHeaderText.style.display = 'flex';
+                        clonedHeaderText.style.flexDirection = 'column';
                     }
 
                     // Pastikan link tetap punya style underline & warna yang sama saat di-capture
@@ -113,7 +125,6 @@ class PDFGenerator {
                         el.style.borderBottomColor = titleColor;
                     });
 
-                    // Same reasoning for the chosen font family.
                     if (cvFont) {
                         const content = clonedDoc.querySelector('.cv-preview-content');
                         if (content) content.style.fontFamily = cvFont;
@@ -140,7 +151,6 @@ class PDFGenerator {
         }
     }
 
-    // Resolves once every <img> inside el has either loaded or failed.
     waitForImages(el) {
         const images = Array.from(el.querySelectorAll('img'));
         return Promise.all(images.map(img => {
@@ -152,7 +162,6 @@ class PDFGenerator {
         }));
     }
 
-    // Slices the captured canvas across multiple A4 pages (no cropping).
     buildMultiPagePdf(sourceCanvas, formData, fileSuffix = 'CV') {
         const pdf = new jspdf.jsPDF({
             orientation: 'portrait',
@@ -161,9 +170,9 @@ class PDFGenerator {
             compress: true
         });
 
-        const pdfWidth = pdf.internal.pageSize.getWidth();   // 210mm
-        const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
-        const margin = 10; // mm
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const margin = 10;
 
         const contentWidthMm = pdfWidth - margin * 2;
         const contentHeightAvailableMm = pdfHeight - margin * 2;
@@ -231,5 +240,4 @@ class PDFGenerator {
     }
 }
 
-// Export for use in main app
 window.PDFGenerator = PDFGenerator;
