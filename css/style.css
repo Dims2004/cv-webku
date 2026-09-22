@@ -465,8 +465,6 @@ body.dark-theme .app-header {
     gap: 16px;
 }
 
-/* Pasangan "Judul Link" + "URL Link" (Ijazah, Transkrip, Magang, Kerja,
-   Proyek, Sertifikasi) - dua input ditumpuk rapat di bawah satu label. */
 .link-field-group input + input {
     margin-top: 8px;
 }
@@ -734,16 +732,17 @@ body.dark-theme .cv-preview-content {
     color: #e2e8f0;
 }
 
-/* Header - classic ATS layout: optional photo box on the left,
-   aligned only with the name + position ("judul"), not the contact
-   lines. Contact details sit on their own full-width row underneath,
-   a single rule underneath separating it from the rest of the document. */
+/* ============================================================
+   HEADER ATS — Foto di kiri, nama+posisi di kanan (sejajar atas),
+   kontak full-width di bawahnya (label colon-style seperti
+   contoh CV referensi). Konsisten di layar & PDF.
+   ============================================================ */
 .preview-header-main {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     margin-bottom: 18px;
-    padding-bottom: 16px;
+    padding-bottom: 14px;
     border-bottom: 2px solid #1a1a2e;
 }
 
@@ -757,41 +756,44 @@ body.dark-theme .preview-header-main {
     gap: 20px;
 }
 
-/* Ukuran tinggi dibuat tetap (bukan mengandalkan align-items: stretch +
-   height:100% pada gambarnya) supaya posisi foto konsisten sejajar dengan
-   baris nama, baik di layar maupun saat di-capture html2canvas untuk PDF.
-   Sebelumnya box ini tidak punya tinggi pasti, sehingga saat html2canvas
-   tidak mendukung penuh "stretch" pada flex item bertinggi auto, foto bisa
-   ter-render melebihi batas atas header ketika PDF diunduh. */
+/* Foto profil: ukuran tetap, tidak ikut melar mengikuti teks di sebelahnya. */
 .preview-photo-box {
-    flex-shrink: 0;
+    flex: 0 0 96px;
     width: 96px;
-    height: 96px;
-    border-radius: 4px;
+    height: 120px;              /* rasio 4:5, mirip pas foto formal */
+    border-radius: 2px;
     overflow: hidden;
     background: #e2e8f0;
     border: 1px solid #cbd5e0;
+    box-sizing: border-box;
 }
 
 .preview-photo-box img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center top; /* fokus ke wajah, bukan dada */
     display: block;
 }
 
 .preview-header-text {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 2px;
 }
 
 .preview-header-main h1 {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 800;
     letter-spacing: 0.5px;
-    margin: 0 0 4px;
+    line-height: 1.15;
+    margin: 0 0 6px;
     text-transform: uppercase;
     color: var(--cv-title-color, #1a1a2e);
+    word-wrap: break-word;
 }
 
 body.dark-theme .preview-header-main h1 {
@@ -801,22 +803,22 @@ body.dark-theme .preview-header-main h1 {
 .preview-header-main .preview-position {
     font-size: 13px;
     font-weight: 600;
-    font-style: normal !important;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    line-height: 1.5;
     color: #4a5568;
-    margin: 0 0 10px;
+    margin: 0;
 }
 
 body.dark-theme .preview-header-main .preview-position {
     color: #a0aec0;
 }
 
-/* Colon-style contact lines: "Alamat : ...", "Handphone : ...", "Email : ..." */
+/* Kontak: satu baris per field, format "Label : nilai" */
 .preview-contact-row {
     font-size: 12.5px;
     color: #1a1a2e;
-    line-height: 1.75;
+    line-height: 1.7;
 }
 
 body.dark-theme .preview-contact-row {
@@ -827,6 +829,7 @@ body.dark-theme .preview-contact-row {
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
+    align-items: baseline;
 }
 
 .preview-contact-row .contact-label {
@@ -835,10 +838,14 @@ body.dark-theme .preview-contact-row {
     flex-shrink: 0;
 }
 
+/* LINK KONTAK — dipaksa bisa diklik & tetap terlihat jelas */
 .preview-contact-row a {
-    color: var(--primary-color, #2563eb);
+    color: #1a56db;
     text-decoration: underline;
+    text-underline-offset: 2px;
     word-break: break-all;
+    cursor: pointer;
+    pointer-events: auto;
 }
 
 body.dark-theme .preview-contact-row a {
@@ -846,7 +853,13 @@ body.dark-theme .preview-contact-row a {
 }
 
 .preview-contact-row a:hover {
+    color: #1e40af;
     text-decoration: none;
+}
+
+.preview-contact-row a i {
+    font-size: 11px;
+    margin-right: 2px;
 }
 
 /* Sections - each section (after the first) is separated from the one
@@ -1000,11 +1013,14 @@ body.dark-theme .preview-exp-item .exp-position {
     font-size: 12px;
     font-weight: 600;
     font-style: normal;
-    color: var(--primary-color, #2563eb);
-    text-decoration: none;
+    color: #1a56db;
+    text-decoration: underline;
+    text-underline-offset: 2px;
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    cursor: pointer;
+    pointer-events: auto;
 }
 
 .preview-doc-links a i,
@@ -1014,7 +1030,8 @@ body.dark-theme .preview-exp-item .exp-position {
 
 .preview-doc-links a:hover,
 .preview-doc-link-inline:hover {
-    text-decoration: underline;
+    color: #1e40af;
+    text-decoration: none;
 }
 
 body.dark-theme .preview-doc-links a,
@@ -1086,9 +1103,6 @@ body.dark-theme .preview-project-item .project-tech {
 }
 
 /* ============ PREVIEW SKILLS ============ */
-/* Rendered as a multi-column grid, one column per skill category
-   (e.g. "Hard Skills" / "Soft Skills"), each with its own bullet list -
-   mirrors the classic two-column ATS "KEMAMPUAN" layout. */
 .preview-skills-columns {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -1345,9 +1359,6 @@ body.dark-theme .cert-preview span {
 }
 
 /* ============ PREVIEW CERTIFICATION - PLAIN BULLET LIST ============ */
-/* A simple "• Name - Issuer (Year)" list, matching a classic ATS resume,
-   instead of a card. The optional uploaded image (proof of certificate)
-   still shows as a small thumbnail underneath when present. */
 .preview-cert-list {
     margin: 0;
     padding-left: 18px;
