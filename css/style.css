@@ -88,17 +88,9 @@ body.dark-theme {
 }
 
 @keyframes loading {
-    0% {
-        width: 0;
-    }
-
-    50% {
-        width: 70%;
-    }
-
-    100% {
-        width: 100%;
-    }
+    0% { width: 0; }
+    50% { width: 70%; }
+    100% { width: 100%; }
 }
 
 #loading-screen p {
@@ -303,23 +295,10 @@ body.dark-theme .app-header {
     transition: var(--transition);
 }
 
-.form-panel::-webkit-scrollbar {
-    width: 6px;
-}
-
-.form-panel::-webkit-scrollbar-track {
-    background: var(--bg-color);
-    border-radius: 3px;
-}
-
-.form-panel::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 3px;
-}
-
-.form-panel::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
-}
+.form-panel::-webkit-scrollbar { width: 6px; }
+.form-panel::-webkit-scrollbar-track { background: var(--bg-color); border-radius: 3px; }
+.form-panel::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+.form-panel::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 .form-header {
     display: flex;
@@ -469,7 +448,7 @@ body.dark-theme .app-header {
     margin-top: 8px;
 }
 
-/* ============ ITEMS (Education, Experience, etc.) ============ */
+/* ============ ITEMS ============ */
 .education-item,
 .internship-item,
 .work-item,
@@ -588,23 +567,10 @@ body.dark-theme .btn-remove-skill:hover {
     transition: var(--transition);
 }
 
-.preview-panel::-webkit-scrollbar {
-    width: 6px;
-}
-
-.preview-panel::-webkit-scrollbar-track {
-    background: var(--bg-color);
-    border-radius: 3px;
-}
-
-.preview-panel::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 3px;
-}
-
-.preview-panel::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
-}
+.preview-panel::-webkit-scrollbar { width: 6px; }
+.preview-panel::-webkit-scrollbar-track { background: var(--bg-color); border-radius: 3px; }
+.preview-panel::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+.preview-panel::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 .preview-header {
     display: flex;
@@ -657,14 +623,8 @@ body.dark-theme .btn-remove-skill:hover {
     background: none;
 }
 
-#titleColorPicker::-webkit-color-swatch-wrapper {
-    padding: 2px;
-}
-
-#titleColorPicker::-webkit-color-swatch {
-    border: none;
-    border-radius: 3px;
-}
+#titleColorPicker::-webkit-color-swatch-wrapper { padding: 2px; }
+#titleColorPicker::-webkit-color-swatch { border: none; border-radius: 3px; }
 
 .font-picker-group {
     display: flex;
@@ -674,9 +634,7 @@ body.dark-theme .btn-remove-skill:hover {
     color: var(--text-secondary, #718096);
 }
 
-.font-picker-group i {
-    font-size: 13px;
-}
+.font-picker-group i { font-size: 13px; }
 
 #fontPicker {
     font-size: 12px;
@@ -713,7 +671,6 @@ body.dark-theme .cv-preview {
     color: #f1f5f9;
 }
 
-/* ============ PREVIEW CV STYLES ============ */
 .cv-preview-content {
     font-family: var(--cv-font-family, var(--font-family));
     color: #1a1a2e;
@@ -733,8 +690,9 @@ body.dark-theme .cv-preview-content {
 }
 
 /* ============================================================
-   HEADER ATS — Foto kotak di kiri mengapit seluruh blok
-   nama + kontak di kanan (seperti contoh CV referensi).
+   HEADER ATS — Foto kotak di kiri sejajar baris NAMA (bukan
+   sejajar kontak). Tinggi header mengikuti tinggi foto supaya
+   tidak ada foto yang "melebihi" atau "kurang".
    ============================================================ */
 .preview-header-main {
     display: flex;
@@ -749,16 +707,23 @@ body.dark-theme .preview-header-main {
     border-bottom-color: #4a5568;
 }
 
-/* Foto profil: kotak rapi di kiri, tidak melar mengikuti teks kanan. */
+/* Foto profil: kotak rapi di kiri, sejajar atas dengan nama.
+   Tinggi 110px dibuat agar kira-kira sama dengan tinggi blok
+   nama + posisi + kontak (5 baris). */
 .preview-photo-box {
     flex: 0 0 90px;
     width: 90px;
-    height: 110px;               /* rasio ±4:5, seperti pas foto formal */
-    border-radius: 0;             /* kotak tajam, seperti contoh */
+    height: 110px;
+    border-radius: 0;
     overflow: hidden;
     background: #e2e8f0;
     border: 1px solid #1a1a2e;
     box-sizing: border-box;
+    /* Kunci: tarik foto ke atas supaya sejajar dengan huruf kapital
+       pada baris nama. Huruf kapital 'DIMAS' punya sedikit ruang di
+       atas (line-height), jadi foto tidak boleh mulai lebih tinggi. */
+    align-self: flex-start;
+    margin-top: 0;
 }
 
 .preview-photo-box img {
@@ -774,7 +739,6 @@ body.dark-theme .preview-header-main {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
     padding-top: 0;
 }
 
@@ -783,7 +747,7 @@ body.dark-theme .preview-header-main {
     font-weight: 800;
     letter-spacing: 0.4px;
     line-height: 1.15;
-    margin: 0 0 6px;
+    margin: 0 0 4px;
     text-transform: uppercase;
     color: var(--cv-title-color, #1a1a2e);
     word-wrap: break-word;
@@ -793,7 +757,6 @@ body.dark-theme .preview-header-main h1 {
     color: var(--cv-title-color, #f1f5f9);
 }
 
-/* Posisi di bawah nama — kecil, uppercase, bukan di samping nama */
 .preview-header-main .preview-position {
     font-size: 11.5px;
     font-weight: 600;
@@ -808,7 +771,7 @@ body.dark-theme .preview-header-main .preview-position {
     color: #a0aec0;
 }
 
-/* Kontak — di dalam blok header (di kanan foto), label bold + colon */
+/* Kontak — di dalam blok header, di kanan foto, label bold + colon */
 .preview-contact-row {
     font-size: 12px;
     color: #1a1a2e;
@@ -832,7 +795,8 @@ body.dark-theme .preview-contact-row {
     flex-shrink: 0;
 }
 
-/* LINK KONTAK — bisa diklik & terlihat jelas */
+/* LINK KONTAK — semua link (Email, LinkedIn, Portofolio) dipaksa
+   bisa diklik & terlihat jelas, tanpa ikon. */
 .preview-contact-row a {
     color: #1a56db;
     text-decoration: underline;
@@ -851,14 +815,29 @@ body.dark-theme .preview-contact-row a {
     text-decoration: none;
 }
 
+/* Sembunyikan ikon apapun yang mungkin masih ada di dalam link kontak */
 .preview-contact-row a i {
-    font-size: 10px;
-    margin-right: 2px;
+    display: none !important;
 }
 
-/* Sections - each section (after the first) is separated from the one
-   before it with a thin rule, matching a classic single-column ATS resume
-   instead of a colored underline under every heading. */
+/* ============================================================
+   TENTANG SAYA — tanpa judul, langsung paragraf.
+   Cukup beri jarak dari header di atasnya.
+   ============================================================ */
+.preview-about {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #2d3748;
+    margin-bottom: 4px;
+    text-align: justify;
+    margin-top: 4px;
+}
+
+body.dark-theme .preview-about {
+    color: #cbd5e0;
+}
+
+/* Sections - pemisah antar section */
 .preview-section {
     margin-bottom: 16px;
     padding-top: 14px;
@@ -892,23 +871,8 @@ body.dark-theme .preview-section-title {
     font-size: 13px;
 }
 
-/* About */
-.preview-about {
-    font-size: 13px;
-    line-height: 1.7;
-    color: #2d3748;
-    margin-bottom: 4px;
-    text-align: justify;
-}
-
-body.dark-theme .preview-about {
-    color: #cbd5e0;
-}
-
 /* Education */
-.preview-education-item {
-    margin-bottom: 12px;
-}
+.preview-education-item { margin-bottom: 12px; }
 
 .preview-education-item .edu-header {
     display: flex;
@@ -924,9 +888,7 @@ body.dark-theme .preview-about {
     color: #1a1a2e;
 }
 
-body.dark-theme .preview-education-item .edu-institution {
-    color: #e2e8f0;
-}
+body.dark-theme .preview-education-item .edu-institution { color: #e2e8f0; }
 
 .preview-education-item .edu-major {
     font-weight: 600;
@@ -934,9 +896,7 @@ body.dark-theme .preview-education-item .edu-institution {
     color: #2d3748;
 }
 
-body.dark-theme .preview-education-item .edu-major {
-    color: #cbd5e0;
-}
+body.dark-theme .preview-education-item .edu-major { color: #cbd5e0; }
 
 .preview-education-item .edu-meta {
     font-size: 12px;
@@ -944,9 +904,7 @@ body.dark-theme .preview-education-item .edu-major {
     font-weight: 500;
 }
 
-body.dark-theme .preview-education-item .edu-meta {
-    color: #a0aec0;
-}
+body.dark-theme .preview-education-item .edu-meta { color: #a0aec0; }
 
 .preview-education-item .edu-gpa {
     font-size: 12px;
@@ -954,14 +912,10 @@ body.dark-theme .preview-education-item .edu-meta {
     margin-top: 2px;
 }
 
-body.dark-theme .preview-education-item .edu-gpa {
-    color: #a0aec0;
-}
+body.dark-theme .preview-education-item .edu-gpa { color: #a0aec0; }
 
 /* Experience Items */
-.preview-exp-item {
-    margin-bottom: 12px;
-}
+.preview-exp-item { margin-bottom: 12px; }
 
 .preview-exp-item .exp-header {
     display: flex;
@@ -977,9 +931,7 @@ body.dark-theme .preview-education-item .edu-gpa {
     color: #1a1a2e;
 }
 
-body.dark-theme .preview-exp-item .exp-company {
-    color: #e2e8f0;
-}
+body.dark-theme .preview-exp-item .exp-company { color: #e2e8f0; }
 
 .preview-exp-item .exp-position {
     font-weight: 600;
@@ -988,11 +940,9 @@ body.dark-theme .preview-exp-item .exp-company {
     color: #2d3748;
 }
 
-body.dark-theme .preview-exp-item .exp-position {
-    color: #cbd5e0;
-}
+body.dark-theme .preview-exp-item .exp-position { color: #cbd5e0; }
 
-/* ============ DOCUMENT / REFERENCE LINKS ============ */
+/* Document links */
 .preview-doc-links {
     display: flex;
     flex-wrap: wrap;
@@ -1016,9 +966,7 @@ body.dark-theme .preview-exp-item .exp-position {
 }
 
 .preview-doc-links a i,
-.preview-doc-link-inline i {
-    font-size: 11px;
-}
+.preview-doc-link-inline i { font-size: 11px; }
 
 .preview-doc-links a:hover,
 .preview-doc-link-inline:hover {
@@ -1027,9 +975,7 @@ body.dark-theme .preview-exp-item .exp-position {
 }
 
 body.dark-theme .preview-doc-links a,
-body.dark-theme .preview-doc-link-inline {
-    color: #60a5fa;
-}
+body.dark-theme .preview-doc-link-inline { color: #60a5fa; }
 
 .preview-exp-item .exp-meta {
     font-size: 12px;
@@ -1037,9 +983,7 @@ body.dark-theme .preview-doc-link-inline {
     font-weight: 500;
 }
 
-body.dark-theme .preview-exp-item .exp-meta {
-    color: #a0aec0;
-}
+body.dark-theme .preview-exp-item .exp-meta { color: #a0aec0; }
 
 .preview-exp-item .exp-description {
     font-size: 13px;
@@ -1049,18 +993,11 @@ body.dark-theme .preview-exp-item .exp-meta {
     padding-left: 18px;
 }
 
-.preview-exp-item .exp-description li {
-    margin-bottom: 2px;
-}
-
-body.dark-theme .preview-exp-item .exp-description {
-    color: #cbd5e0;
-}
+.preview-exp-item .exp-description li { margin-bottom: 2px; }
+body.dark-theme .preview-exp-item .exp-description { color: #cbd5e0; }
 
 /* Projects */
-.preview-project-item {
-    margin-bottom: 12px;
-}
+.preview-project-item { margin-bottom: 12px; }
 
 .preview-project-item .project-name {
     font-weight: 700;
@@ -1068,9 +1005,7 @@ body.dark-theme .preview-exp-item .exp-description {
     color: #1a1a2e;
 }
 
-body.dark-theme .preview-project-item .project-name {
-    color: #e2e8f0;
-}
+body.dark-theme .preview-project-item .project-name { color: #e2e8f0; }
 
 .preview-project-item .project-desc {
     font-size: 13px;
@@ -1079,9 +1014,7 @@ body.dark-theme .preview-project-item .project-name {
     margin-top: 2px;
 }
 
-body.dark-theme .preview-project-item .project-desc {
-    color: #cbd5e0;
-}
+body.dark-theme .preview-project-item .project-desc { color: #cbd5e0; }
 
 .preview-project-item .project-tech {
     font-size: 12px;
@@ -1090,20 +1023,16 @@ body.dark-theme .preview-project-item .project-desc {
     margin-top: 2px;
 }
 
-body.dark-theme .preview-project-item .project-tech {
-    color: #a0aec0;
-}
+body.dark-theme .preview-project-item .project-tech { color: #a0aec0; }
 
-/* ============ PREVIEW SKILLS ============ */
+/* Skills */
 .preview-skills-columns {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 4px 24px;
 }
 
-.preview-skill-col {
-    min-width: 0;
-}
+.preview-skill-col { min-width: 0; }
 
 .preview-skill-col .skill-col-title {
     font-size: 13px;
@@ -1112,9 +1041,7 @@ body.dark-theme .preview-project-item .project-tech {
     margin: 0 0 4px;
 }
 
-body.dark-theme .preview-skill-col .skill-col-title {
-    color: #e2e8f0;
-}
+body.dark-theme .preview-skill-col .skill-col-title { color: #e2e8f0; }
 
 .preview-skill-col ul {
     margin: 0;
@@ -1124,25 +1051,17 @@ body.dark-theme .preview-skill-col .skill-col-title {
     color: #2d3748;
 }
 
-body.dark-theme .preview-skill-col ul {
-    color: #cbd5e0;
-}
+body.dark-theme .preview-skill-col ul { color: #cbd5e0; }
+.preview-skill-col ul li { margin-bottom: 1px; }
 
-.preview-skill-col ul li {
-    margin-bottom: 1px;
-}
-
-/* ============ PERIOD DATE PICKER ============ */
+/* Period picker */
 .period-picker {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.period-picker .form-input {
-    flex: 1;
-    min-width: 0;
-}
+.period-picker .form-input { flex: 1; min-width: 0; }
 
 .period-sep {
     color: var(--text-muted);
@@ -1168,7 +1087,7 @@ body.dark-theme .preview-skill-col ul {
     accent-color: var(--primary-color);
 }
 
-/* ============ PHOTO OPTION TOGGLE ============ */
+/* Photo option toggle */
 .photo-option-toggle {
     display: flex;
     gap: 10px;
@@ -1191,9 +1110,7 @@ body.dark-theme .preview-skill-col ul {
     transition: var(--transition);
 }
 
-.photo-option-btn:hover {
-    border-color: var(--primary-color);
-}
+.photo-option-btn:hover { border-color: var(--primary-color); }
 
 .photo-option-btn input[type="radio"] {
     accent-color: var(--primary-color);
@@ -1226,11 +1143,9 @@ body.dark-theme .photo-option-btn:has(input:checked) {
     line-height: 1.6;
 }
 
-body.dark-theme .form-hint {
-    color: #64748b;
-}
+body.dark-theme .form-hint { color: #64748b; }
 
-/* ============ CERTIFICATE UPLOAD ============ */
+/* Certificate upload */
 .cert-upload-area {
     display: flex;
     align-items: center;
@@ -1242,9 +1157,7 @@ body.dark-theme .form-hint {
     transition: var(--transition);
 }
 
-.cert-upload-area:hover {
-    border-color: var(--primary-color);
-}
+.cert-upload-area:hover { border-color: var(--primary-color); }
 
 .cert-preview {
     width: 80px;
@@ -1269,16 +1182,8 @@ body.dark-theme .form-hint {
     object-fit: cover;
 }
 
-.cert-preview i {
-    font-size: 28px;
-    color: var(--text-muted);
-}
-
-.cert-preview span {
-    font-size: 10px;
-    text-align: center;
-    padding: 0 4px;
-}
+.cert-preview i { font-size: 28px; color: var(--text-muted); }
+.cert-preview span { font-size: 10px; text-align: center; padding: 0 4px; }
 
 .cert-upload-controls {
     display: flex;
@@ -1325,32 +1230,15 @@ body.dark-theme .form-hint {
     width: fit-content;
 }
 
-.btn-remove-cert-image:hover {
-    background: #dc2626;
-}
+.btn-remove-cert-image:hover { background: #dc2626; }
+.btn-remove-cert-image.hidden { display: none; }
 
-.btn-remove-cert-image.hidden {
-    display: none;
-}
+body.dark-theme .cert-upload-area { border-color: #334155; }
+body.dark-theme .cert-preview { background: #1e293b; border-color: #334155; }
+body.dark-theme .cert-preview i { color: #64748b; }
+body.dark-theme .cert-preview span { color: #64748b; }
 
-body.dark-theme .cert-upload-area {
-    border-color: #334155;
-}
-
-body.dark-theme .cert-preview {
-    background: #1e293b;
-    border-color: #334155;
-}
-
-body.dark-theme .cert-preview i {
-    color: #64748b;
-}
-
-body.dark-theme .cert-preview span {
-    color: #64748b;
-}
-
-/* ============ PREVIEW CERTIFICATION - PLAIN BULLET LIST ============ */
+/* Preview certification */
 .preview-cert-list {
     margin: 0;
     padding-left: 18px;
@@ -1363,39 +1251,26 @@ body.dark-theme .cert-preview span {
     color: #2d3748;
 }
 
-body.dark-theme .preview-cert-item {
-    color: #cbd5e0;
-}
+body.dark-theme .preview-cert-item { color: #cbd5e0; }
 
 .preview-cert-item .cert-info {
     font-size: 13px;
     color: #2d3748;
 }
 
-body.dark-theme .preview-cert-item .cert-info {
-    color: #cbd5e0;
-}
+body.dark-theme .preview-cert-item .cert-info { color: #cbd5e0; }
 
-.preview-cert-item .cert-name {
-    font-weight: 600;
-}
+.preview-cert-item .cert-name { font-weight: 600; }
 
-.preview-cert-item .cert-issuer {
-    color: #4a5568;
-}
-
-body.dark-theme .preview-cert-item .cert-issuer {
-    color: #a0aec0;
-}
+.preview-cert-item .cert-issuer { color: #4a5568; }
+body.dark-theme .preview-cert-item .cert-issuer { color: #a0aec0; }
 
 .preview-cert-item .cert-year {
     color: #4a5568;
     font-size: 12px;
 }
 
-body.dark-theme .preview-cert-item .cert-year {
-    color: #a0aec0;
-}
+body.dark-theme .preview-cert-item .cert-year { color: #a0aec0; }
 
 .preview-cert-image {
     margin-top: 6px;
@@ -1421,12 +1296,9 @@ body.dark-theme .preview-cert-item .cert-year {
     object-fit: cover;
 }
 
+body.dark-theme .preview-cert-image { border-color: #334155; }
 
-body.dark-theme .preview-cert-image {
-    border-color: #334155;
-}
-
-/* ============ TOAST NOTIFICATIONS ============ */
+/* Toast */
 .toast-container {
     position: fixed;
     top: 20px;
@@ -1452,47 +1324,20 @@ body.dark-theme .preview-cert-image {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.toast.success {
-    border-color: #22c55e;
-}
-
-.toast.error {
-    border-color: #ef4444;
-}
-
-.toast.info {
-    border-color: var(--primary-color);
-}
-
-.toast i {
-    font-size: 20px;
-}
-
-.toast.success i {
-    color: #22c55e;
-}
-
-.toast.error i {
-    color: #ef4444;
-}
-
-.toast.info i {
-    color: var(--primary-color);
-}
+.toast.success { border-color: #22c55e; }
+.toast.error { border-color: #ef4444; }
+.toast.info { border-color: var(--primary-color); }
+.toast i { font-size: 20px; }
+.toast.success i { color: #22c55e; }
+.toast.error i { color: #ef4444; }
+.toast.info i { color: var(--primary-color); }
 
 @keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 
-/* ============ FOOTER ============ */
+/* Footer */
 .app-footer {
     background: var(--card-bg);
     border-top: 1px solid var(--border-color);
@@ -1503,49 +1348,21 @@ body.dark-theme .preview-cert-image {
     margin-top: 40px;
 }
 
-/* ============ SCROLLBAR ============ */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-color); }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-::-webkit-scrollbar-track {
-    background: var(--bg-color);
-}
+/* Utility */
+.text-center { text-align: center; }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
 
-::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
-}
-
-/* ============ UTILITY ============ */
-.text-center {
-    text-align: center;
-}
-
-.mt-8 {
-    margin-top: 8px;
-}
-
-.mt-16 {
-    margin-top: 16px;
-}
-
-.mb-8 {
-    margin-bottom: 8px;
-}
-
-.mb-16 {
-    margin-bottom: 16px;
-}
-
-/* ============ PRINT STYLES ============ */
+/* Print */
 @media print {
-
     .app-header,
     .app-footer,
     .form-actions,
@@ -1560,9 +1377,7 @@ body.dark-theme .preview-cert-image {
         display: none !important;
     }
 
-    .cv-builder-layout {
-        display: block !important;
-    }
+    .cv-builder-layout { display: block !important; }
 
     .preview-panel {
         position: relative !important;
@@ -1579,25 +1394,9 @@ body.dark-theme .preview-cert-image {
         padding: 20px !important;
     }
 
-    .cv-preview-content {
-        color: #000 !important;
-    }
-
-    body.dark-theme .cv-preview {
-        background: white !important;
-        color: #000 !important;
-    }
-
-    body.dark-theme .cv-preview-content {
-        color: #000 !important;
-    }
-
-    body.dark-theme .preview-header-main {
-        border-bottom-color: #000 !important;
-    }
-
-    body.dark-theme .preview-section-title {
-        border-bottom-color: #000 !important;
-        color: #000 !important;
-    }
+    .cv-preview-content { color: #000 !important; }
+    body.dark-theme .cv-preview { background: white !important; color: #000 !important; }
+    body.dark-theme .cv-preview-content { color: #000 !important; }
+    body.dark-theme .preview-header-main { border-bottom-color: #000 !important; }
+    body.dark-theme .preview-section-title { border-bottom-color: #000 !important; color: #000 !important; }
 }
