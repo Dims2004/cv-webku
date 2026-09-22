@@ -258,7 +258,7 @@ class CVBuilderApp {
     }
 
     // ============ EDUCATION ============
-    createEducationItem(data = { institution: '', major: '', location: '', periodStart: '', periodEnd: '', ongoing: false, gpa: '', linkIjazah: '', linkTranskrip: '' }) {
+    createEducationItem(data = { institution: '', major: '', location: '', periodStart: '', periodEnd: '', ongoing: false, gpa: '', linkIjazah: '', linkIjazahTitle: '', linkTranskrip: '', linkTranskripTitle: '' }) {
         const div = document.createElement('div');
         div.className = 'education-item';
         const isOngoing = !!data.ongoing;
@@ -293,12 +293,14 @@ class CVBuilderApp {
                 <label>GPA / Prestasi (Opsional)</label>
                 <input type="text" class="form-input edu-gpa" value="${this.escapeHtml(data.gpa)}" placeholder="GPA: 3.58 atau prestasi lainnya">
             </div>
-            <div class="form-group">
+            <div class="form-group link-field-group">
                 <label>Link Ijazah (Opsional)</label>
+                <input type="text" class="form-input edu-link-ijazah-title" value="${this.escapeHtml(data.linkIjazahTitle)}" placeholder="Judul link (contoh: Lihat Ijazah)">
                 <input type="url" class="form-input edu-link-ijazah" value="${this.escapeHtml(data.linkIjazah)}" placeholder="Link Google Drive/Dropbox ke scan ijazah">
             </div>
-            <div class="form-group">
+            <div class="form-group link-field-group">
                 <label>Link Transkrip Nilai (Opsional)</label>
+                <input type="text" class="form-input edu-link-transkrip-title" value="${this.escapeHtml(data.linkTranskripTitle)}" placeholder="Judul link (contoh: Lihat Transkrip Nilai)">
                 <input type="url" class="form-input edu-link-transkrip" value="${this.escapeHtml(data.linkTranskrip)}" placeholder="Link Google Drive/Dropbox ke scan transkrip">
             </div>
             <button type="button" class="btn-remove-edu hidden">
@@ -334,7 +336,7 @@ class CVBuilderApp {
     }
 
     // ============ INTERNSHIP ============
-    createInternshipItem(data = { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '', link: '' }) {
+    createInternshipItem(data = { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '', link: '', linkTitle: '' }) {
         const div = document.createElement('div');
         div.className = 'internship-item';
         const isOngoing = !!data.ongoing;
@@ -369,8 +371,9 @@ class CVBuilderApp {
                 <label>Deskripsi</label>
                 <textarea class="form-textarea int-description" rows="3" placeholder="Deskripsi pekerjaan...">${this.escapeHtml(data.description)}</textarea>
             </div>
-            <div class="form-group">
+            <div class="form-group link-field-group">
                 <label>Link Sertifikat/Referensi Magang (Opsional)</label>
+                <input type="text" class="form-input int-link-title" value="${this.escapeHtml(data.linkTitle)}" placeholder="Judul link (contoh: Lihat Sertifikat Magang)">
                 <input type="url" class="form-input int-link" value="${this.escapeHtml(data.link)}" placeholder="Link sertifikat/surat referensi magang">
             </div>
             <button type="button" class="btn-remove-int hidden">
@@ -406,7 +409,7 @@ class CVBuilderApp {
     }
 
     // ============ WORK EXPERIENCE ============
-    createWorkItem(data = { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '', link: '' }) {
+    createWorkItem(data = { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '', link: '', linkTitle: '' }) {
         const div = document.createElement('div');
         div.className = 'work-item';
         const isOngoing = !!data.ongoing;
@@ -441,8 +444,9 @@ class CVBuilderApp {
                 <label>Deskripsi</label>
                 <textarea class="form-textarea work-description" rows="3" placeholder="Deskripsi pekerjaan...">${this.escapeHtml(data.description)}</textarea>
             </div>
-            <div class="form-group">
+            <div class="form-group link-field-group">
                 <label>Link Referensi/Surat Kerja (Opsional)</label>
+                <input type="text" class="form-input work-link-title" value="${this.escapeHtml(data.linkTitle)}" placeholder="Judul link (contoh: Lihat Surat Referensi)">
                 <input type="url" class="form-input work-link" value="${this.escapeHtml(data.link)}" placeholder="Link surat referensi/pengalaman kerja">
             </div>
             <button type="button" class="btn-remove-work hidden">
@@ -545,7 +549,7 @@ class CVBuilderApp {
     }
 
     // ============ PROJECTS ============
-    createProjectItem(data = { name: '', description: '', tech: '', link: '' }) {
+    createProjectItem(data = { name: '', description: '', tech: '', link: '', linkTitle: '' }) {
         const div = document.createElement('div');
         div.className = 'project-item';
         div.innerHTML = `
@@ -561,8 +565,9 @@ class CVBuilderApp {
                 <label>Teknologi / Tools</label>
                 <input type="text" class="form-input project-tech" value="${this.escapeHtml(data.tech)}" placeholder="Teknologi yang digunakan">
             </div>
-            <div class="form-group">
+            <div class="form-group link-field-group">
                 <label>Link Proyek (Opsional)</label>
+                <input type="text" class="form-input project-link-title" value="${this.escapeHtml(data.linkTitle)}" placeholder="Judul link (contoh: Lihat Demo / GitHub)">
                 <input type="url" class="form-input project-link" value="${this.escapeHtml(data.link)}" placeholder="Link demo/repository/live proyek">
             </div>
             <button type="button" class="btn-remove-project hidden">
@@ -641,7 +646,7 @@ class CVBuilderApp {
     }
 
     // ============ CERTIFICATIONS WITH IMAGE UPLOAD ============
-    createCertificationItem(data = { name: '', issuer: '', year: '', image: null, link: '' }) {
+    createCertificationItem(data = { name: '', issuer: '', year: '', image: null, link: '', linkTitle: '' }) {
         const index = this.certImageCounter++;
         const div = document.createElement('div');
         div.className = 'certification-item';
@@ -663,8 +668,9 @@ class CVBuilderApp {
                 <label>Tahun</label>
                 <select class="form-input cert-year">${this.buildYearOptions(data.year)}</select>
             </div>
-            <div class="form-group">
+            <div class="form-group link-field-group">
                 <label>Link Sertifikat/Verifikasi (Opsional)</label>
+                <input type="text" class="form-input cert-link-title" value="${this.escapeHtml(data.linkTitle)}" placeholder="Judul link (contoh: Lihat Sertifikat)">
                 <input type="url" class="form-input cert-link" value="${this.escapeHtml(data.link)}" placeholder="Link verifikasi/sertifikat online">
             </div>
             <div class="form-group">
@@ -1111,8 +1117,8 @@ class CVBuilderApp {
         formData.education.forEach(edu => {
             if (edu.institution || edu.major) {
                 const eduLinks = [];
-                if (edu.linkIjazah) eduLinks.push(`<a href="${this.formatLinkUrl(edu.linkIjazah)}" target="_blank" rel="noopener"><i class="fas fa-file-alt"></i> Ijazah</a>`);
-                if (edu.linkTranskrip) eduLinks.push(`<a href="${this.formatLinkUrl(edu.linkTranskrip)}" target="_blank" rel="noopener"><i class="fas fa-file-alt"></i> Transkrip Nilai</a>`);
+                if (edu.linkIjazah) eduLinks.push(`<a href="${this.formatLinkUrl(edu.linkIjazah)}" target="_blank" rel="noopener"><i class="fas fa-file-alt"></i> ${this.escapeHtml(edu.linkIjazahTitle) || 'Lihat Ijazah'}</a>`);
+                if (edu.linkTranskrip) eduLinks.push(`<a href="${this.formatLinkUrl(edu.linkTranskrip)}" target="_blank" rel="noopener"><i class="fas fa-file-alt"></i> ${this.escapeHtml(edu.linkTranskripTitle) || 'Lihat Transkrip Nilai'}</a>`);
                 educationHTML += `
                     <div class="preview-education-item">
                         <div class="edu-header">
@@ -1139,7 +1145,7 @@ class CVBuilderApp {
                         </div>
                         <div class="exp-position">${this.escapeHtml(int.position || '')}</div>
                         ${this.buildDescriptionListHTML(int.description)}
-                        ${int.link ? `<div class="preview-doc-links"><a href="${this.formatLinkUrl(int.link)}" target="_blank" rel="noopener"><i class="fas fa-link"></i> Lihat Sertifikat/Referensi</a></div>` : ''}
+                        ${int.link ? `<div class="preview-doc-links"><a href="${this.formatLinkUrl(int.link)}" target="_blank" rel="noopener"><i class="fas fa-link"></i> ${this.escapeHtml(int.linkTitle) || 'Lihat Sertifikat/Referensi'}</a></div>` : ''}
                     </div>
                 `;
             }
@@ -1157,7 +1163,7 @@ class CVBuilderApp {
                         </div>
                         <div class="exp-position">${this.escapeHtml(work.position || '')}</div>
                         ${this.buildDescriptionListHTML(work.description)}
-                        ${work.link ? `<div class="preview-doc-links"><a href="${this.formatLinkUrl(work.link)}" target="_blank" rel="noopener"><i class="fas fa-link"></i> Lihat Referensi/Surat Kerja</a></div>` : ''}
+                        ${work.link ? `<div class="preview-doc-links"><a href="${this.formatLinkUrl(work.link)}" target="_blank" rel="noopener"><i class="fas fa-link"></i> ${this.escapeHtml(work.linkTitle) || 'Lihat Referensi/Surat Kerja'}</a></div>` : ''}
                     </div>
                 `;
             }
@@ -1189,7 +1195,7 @@ class CVBuilderApp {
                         <div class="project-name">${this.escapeHtml(project.name || '')}</div>
                         ${project.description ? `<div class="project-desc">${this.escapeHtml(project.description)}</div>` : ''}
                         ${project.tech ? `<div class="project-tech"><strong>Teknologi:</strong> ${this.escapeHtml(project.tech)}</div>` : ''}
-                        ${project.link ? `<div class="preview-doc-links"><a href="${this.formatLinkUrl(project.link)}" target="_blank" rel="noopener"><i class="fas fa-link"></i> Lihat Proyek</a></div>` : ''}
+                        ${project.link ? `<div class="preview-doc-links"><a href="${this.formatLinkUrl(project.link)}" target="_blank" rel="noopener"><i class="fas fa-link"></i> ${this.escapeHtml(project.linkTitle) || 'Lihat Proyek'}</a></div>` : ''}
                     </div>
                 `;
             }
@@ -1227,7 +1233,7 @@ class CVBuilderApp {
             if (cert.name) {
                 const issuerPart = cert.issuer ? ` - ${this.escapeHtml(cert.issuer)}` : '';
                 const yearPart = cert.year ? ` (${this.escapeHtml(cert.year)})` : '';
-                const linkPart = cert.link ? ` <a href="${this.formatLinkUrl(cert.link)}" target="_blank" rel="noopener" class="preview-doc-link-inline"><i class="fas fa-link"></i> Lihat Sertifikat</a>` : '';
+                const linkPart = cert.link ? ` <a href="${this.formatLinkUrl(cert.link)}" target="_blank" rel="noopener" class="preview-doc-link-inline"><i class="fas fa-link"></i> ${this.escapeHtml(cert.linkTitle) || 'Lihat Sertifikat'}</a>` : '';
                 certHTML += `
                     <li class="preview-cert-item">
                         <span class="cert-info">
@@ -1336,7 +1342,9 @@ class CVBuilderApp {
                 period: this.formatYearPeriodID(periodStart, periodEnd, ongoing),
                 gpa: item.querySelector('.edu-gpa').value,
                 linkIjazah: item.querySelector('.edu-link-ijazah') ? item.querySelector('.edu-link-ijazah').value : '',
-                linkTranskrip: item.querySelector('.edu-link-transkrip') ? item.querySelector('.edu-link-transkrip').value : ''
+                linkIjazahTitle: item.querySelector('.edu-link-ijazah-title') ? item.querySelector('.edu-link-ijazah-title').value : '',
+                linkTranskrip: item.querySelector('.edu-link-transkrip') ? item.querySelector('.edu-link-transkrip').value : '',
+                linkTranskripTitle: item.querySelector('.edu-link-transkrip-title') ? item.querySelector('.edu-link-transkrip-title').value : ''
             });
         });
 
@@ -1351,7 +1359,8 @@ class CVBuilderApp {
                 location: item.querySelector('.int-location').value,
                 period: this.formatPeriodID(periodStart, periodEnd, ongoing),
                 description: item.querySelector('.int-description').value,
-                link: item.querySelector('.int-link') ? item.querySelector('.int-link').value : ''
+                link: item.querySelector('.int-link') ? item.querySelector('.int-link').value : '',
+                linkTitle: item.querySelector('.int-link-title') ? item.querySelector('.int-link-title').value : ''
             });
         });
 
@@ -1366,7 +1375,8 @@ class CVBuilderApp {
                 location: item.querySelector('.work-location').value,
                 period: this.formatPeriodID(periodStart, periodEnd, ongoing),
                 description: item.querySelector('.work-description').value,
-                link: item.querySelector('.work-link') ? item.querySelector('.work-link').value : ''
+                link: item.querySelector('.work-link') ? item.querySelector('.work-link').value : '',
+                linkTitle: item.querySelector('.work-link-title') ? item.querySelector('.work-link-title').value : ''
             });
         });
 
@@ -1390,7 +1400,8 @@ class CVBuilderApp {
                 name: item.querySelector('.project-name').value,
                 description: item.querySelector('.project-description').value,
                 tech: item.querySelector('.project-tech').value,
-                link: item.querySelector('.project-link') ? item.querySelector('.project-link').value : ''
+                link: item.querySelector('.project-link') ? item.querySelector('.project-link').value : '',
+                linkTitle: item.querySelector('.project-link-title') ? item.querySelector('.project-link-title').value : ''
             });
         });
 
@@ -1415,7 +1426,8 @@ class CVBuilderApp {
                 issuer: item.querySelector('.cert-issuer').value,
                 year: item.querySelector('.cert-year').value,
                 image: img ? img.src : null,
-                link: item.querySelector('.cert-link') ? item.querySelector('.cert-link').value : ''
+                link: item.querySelector('.cert-link') ? item.querySelector('.cert-link').value : '',
+                linkTitle: item.querySelector('.cert-link-title') ? item.querySelector('.cert-link-title').value : ''
             });
         });
 
