@@ -392,19 +392,12 @@ body.dark-theme .creative-skills-list {
 }
 
 /* ============================================================
-   CV CREATIVE — SIDEBAR LAYOUT (foto + kontak + skills di kiri,
-   profil + riwayat di kanan). Warna sidebar & aksen judul diatur
-   lewat --creative-accent-color, diubah bebas lewat #creativeColorPicker
-   (lihat setAccentColor di creativeCvBuilder.js), jadi bukan warna
-   yang dipatok (hardcoded) ke satu pilihan saja.
+   CV CREATIVE — SIDEBAR LAYOUT
    ============================================================ */
 .creative-sidebar-layout {
     display: flex;
     align-items: stretch;
     gap: 0;
-    /* "Melepaskan diri" dari padding .cv-preview supaya sidebar bisa
-       mengisi penuh dari tepi kiri/atas/bawah kartu preview, seperti
-       pada CV referensi. */
     margin: -30px;
     min-height: 600px;
 }
@@ -488,6 +481,21 @@ body.dark-theme .creative-skills-list {
     flex-shrink: 0;
     margin-top: 2px;
     text-align: center;
+}
+
+/* Link di sidebar Creative: tetap putih, underline jelas, bisa diklik */
+.creative-sidebar-link {
+    color: #ffffff;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    word-break: break-word;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.creative-sidebar-link:hover {
+    color: #f0fdfa;
+    text-decoration: none;
 }
 
 .creative-main {
