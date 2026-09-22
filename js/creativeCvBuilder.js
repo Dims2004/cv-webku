@@ -1,19 +1,24 @@
-// Creative CV Builder Module - Handles the one-page "CV Creative" form,
-// its live preview, and its PDF export. Kept separate from the ATS
-// CVBuilderApp (main.js) so the two CV types don't interfere with each other.
+// Creative CV Builder Module
 class CreativeCvBuilder {
     constructor() {
         this.photoDataUrl = null;
         this.bindEvents();
         this.populateSampleData();
+
+        // Re-render ketika bahasa berubah
+        document.addEventListener('languageChanged', () => {
+            this.updatePreview();
+        });
+    }
+
+    t(key) {
+        return window.i18n ? window.i18n.t(key) : key;
     }
 
     bindEvents() {
         const form = document.getElementById('creativeCvForm');
-        if (!form) return; // Screen not present in this page, bail out safely.
+        if (!form) return;
 
-        // Auto update preview on any input/textarea change inside the form
-        // (except the photo file input, handled separately).
         form.addEventListener('input', (e) => {
             if (e.target.id === 'creativePhotoInput') return;
             this.updatePreview();
@@ -25,6 +30,7 @@ class CreativeCvBuilder {
 
         document.getElementById('previewBtnCreative').addEventListener('click', () => this.updatePreview());
         document.getElementById('downloadPDFBtnCreative').addEventListener('click', () => this.downloadPDF());
+        document.getElementById('downloadWordBtnCreative').addEventListener('click', () => this.downloadWord());
 
         const colorPicker = document.getElementById('creativeColorPicker');
         if (colorPicker) {
@@ -32,14 +38,12 @@ class CreativeCvBuilder {
             this.loadAccentColor();
         }
 
-        // Checkbox "Masih berlangsung/Sekarang" pada Periode
         this.setupOngoingCheckbox('creativeExperienceContainer', '.work-item', 'creative-exp-period-ongoing', 'creative-exp-period-end');
         this.setupOngoingCheckbox('creativeEducationContainer', '.education-item', 'creative-edu-period-ongoing', 'creative-edu-period-end');
 
         this.setupPhotoUpload();
     }
 
-    // ============ SAMPLE DATA ============
     populateSampleData() {
         document.getElementById('creativeFullName').value = '';
         document.getElementById('creativePosition').value = '';
@@ -54,66 +58,41 @@ class CreativeCvBuilder {
         document.getElementById('creativeCertifications').value = '';
         document.getElementById('creativeAchievements').value = '';
 
-        const experiences = [
-            { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '' }
-        ];
-
-        const educations = [
-            { major: '', institution: '', location: '', periodStart: '', periodEnd: '', ongoing: false }
-        ];
-
-        const skills = [
-            { category: '', items: '' }
-        ];
-
         const expContainer = document.getElementById('creativeExperienceContainer');
         expContainer.innerHTML = '';
-        experiences.forEach((exp, index) => {
-            const item = this.createExperienceItem(exp);
-            expContainer.appendChild(item);
-            if (index > 0) item.querySelector('.btn-remove-work').classList.remove('hidden');
-        });
+        expContainer.appendChild(this.createExperienceItem());
 
         const eduContainer = document.getElementById('creativeEducationContainer');
         eduContainer.innerHTML = '';
-        educations.forEach((edu, index) => {
-            const item = this.createEducationItem(edu);
-            eduContainer.appendChild(item);
-            if (index > 0) item.querySelector('.btn-remove-edu').classList.remove('hidden');
-        });
+        eduContainer.appendChild(this.createEducationItem());
 
         const skillContainer = document.getElementById('creativeSkillsContainer');
         skillContainer.innerHTML = '';
-        skills.forEach((skill, index) => {
-            const item = this.createSkillCategoryItem(skill);
-            skillContainer.appendChild(item);
-            if (index > 0) item.querySelector('.btn-remove-skill').classList.remove('hidden');
-        });
+        skillContainer.appendChild(this.createSkillCategoryItem());
 
         this.updatePreview();
     }
 
-    // ============ PENGALAMAN ============
     createExperienceItem(data = { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '' }) {
         const div = document.createElement('div');
         div.className = 'work-item';
         const isOngoing = !!data.ongoing;
         div.innerHTML = `
             <div class="form-group">
-                <label>Perusahaan / Organisasi</label>
-                <input type="text" class="form-input creative-exp-company" value="${this.escapeHtml(data.company)}" placeholder="Nama perusahaan / organisasi">
+                <label data-i18n="labelCompanyOrg">Perusahaan / Organisasi</label>
+                <input type="text" class="form-input creative-exp-company" value="${this.escapeHtml(data.company)}" placeholder="Nama perusahaan / organisasi" data-i18n-placeholder="phCompanyOrg">
             </div>
             <div class="form-group">
-                <label>Posisi</label>
-                <input type="text" class="form-input creative-exp-position" value="${this.escapeHtml(data.position)}" placeholder="Posisi / jabatan">
+                <label data-i18n="labelPosition">Posisi</label>
+                <input type="text" class="form-input creative-exp-position" value="${this.escapeHtml(data.position)}" placeholder="Posisi / jabatan" data-i18n-placeholder="phPositionJob">
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Lokasi</label>
-                    <input type="text" class="form-input creative-exp-location" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi">
+                    <label data-i18n="labelLocation">Lokasi</label>
+                    <input type="text" class="form-input creative-exp-location" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi" data-i18n-placeholder="phLocation">
                 </div>
                 <div class="form-group">
-                    <label>Periode</label>
+                    <label data-i18n="labelPeriod">Periode</label>
                     <div class="period-picker">
                         <input type="month" class="form-input creative-exp-period-start" value="${this.escapeHtml(data.periodStart || '')}">
                         <span class="period-sep">–</span>
@@ -121,20 +100,20 @@ class CreativeCvBuilder {
                     </div>
                     <label class="period-ongoing-label">
                         <input type="checkbox" class="creative-exp-period-ongoing" ${isOngoing ? 'checked' : ''}>
-                        Masih berlangsung (Sekarang)
+                        <span data-i18n="ongoingNow">Masih berlangsung (Sekarang)</span>
                     </label>
                 </div>
             </div>
             <div class="form-group">
-                <label>Deskripsi (satu poin per baris)</label>
-                <textarea class="form-textarea creative-exp-description" rows="3" placeholder="Tuliskan tiap poin di baris baru...">${this.escapeHtml(data.description)}</textarea>
+                <label data-i18n="labelDescriptionPerLine">Deskripsi (satu poin per baris)</label>
+                <textarea class="form-textarea creative-exp-description" rows="3" placeholder="Tuliskan tiap poin di baris baru..." data-i18n-placeholder="phDescriptionPerLine">${this.escapeHtml(data.description)}</textarea>
             </div>
             <button type="button" class="btn-remove-work hidden">
-                <i class="fas fa-times"></i> Hapus
+                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
             </button>
         `;
 
-        div.querySelectorAll('input, select').forEach(input => {
+        div.querySelectorAll('input, select, textarea').forEach(input => {
             input.addEventListener('input', () => this.updatePreview());
             input.addEventListener('change', () => this.updatePreview());
         });
@@ -143,12 +122,13 @@ class CreativeCvBuilder {
             if (document.querySelectorAll('#creativeExperienceContainer .work-item').length > 1) {
                 div.remove();
                 this.updatePreview();
-                this.showToast('Pengalaman dihapus', 'info');
+                this.showToast(this.t('delete'), 'info');
             } else {
-                this.showToast('Minimal harus ada satu pengalaman', 'error');
+                this.showToast('Minimal satu', 'error');
             }
         });
 
+        if (window.i18n) window.i18n.applyTranslations();
         return div;
     }
 
@@ -157,30 +137,29 @@ class CreativeCvBuilder {
         container.appendChild(this.createExperienceItem());
         document.querySelectorAll('#creativeExperienceContainer .btn-remove-work').forEach(btn => btn.classList.remove('hidden'));
         this.updatePreview();
-        this.showToast('Pengalaman ditambahkan', 'success');
+        this.showToast(this.t('addExperience'), 'success');
     }
 
-    // ============ PENDIDIKAN ============
     createEducationItem(data = { major: '', institution: '', location: '', periodStart: '', periodEnd: '', ongoing: false }) {
         const div = document.createElement('div');
         div.className = 'education-item';
         const isOngoing = !!data.ongoing;
         div.innerHTML = `
             <div class="form-group">
-                <label>Jurusan / Program</label>
-                <input type="text" class="form-input creative-edu-major" value="${this.escapeHtml(data.major)}" placeholder="Jurusan / Program studi">
+                <label data-i18n="labelMajor">Jurusan / Program</label>
+                <input type="text" class="form-input creative-edu-major" value="${this.escapeHtml(data.major)}" placeholder="Jurusan / Program studi" data-i18n-placeholder="phMajor">
             </div>
             <div class="form-group">
-                <label>Institusi</label>
-                <input type="text" class="form-input creative-edu-institution" value="${this.escapeHtml(data.institution)}" placeholder="Nama institusi">
+                <label data-i18n="labelInstitution">Institusi</label>
+                <input type="text" class="form-input creative-edu-institution" value="${this.escapeHtml(data.institution)}" placeholder="Nama institusi" data-i18n-placeholder="phInstitution">
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Lokasi</label>
-                    <input type="text" class="form-input creative-edu-location" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi">
+                    <label data-i18n="labelLocation">Lokasi</label>
+                    <input type="text" class="form-input creative-edu-location" value="${this.escapeHtml(data.location)}" placeholder="Kota, Provinsi" data-i18n-placeholder="phLocation">
                 </div>
                 <div class="form-group">
-                    <label>Periode</label>
+                    <label data-i18n="labelPeriod">Periode</label>
                     <div class="period-picker">
                         <select class="form-input creative-edu-period-start">${this.buildYearOptions(data.periodStart)}</select>
                         <span class="period-sep">–</span>
@@ -188,12 +167,12 @@ class CreativeCvBuilder {
                     </div>
                     <label class="period-ongoing-label">
                         <input type="checkbox" class="creative-edu-period-ongoing" ${isOngoing ? 'checked' : ''}>
-                        Masih berkuliah (Sekarang)
+                        <span data-i18n="ongoingStudy">Masih berkuliah (Sekarang)</span>
                     </label>
                 </div>
             </div>
             <button type="button" class="btn-remove-edu hidden">
-                <i class="fas fa-times"></i> Hapus
+                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
             </button>
         `;
 
@@ -206,12 +185,13 @@ class CreativeCvBuilder {
             if (document.querySelectorAll('#creativeEducationContainer .education-item').length > 1) {
                 div.remove();
                 this.updatePreview();
-                this.showToast('Pendidikan dihapus', 'info');
+                this.showToast(this.t('delete'), 'info');
             } else {
-                this.showToast('Minimal harus ada satu pendidikan', 'error');
+                this.showToast('Minimal satu', 'error');
             }
         });
 
+        if (window.i18n) window.i18n.applyTranslations();
         return div;
     }
 
@@ -220,37 +200,41 @@ class CreativeCvBuilder {
         container.appendChild(this.createEducationItem());
         document.querySelectorAll('#creativeEducationContainer .btn-remove-edu').forEach(btn => btn.classList.remove('hidden'));
         this.updatePreview();
-        this.showToast('Pendidikan ditambahkan', 'success');
+        this.showToast(this.t('addEducation'), 'success');
     }
 
-    // ============ KEAHLIAN ============
     createSkillCategoryItem(data = { category: '', items: '' }) {
         const div = document.createElement('div');
         div.className = 'skill-category-item';
         div.innerHTML = `
             <div class="form-group">
-                <label>Kategori Skill</label>
-                <input type="text" class="form-input creative-skill-category" value="${this.escapeHtml(data.category)}" placeholder="Contoh: IoT, Pemrograman, dll (boleh dikosongkan)">
+                <label data-i18n="labelSkillCategory">Kategori Skill</label>
+                <input type="text" class="form-input creative-skill-category" value="${this.escapeHtml(data.category)}" placeholder="Contoh: IoT, Pemrograman, dll (boleh dikosongkan)" data-i18n-placeholder="phSkillCategoryCreative">
             </div>
             <div class="form-group">
-                <label>Daftar Skill</label>
-                <textarea class="form-textarea creative-skill-items" rows="2" placeholder="Pisahkan dengan koma">${this.escapeHtml(data.items)}</textarea>
+                <label data-i18n="labelSkillItems">Daftar Skill</label>
+                <textarea class="form-textarea creative-skill-items" rows="2" placeholder="Pisahkan dengan koma" data-i18n-placeholder="phSkillItemsShort">${this.escapeHtml(data.items)}</textarea>
             </div>
             <button type="button" class="btn-remove-skill hidden">
-                <i class="fas fa-times"></i> Hapus Kategori
+                <i class="fas fa-times"></i> <span data-i18n="deleteCategory">Hapus Kategori</span>
             </button>
         `;
+
+        div.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('input', () => this.updatePreview());
+        });
 
         div.querySelector('.btn-remove-skill').addEventListener('click', () => {
             if (document.querySelectorAll('#creativeSkillsContainer .skill-category-item').length > 1) {
                 div.remove();
                 this.updatePreview();
-                this.showToast('Kategori skill dihapus', 'info');
+                this.showToast(this.t('delete'), 'info');
             } else {
-                this.showToast('Minimal harus ada satu kategori skill', 'error');
+                this.showToast('Minimal satu', 'error');
             }
         });
 
+        if (window.i18n) window.i18n.applyTranslations();
         return div;
     }
 
@@ -259,10 +243,9 @@ class CreativeCvBuilder {
         container.appendChild(this.createSkillCategoryItem());
         document.querySelectorAll('#creativeSkillsContainer .btn-remove-skill').forEach(btn => btn.classList.remove('hidden'));
         this.updatePreview();
-        this.showToast('Kategori skill ditambahkan', 'success');
+        this.showToast(this.t('addSkill'), 'success');
     }
 
-    // ============ PHOTO UPLOAD ============
     setupPhotoUpload() {
         const fileInput = document.getElementById('creativePhotoInput');
         const preview = document.getElementById('creativePhotoPreview');
@@ -275,13 +258,13 @@ class CreativeCvBuilder {
 
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
             if (!validTypes.includes(file.type)) {
-                this.showToast('Format file tidak didukung. Gunakan JPG, JPEG, atau PNG', 'error');
+                this.showToast('Format file tidak didukung', 'error');
                 fileInput.value = '';
                 return;
             }
 
             if (file.size > 15 * 1024 * 1024) {
-                this.showToast('Ukuran file terlalu besar. Maksimal 15MB', 'error');
+                this.showToast('Maksimal 15MB', 'error');
                 fileInput.value = '';
                 return;
             }
@@ -295,23 +278,23 @@ class CreativeCvBuilder {
                 this.updatePreview();
                 this.showToast('Foto profil berhasil diupload', 'success');
             } catch (error) {
-                console.error('Gagal memproses foto profil:', error);
-                this.showToast('Gagal memproses foto. Coba gunakan foto lain', 'error');
+                console.error('Gagal memproses foto:', error);
+                this.showToast('Gagal memproses foto', 'error');
                 fileInput.value = '';
             }
         });
 
         removeBtn.addEventListener('click', () => {
             this.photoDataUrl = null;
-            preview.innerHTML = `<i class="fas fa-user"></i><span>Belum ada foto</span>`;
+            preview.innerHTML = `<i class="fas fa-user"></i><span data-i18n="noPhoto">Belum ada foto</span>`;
             removeBtn.classList.add('hidden');
             fileInput.value = '';
             this.updatePreview();
-            this.showToast('Foto profil dihapus', 'info');
+            if (window.i18n) window.i18n.applyTranslations();
+            this.showToast('Foto dihapus', 'info');
         });
     }
 
-    // ============ IMAGE COMPRESSION ============
     compressImageFile(file, maxWidth = 800, quality = 0.85) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -342,7 +325,6 @@ class CreativeCvBuilder {
         });
     }
 
-    // ============ ONGOING CHECKBOX ============
     setupOngoingCheckbox(containerId, itemSelector, ongoingClass, endClass) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -356,7 +338,6 @@ class CreativeCvBuilder {
         });
     }
 
-    // ============ YEAR DROPDOWN ============
     buildYearOptions(selectedValue = '') {
         const currentYear = new Date().getFullYear();
         const fromYear = currentYear + 1;
@@ -369,11 +350,9 @@ class CreativeCvBuilder {
         return options;
     }
 
-    // ============ PERIOD FORMATTING ============
     formatMonthID(value) {
         if (!value) return '';
-        const bulanID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const bulanID = window.i18n ? window.i18n.t('months') : [];
         const [year, month] = value.split('-');
         const idx = parseInt(month, 10) - 1;
         if (isNaN(idx) || !bulanID[idx] || !year) return value;
@@ -382,18 +361,17 @@ class CreativeCvBuilder {
 
     formatPeriodID(startValue, endValue, ongoing) {
         const start = this.formatMonthID(startValue);
-        const end = ongoing ? 'Sekarang' : this.formatMonthID(endValue);
+        const end = ongoing ? this.t('now') : this.formatMonthID(endValue);
         if (start && end) return `${start} - ${end}`;
         return start || end || '';
     }
 
     formatYearPeriodID(startYear, endYear, ongoing) {
-        const end = ongoing ? 'Sekarang' : (endYear || '');
+        const end = ongoing ? this.t('now') : (endYear || '');
         if (startYear && end) return `${startYear} - ${end}`;
         return startYear || end || '';
     }
 
-    // ============ HELPER ============
     escapeHtml(text) {
         if (!text) return '';
         const div = document.createElement('div');
@@ -401,7 +379,6 @@ class CreativeCvBuilder {
         return div.innerHTML;
     }
 
-    // Normalisasi URL: pastikan selalu punya protokol supaya bisa diklik.
     formatLinkUrl(url) {
         if (url === null || url === undefined) return '';
         const trimmed = String(url).trim();
@@ -419,7 +396,6 @@ class CreativeCvBuilder {
         return text.split('\n').map(l => l.trim()).filter(l => l);
     }
 
-    // ============ WARNA AKSEN ============
     setAccentColor(color) {
         document.documentElement.style.setProperty('--creative-accent-color', color);
         localStorage.setItem('creativeAccentColor', color);
@@ -434,7 +410,6 @@ class CreativeCvBuilder {
         if (picker) picker.value = color;
     }
 
-    // ============ COLLECT FORM DATA ============
     collectFormData() {
         const experiences = [];
         document.querySelectorAll('#creativeExperienceContainer .work-item').forEach(item => {
@@ -492,14 +467,12 @@ class CreativeCvBuilder {
         };
     }
 
-    // ============ UPDATE PREVIEW ============
     updatePreview() {
         const preview = document.getElementById('creativeCvPreview');
         if (!preview) return;
         const data = this.collectFormData();
+        const t = (k) => this.t(k);
 
-        // Kontak (sidebar) — LinkedIn & Instagram jadi link yang bisa diklik.
-        // Email & telepon juga dijadikan link (mailto: / tel:) supaya konsisten.
         const contactParts = [];
 
         if (data.email) {
@@ -546,7 +519,6 @@ class CreativeCvBuilder {
             );
         }
 
-        // Keahlian (sidebar)
         let skillsHTML = '';
         data.skills.forEach(skill => {
             if (!skill.category && !skill.items) return;
@@ -558,11 +530,9 @@ class CreativeCvBuilder {
             }
         });
 
-        // Bahasa & Pencapaian (sidebar)
         const languagesHTML = data.languages.map(l => `<li>${this.escapeHtml(l)}</li>`).join('');
         const achievementsHTML = data.achievements.map(a => `<li>${this.escapeHtml(a)}</li>`).join('');
 
-        // Pengalaman Kerja (konten utama)
         let expHTML = '';
         data.experiences.forEach(exp => {
             if (!exp.company && !exp.position) return;
@@ -584,7 +554,6 @@ class CreativeCvBuilder {
             `;
         });
 
-        // Pendidikan (konten utama)
         let eduHTML = '';
         data.educations.forEach(edu => {
             if (!edu.major && !edu.institution) return;
@@ -597,8 +566,7 @@ class CreativeCvBuilder {
             `;
         });
 
-        // Pelatihan & Sertifikasi (konten utama)
-        const trainingHTML = data.training.map(t => `<li>${this.escapeHtml(t)}</li>`).join('');
+        const trainingHTML = data.training.map(x => `<li>${this.escapeHtml(x)}</li>`).join('');
         const certificationsHTML = data.certifications.map(c => `<li>${this.escapeHtml(c)}</li>`).join('');
 
         const photoHTML = data.photo
@@ -612,25 +580,25 @@ class CreativeCvBuilder {
 
                     ${contactParts.length ? `
                     <div class="creative-sidebar-section">
-                        <h3>Kontak</h3>
+                        <h3>${t('pvContact')}</h3>
                         <ul class="creative-sidebar-list creative-contact-sidebar-list">${contactParts.join('')}</ul>
                     </div>` : ''}
 
                     ${skillsHTML ? `
                     <div class="creative-sidebar-section">
-                        <h3>Skills</h3>
+                        <h3>${t('pvSkills')}</h3>
                         <ul class="creative-sidebar-list">${skillsHTML}</ul>
                     </div>` : ''}
 
                     ${languagesHTML ? `
                     <div class="creative-sidebar-section">
-                        <h3>Bahasa</h3>
+                        <h3>${t('pvLanguages')}</h3>
                         <ul class="creative-sidebar-list">${languagesHTML}</ul>
                     </div>` : ''}
 
                     ${achievementsHTML ? `
                     <div class="creative-sidebar-section">
-                        <h3>Pencapaian</h3>
+                        <h3>${t('pvAchievements')}</h3>
                         <ul class="creative-sidebar-list">${achievementsHTML}</ul>
                     </div>` : ''}
                 </aside>
@@ -641,30 +609,30 @@ class CreativeCvBuilder {
 
                     ${data.aboutMe ? `
                     <div class="creative-section">
-                        <h2 class="creative-section-title">Tentang Saya</h2>
+                        <h2 class="creative-section-title">${t('pvAboutShort')}</h2>
                         <p class="creative-about-text">${this.escapeHtml(data.aboutMe)}</p>
                     </div>` : ''}
 
                     ${eduHTML ? `
                     <div class="creative-section">
-                        <h2 class="creative-section-title">Pendidikan</h2>
+                        <h2 class="creative-section-title">${t('pvEducation')}</h2>
                         ${eduHTML}
                     </div>` : ''}
 
                     <div class="creative-section">
-                        <h2 class="creative-section-title">Pengalaman Kerja</h2>
+                        <h2 class="creative-section-title">${t('pvExperience')}</h2>
                         ${expHTML}
                     </div>
 
                     ${trainingHTML ? `
                     <div class="creative-section">
-                        <h2 class="creative-section-title">Pelatihan</h2>
+                        <h2 class="creative-section-title">${t('pvTraining')}</h2>
                         <ul class="creative-main-list">${trainingHTML}</ul>
                     </div>` : ''}
 
                     ${certificationsHTML ? `
                     <div class="creative-section">
-                        <h2 class="creative-section-title">Sertifikasi</h2>
+                        <h2 class="creative-section-title">${t('pvCertifications')}</h2>
                         <ul class="creative-main-list">${certificationsHTML}</ul>
                     </div>` : ''}
                 </main>
@@ -674,7 +642,6 @@ class CreativeCvBuilder {
         this.syncSidebarHeight();
     }
 
-    // ============ SAMAKAN TINGGI SIDEBAR & KONTEN UTAMA ============
     syncSidebarHeight() {
         requestAnimationFrame(() => {
             const sidebar = document.querySelector('#creativeCvPreview .creative-sidebar');
@@ -695,10 +662,9 @@ class CreativeCvBuilder {
         });
     }
 
-    // ============ DOWNLOAD PDF ============
     downloadPDF() {
         if (typeof PDFGenerator === 'undefined') {
-            this.showToast('Fitur PDF tidak tersedia. Silakan refresh halaman.', 'error');
+            this.showToast('Fitur PDF tidak tersedia.', 'error');
             return;
         }
 
@@ -709,7 +675,7 @@ class CreativeCvBuilder {
         const hasData = formData.fullName || formData.position || formData.aboutMe || formData.experiences.length > 0;
 
         if (!hasData) {
-            this.showToast('Tidak ada data CV untuk diekspor. Silakan isi formulir terlebih dahulu.', 'error');
+            this.showToast('Tidak ada data CV untuk diekspor.', 'error');
             return;
         }
 
@@ -717,7 +683,7 @@ class CreativeCvBuilder {
         const originalText = downloadBtn.innerHTML;
 
         try {
-            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             downloadBtn.disabled = true;
 
             pdfGenerator.generatePDF(formData, {
@@ -737,6 +703,42 @@ class CreativeCvBuilder {
         }
     }
 
+    downloadWord() {
+        if (typeof WordGenerator === 'undefined') {
+            this.showToast('Fitur Word tidak tersedia.', 'error');
+            return;
+        }
+
+        const formData = this.collectFormData();
+        const hasData = formData.fullName || formData.position || formData.aboutMe || formData.experiences.length > 0;
+
+        if (!hasData) {
+            this.showToast('Tidak ada data CV untuk diekspor.', 'error');
+            return;
+        }
+
+        const wordGen = new WordGenerator();
+        const downloadBtn = document.getElementById('downloadWordBtnCreative');
+        const originalText = downloadBtn.innerHTML;
+
+        try {
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            downloadBtn.disabled = true;
+
+            wordGen.generateWord(formData, { type: 'creative', fileSuffix: 'CV_Creative' });
+
+            setTimeout(() => {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            }, 2000);
+        } catch (error) {
+            console.error('Word download error:', error);
+            this.showToast('Gagal download Word: ' + error.message, 'error');
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+        }
+    }
+
     showToast(message, type = 'info') {
         if (window.app && window.app.showToast) {
             window.app.showToast(message, type);
@@ -746,7 +748,6 @@ class CreativeCvBuilder {
     }
 }
 
-// Initialize alongside the main app.
 document.addEventListener('DOMContentLoaded', () => {
     window.creativeCv = new CreativeCvBuilder();
 });
