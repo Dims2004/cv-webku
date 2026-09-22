@@ -33,49 +33,23 @@ class PDFGenerator {
 
         try {
             // Make sure every image (certificate badges, etc.) is fully loaded
-            // BEFORE we measure the preview's height. Otherwise an image that
-            // finishes loading a moment later pushes the layout taller, and
-            // html2canvas ends up cropping the capture to the earlier
-            // (smaller) height — which is what was cutting off certifications.
+            // BEFORE we measure the preview's height.
             await this.waitForImages(previewElement);
-            // Let the browser finish a layout/paint pass after images settle.
             await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
             // Read the color/font currently applied on screen so the PDF
-            // matches exactly what the user picked, regardless of how
-            // html2canvas handles CSS custom properties during cloning.
+            // matches exactly what the user picked.
             const titleColor = getComputedStyle(document.documentElement)
                 .getPropertyValue('--cv-title-color').trim() || '#a11d3d';
             const cvFont = getComputedStyle(document.documentElement)
                 .getPropertyValue('--cv-font-family').trim();
 
-            // Render at a higher-quality scale for crisp, HD text/images in
-            // the downloaded PDF. 3x is noticeably sharper than 2x,
-            // especially for small text and certificate photos, at the
-            // cost of a slightly larger file / longer processing time.
+            // Render at a higher-quality scale for crisp, HD text/images.
             const RENDER_SCALE = 3;
 
             // --- Fix for "PDF berantakan kalau download dari HP" ---
-            // html2canvas re-lays-out the page inside a hidden clone before
-            // capturing it. By default that clone uses the REAL device's
-            // viewport width. On a phone that's ~360-430px, which is well
-            // inside the @media (max-width: 768px) / (max-width: 480px)
-            // breakpoints in responsive.css. Those breakpoints shrink the
-            // preview's font sizes with !important and stack the contact
-            // row vertically — a layout meant for on-screen reading on a
-            // small screen, not for an exported document. That's exactly
-            // why a PDF downloaded from a phone looks different (and
-            // broken/squeezed) compared to one downloaded from a desktop
-            // browser, even though the underlying CV data is identical.
-            //
-            // The fix is to tell html2canvas to lay out its clone inside a
-            // virtual "desktop-sized" window via windowWidth/windowHeight,
-            // regardless of the real device's screen size. That makes every
-            // device (phone, tablet, laptop) render the exact same
-            // desktop/ATS layout before capture, so the resulting PDF is
-            // identical no matter where it was downloaded from.
-            const DESKTOP_VIEWPORT_WIDTH = 1400;  // matches .container max-width in style.css, comfortably above every mobile breakpoint (1024/768/480px)
-            const DESKTOP_VIEWPORT_HEIGHT = 1400; // tall + not "landscape", so it doesn't trip the max-height:600 landscape breakpoint either
+            const DESKTOP_VIEWPORT_WIDTH = 1400;
+            const DESKTOP_VIEWPORT_HEIGHT = 1400;
 
             const canvas = await html2canvas(previewElement, {
                 scale: RENDER_SCALE,
@@ -86,11 +60,7 @@ class PDFGenerator {
                 windowWidth: DESKTOP_VIEWPORT_WIDTH,
                 windowHeight: DESKTOP_VIEWPORT_HEIGHT,
                 onclone: (clonedDoc) => {
-                    // Belt-and-suspenders on top of the windowWidth trick
-                    // above: pin the preview element itself to a fixed
-                    // desktop-style width in the clone, so its layout can
-                    // never depend on whatever width its parent grid
-                    // happens to compute on a given device.
+                    // Pin the preview element to a fixed desktop-style width.
                     const clonedPreview = clonedDoc.getElementById(previewElementId);
                     if (clonedPreview) {
                         clonedPreview.style.width = '750px';
@@ -98,13 +68,6 @@ class PDFGenerator {
                     }
 
                     // --- CV Creative: samakan tinggi sidebar & konten utama ---
-                    // html2canvas tidak selalu mendukung "align-items: stretch"
-                    // milik flexbox untuk sibling yang tingginya auto, jadi
-                    // sidebar berwarna bisa ter-capture pendek sesuai isinya
-                    // sendiri saja, bukan menyamai kolom kanan yang lebih
-                    // panjang. Diukur & disamakan di sini, PERSIS pada lebar
-                    // 750px yang dipakai untuk capture (bukan lebar layar asli
-                    // pengguna), supaya hasilnya akurat apa pun device-nya.
                     const clonedSidebar = clonedDoc.querySelector('.creative-sidebar');
                     const clonedMain = clonedDoc.querySelector('.creative-main');
                     if (clonedSidebar && clonedMain) {
@@ -115,31 +78,34 @@ class PDFGenerator {
                         clonedMain.style.minHeight = tallest + 'px';
                     }
 
-                    // --- Fix for "foto melebihi batas atas saat PDF diunduh" ---
-                    // Pin the ATS header photo box to a fixed pixel size
-                    // explicitly on the clone, on top of the fixed height
-                    // already set in style.css. This guards against any
-                    // html2canvas version/quirk that doesn't fully respect
-                    // a CSS height on a flex child, which previously let
-                    // the photo render taller than the header and overflow
-                    // past its top edge.
+                    // --- Fix foto profil ATS: ukuran tetap saat capture ---
                     const clonedPhotoBox = clonedDoc.querySelector('.preview-photo-box');
                     if (clonedPhotoBox) {
-                        const boxSize = clonedPhotoBox.getBoundingClientRect().width || 96;
-                        clonedPhotoBox.style.width = boxSize + 'px';
-                        clonedPhotoBox.style.height = boxSize + 'px';
-                        clonedPhotoBox.style.flexShrink = '0';
+                        clonedPhotoBox.style.width = '96px';
+                        clonedPhotoBox.style.height = '120px';
+                        clonedPhotoBox.style.flex = '0 0 96px';
+                        clonedPhotoBox.style.overflow = 'hidden';
+                        clonedPhotoBox.style.borderRadius = '2px';
+
                         const clonedPhotoImg = clonedPhotoBox.querySelector('img');
                         if (clonedPhotoImg) {
                             clonedPhotoImg.style.width = '100%';
                             clonedPhotoImg.style.height = '100%';
                             clonedPhotoImg.style.objectFit = 'cover';
+                            clonedPhotoImg.style.objectPosition = 'center top';
+                            clonedPhotoImg.style.display = 'block';
                         }
                     }
 
-                    // Force the heading colors explicitly on the clone, since
-                    // relying on the --cv-title-color variable being cloned
-                    // correctly is unreliable across html2canvas versions.
+                    // Pastikan link tetap punya style underline & warna yang sama saat di-capture
+                    clonedDoc.querySelectorAll(
+                        '.preview-contact-row a, .preview-doc-links a, .preview-doc-link-inline, .creative-sidebar-link'
+                    ).forEach(a => {
+                        a.style.color = '#1a56db';
+                        a.style.textDecoration = 'underline';
+                    });
+
+                    // Force heading colors explicitly on the clone.
                     const heading = clonedDoc.querySelector('.preview-header-main h1');
                     if (heading) heading.style.color = titleColor;
                     clonedDoc.querySelectorAll('.preview-section-title').forEach(el => {
@@ -186,8 +152,7 @@ class PDFGenerator {
         }));
     }
 
-    // Slices the captured canvas across multiple A4 pages (no cropping, no
-    // forced minimum scale) and saves the resulting PDF.
+    // Slices the captured canvas across multiple A4 pages (no cropping).
     buildMultiPagePdf(sourceCanvas, formData, fileSuffix = 'CV') {
         const pdf = new jspdf.jsPDF({
             orientation: 'portrait',
@@ -203,10 +168,7 @@ class PDFGenerator {
         const contentWidthMm = pdfWidth - margin * 2;
         const contentHeightAvailableMm = pdfHeight - margin * 2;
 
-        // px -> mm ratio so the image width exactly fills contentWidthMm
         const pxToMm = contentWidthMm / sourceCanvas.width;
-
-        // How many source pixels correspond to one page's worth of height
         const pageHeightPx = Math.floor(contentHeightAvailableMm / pxToMm);
 
         let renderedHeightPx = 0;
@@ -215,7 +177,6 @@ class PDFGenerator {
         while (renderedHeightPx < sourceCanvas.height) {
             const sliceHeightPx = Math.min(pageHeightPx, sourceCanvas.height - renderedHeightPx);
 
-            // Draw this slice of the source canvas onto its own page-sized canvas
             const pageCanvas = document.createElement('canvas');
             pageCanvas.width = sourceCanvas.width;
             pageCanvas.height = sliceHeightPx;
@@ -225,14 +186,10 @@ class PDFGenerator {
             ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
             ctx.drawImage(
                 sourceCanvas,
-                0, renderedHeightPx, sourceCanvas.width, sliceHeightPx, // source rect
-                0, 0, pageCanvas.width, sliceHeightPx                   // dest rect
+                0, renderedHeightPx, sourceCanvas.width, sliceHeightPx,
+                0, 0, pageCanvas.width, sliceHeightPx
             );
 
-            // PNG instead of JPEG: JPEG's lossy compression is what was
-            // making text edges and certificate photos look blurry/burem.
-            // PNG is lossless so text and images stay sharp; the extra file
-            // size is worth it for a document this small (a few pages).
             const imgData = pageCanvas.toDataURL('image/png');
             const sliceHeightMm = sliceHeightPx * pxToMm;
 
