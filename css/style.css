@@ -735,13 +735,13 @@ body.dark-theme .cv-preview-content {
 }
 
 /* Header - classic ATS layout: optional photo box on the left,
-   name + colon-style contact details on the right (or full width when
-   no photo is chosen), a single rule underneath separating it from the
-   rest of the document. */
+   aligned only with the name + position ("judul"), not the contact
+   lines. Contact details sit on their own full-width row underneath,
+   a single rule underneath separating it from the rest of the document. */
 .preview-header-main {
     display: flex;
-    align-items: flex-start;
-    gap: 20px;
+    flex-direction: column;
+    gap: 10px;
     margin-bottom: 18px;
     padding-bottom: 16px;
     border-bottom: 2px solid #1a1a2e;
@@ -751,10 +751,15 @@ body.dark-theme .preview-header-main {
     border-bottom-color: #4a5568;
 }
 
+.preview-header-top {
+    display: flex;
+    align-items: stretch;
+    gap: 20px;
+}
+
 .preview-photo-box {
     flex-shrink: 0;
     width: 96px;
-    height: 120px;
     border-radius: 4px;
     overflow: hidden;
     background: #e2e8f0;
@@ -824,17 +829,17 @@ body.dark-theme .preview-contact-row {
 }
 
 .preview-contact-row a {
-    color: #1a1a2e;
-    text-decoration: none;
+    color: var(--primary-color, #2563eb);
+    text-decoration: underline;
     word-break: break-all;
 }
 
 body.dark-theme .preview-contact-row a {
-    color: #cbd5e0;
+    color: #60a5fa;
 }
 
 .preview-contact-row a:hover {
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 /* Sections - each section (after the first) is separated from the one
