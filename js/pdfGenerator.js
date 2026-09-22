@@ -65,13 +65,16 @@ class PDFGenerator {
                         clonedMain.style.minHeight = tallest + 'px';
                     }
 
-                    // --- Foto profil ATS: ukuran tetap saat capture ---
-                    // Ukuran baru: 90x110px (kotak, bukan bulat).
+                    // --- Foto profil ATS: sejajar atas dengan nama ---
+                    // align-self: flex-start supaya foto tidak melar dan tidak
+                    // melebihi batas atas header. Ukuran 90x110px.
                     const clonedPhotoBox = clonedDoc.querySelector('.preview-photo-box');
                     if (clonedPhotoBox) {
                         clonedPhotoBox.style.width = '90px';
                         clonedPhotoBox.style.height = '110px';
                         clonedPhotoBox.style.flex = '0 0 90px';
+                        clonedPhotoBox.style.alignSelf = 'flex-start';
+                        clonedPhotoBox.style.marginTop = '0';
                         clonedPhotoBox.style.overflow = 'hidden';
                         clonedPhotoBox.style.borderRadius = '0';
                         clonedPhotoBox.style.border = '1px solid #1a1a2e';
@@ -87,9 +90,6 @@ class PDFGenerator {
                     }
 
                     // --- Pastikan header ATS tetap flex row saat capture ---
-                    // html2canvas kadang tidak menghormati display:flex pada
-                    // elemen yang di-clone, sehingga foto & teks bisa tumpang
-                    // tindih atau foto jadi full-width. Pin eksplisit di sini.
                     const clonedHeader = clonedDoc.querySelector('.preview-header-main');
                     if (clonedHeader) {
                         clonedHeader.style.display = 'flex';
@@ -107,14 +107,20 @@ class PDFGenerator {
                         clonedHeaderText.style.minWidth = '0';
                         clonedHeaderText.style.display = 'flex';
                         clonedHeaderText.style.flexDirection = 'column';
+                        clonedHeaderText.style.paddingTop = '0';
                     }
 
-                    // Pastikan link tetap punya style underline & warna yang sama saat di-capture
+                    // Pastikan link di kontak & dokumen punya style konsisten
                     clonedDoc.querySelectorAll(
                         '.preview-contact-row a, .preview-doc-links a, .preview-doc-link-inline, .creative-sidebar-link'
                     ).forEach(a => {
                         a.style.color = '#1a56db';
                         a.style.textDecoration = 'underline';
+                    });
+
+                    // Pastikan ikon di dalam link kontak benar-benar hilang
+                    clonedDoc.querySelectorAll('.preview-contact-row a i').forEach(i => {
+                        i.style.display = 'none';
                     });
 
                     // Force heading colors explicitly on the clone.
