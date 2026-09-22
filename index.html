@@ -24,7 +24,7 @@
         <div class="loader">
             <div class="loader-bar"></div>
         </div>
-        <p>Memuat Aplikasi...</p>
+        <p data-i18n="loading">Memuat Aplikasi...</p>
     </div>
 
     <!-- Main Application -->
@@ -35,9 +35,14 @@
                 <div class="header-content">
                     <div class="logo">
                         <img src="logoku.png" alt="CV Logo">
-                        <span>CV Builder</span>
+                        <span data-i18n="appTitle">CV Builder</span>
                     </div>
                     <div class="header-actions">
+                        <!-- Language Switcher -->
+                        <div class="lang-switch" id="langSwitch" role="group" aria-label="Language">
+                            <button type="button" class="lang-btn active" data-lang="id">ID</button>
+                            <button type="button" class="lang-btn" data-lang="en">EN</button>
+                        </div>
                         <button id="themeToggle" class="btn-icon" aria-label="Toggle theme">
                             <i class="fas fa-moon"></i>
                         </button>
@@ -55,56 +60,59 @@
                         <div class="welcome-icon">
                             <img src="logoku.png" alt="CV Logo">
                         </div>
-                        <h1>Buat CV Profesional</h1>
-                        <p>Pilih metode untuk memulai membuat CV Anda</p>
+                        <h1 data-i18n="welcomeTitle">Buat CV Profesional</h1>
+                        <p data-i18n="welcomeSubtitle">Pilih metode untuk memulai membuat CV Anda</p>
                         <div class="welcome-actions">
                             <button id="createCVBtn" class="btn-primary">
                                 <i class="fas fa-plus-circle"></i>
-                                Buat CV Baru
+                                <span data-i18n="createCV">Buat CV Baru</span>
                             </button>
                         </div>
                         <div class="welcome-features">
                             <div class="feature">
                                 <i class="fas fa-edit"></i>
-                                <span>Edit Real-time</span>
+                                <span data-i18n="featureLiveEdit">Edit Real-time</span>
                             </div>
                             <div class="feature">
                                 <i class="fas fa-download"></i>
-                                <span>Unduh PDF</span>
+                                <span data-i18n="featureDownload">Unduh PDF & Word</span>
                             </div>
                             <div class="feature">
                                 <i class="fas fa-mobile-screen"></i>
-                                <span>Responsive</span>
+                                <span data-i18n="featureResponsive">Responsive</span>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- CV Builder Screen -->
+                <!-- CV Builder Screen (ATS) -->
                 <section id="cvBuilderScreen" class="cv-builder-screen hidden">
                     <div class="cv-builder-layout">
                         <!-- Form Panel -->
                         <div class="form-panel">
                             <div class="form-header">
                                 <div class="form-header-left">
-    <button id="backToHomeBtn" class="btn-icon" aria-label="Kembali ke Beranda"
-        title="Kembali ke Beranda">
-        <i class="fas fa-arrow-left"></i>
-    </button>
-
-    <h2 class="form-title">
-        <img src="logoku.png" alt="CV Logo">
-        Edit CV
-    </h2>
-</div>
+                                    <button id="backToHomeBtn" class="btn-icon" aria-label="Kembali ke Beranda"
+                                        title="Kembali ke Beranda">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <h2 class="form-title">
+                                        <img src="logoku.png" alt="CV Logo">
+                                        <span data-i18n="editCV">Edit CV</span>
+                                    </h2>
+                                </div>
                                 <div class="form-actions">
                                     <button id="previewBtn" class="btn-preview">
                                         <i class="fas fa-eye"></i>
-                                        Preview
+                                        <span data-i18n="preview">Preview</span>
+                                    </button>
+                                    <button id="downloadWordBtn" class="btn-word">
+                                        <i class="fas fa-file-word"></i>
+                                        <span data-i18n="downloadWord">Word</span>
                                     </button>
                                     <button id="downloadPDFBtn" class="btn-download">
                                         <i class="fas fa-file-pdf"></i>
-                                        Download PDF
+                                        <span data-i18n="downloadPDF">PDF</span>
                                     </button>
                                 </div>
                             </div>
@@ -113,37 +121,37 @@
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-image"></i>
-                                        Foto Profil
-                                        <span class="optional-badge">Opsional</span>
+                                        <span data-i18n="photoSection">Foto Profil</span>
+                                        <span class="optional-badge" data-i18n="optional">Opsional</span>
                                     </h3>
                                     <div class="photo-option-toggle" role="radiogroup" aria-label="Pilihan foto pada CV">
                                         <label class="photo-option-btn">
                                             <input type="radio" name="photoOption" id="photoOptionNone" value="none" checked>
-                                            <span><i class="fas fa-file-alt"></i> Tanpa Foto</span>
+                                            <span><i class="fas fa-file-alt"></i> <span data-i18n="withoutPhoto">Tanpa Foto</span></span>
                                         </label>
                                         <label class="photo-option-btn">
                                             <input type="radio" name="photoOption" id="photoOptionWith" value="with">
-                                            <span><i class="fas fa-camera"></i> Dengan Foto</span>
+                                            <span><i class="fas fa-camera"></i> <span data-i18n="withPhoto">Dengan Foto</span></span>
                                         </label>
                                     </div>
                                     <div id="atsPhotoUploadArea" class="cert-upload-area hidden">
                                         <div class="cert-preview" id="atsPhotoPreview">
                                             <i class="fas fa-user"></i>
-                                            <span>Belum ada foto</span>
+                                            <span data-i18n="noPhoto">Belum ada foto</span>
                                         </div>
                                         <div class="cert-upload-controls">
                                             <label class="btn-upload-cert">
                                                 <i class="fas fa-upload"></i>
-                                                Pilih Foto
+                                                <span data-i18n="choosePhoto">Pilih Foto</span>
                                                 <input type="file" id="atsPhotoInput"
                                                     accept="image/jpeg,image/jpg,image/png" hidden>
                                             </label>
                                             <button type="button" id="removeAtsPhotoBtn" class="btn-remove-cert-image hidden">
-                                                <i class="fas fa-trash"></i> Hapus
+                                                <i class="fas fa-trash"></i> <span data-i18n="delete">Hapus</span>
                                             </button>
                                         </div>
                                     </div>
-                                    <p class="form-hint">
+                                    <p class="form-hint" data-i18n="photoHint">
                                         Gunakan foto formal berlatar polos. Beberapa perusahaan justru lebih menyukai CV ATS tanpa foto, jadi pilih sesuai kebutuhan lowongan yang dituju.
                                     </p>
                                 </div>
@@ -152,41 +160,37 @@
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-user"></i>
-                                        Header Profil
+                                        <span data-i18n="profileHeader">Header Profil</span>
                                     </h3>
                                     <div class="form-group">
-                                        <label for="fullName">Nama Lengkap</label>
-                                        <input type="text" id="fullName" placeholder="nama" class="form-input">
+                                        <label for="fullName" data-i18n="labelFullName">Nama Lengkap</label>
+                                        <input type="text" id="fullName" placeholder="nama" class="form-input" data-i18n-placeholder="phFullName">
                                     </div>
                                     <div class="form-group">
-                                        <label for="position">Posisi / Jabatan</label>
-                                        <input type="text" id="position"
-                                            placeholder=""
-                                            class="form-input">
+                                        <label for="position" data-i18n="labelPosition">Posisi / Jabatan</label>
+                                        <input type="text" id="position" placeholder="" class="form-input" data-i18n-placeholder="phPosition">
                                     </div>
                                     <div class="form-group">
-                                        <label for="email">Email</label>
-                                        <input type="email" id="email" placeholder="nama akun" class="form-input">
+                                        <label for="email" data-i18n="labelEmail">Email</label>
+                                        <input type="email" id="email" placeholder="nama akun" class="form-input" data-i18n-placeholder="phEmail">
                                     </div>
                                     <div class="form-group">
-                                        <label for="phone">Telepon</label>
+                                        <label for="phone" data-i18n="labelPhone">Telepon</label>
                                         <input type="tel" id="phone" placeholder="(+62)" class="form-input">
                                     </div>
                                     <div class="form-group link-field-group">
-                                        <label for="linkedin">LinkedIn</label>
-                                        <input type="text" id="linkedinTitle" placeholder="Judul link (contoh: LinkedIn - Dimas Febrianto)" class="form-input">
-                                        <input type="url" id="linkedin" placeholder="akun linkdln" class="form-input">
+                                        <label for="linkedin" data-i18n="labelLinkedin">LinkedIn</label>
+                                        <input type="text" id="linkedinTitle" placeholder="Judul link (contoh: LinkedIn - Dimas Febrianto)" class="form-input" data-i18n-placeholder="phLinkTitle">
+                                        <input type="url" id="linkedin" placeholder="akun linkdln" class="form-input" data-i18n-placeholder="phLinkedin">
                                     </div>
                                     <div class="form-group link-field-group">
-                                        <label for="portfolio">Portofolio</label>
-                                        <input type="text" id="portfolioTitle" placeholder="Judul link (contoh: Lihat Portofolio)" class="form-input">
-                                        <input type="url" id="portfolio" placeholder="opsional"
-                                            class="form-input">
+                                        <label for="portfolio" data-i18n="labelPortfolio">Portofolio</label>
+                                        <input type="text" id="portfolioTitle" placeholder="Judul link (contoh: Lihat Portofolio)" class="form-input" data-i18n-placeholder="phLinkTitle">
+                                        <input type="url" id="portfolio" placeholder="opsional" class="form-input" data-i18n-placeholder="phOptional">
                                     </div>
                                     <div class="form-group">
-                                        <label for="domicile">Domisili</label>
-                                        <input type="text" id="domicile" placeholder="Kota, provinsi"
-                                            class="form-input">
+                                        <label for="domicile" data-i18n="labelDomicile">Domisili</label>
+                                        <input type="text" id="domicile" placeholder="Kota, provinsi" class="form-input" data-i18n-placeholder="phDomicile">
                                     </div>
                                 </div>
 
@@ -194,12 +198,12 @@
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-user-edit"></i>
-                                        Tentang Saya
+                                        <span data-i18n="aboutSection">Tentang Saya</span>
                                     </h3>
                                     <div class="form-group">
-                                        <label for="aboutMe">Deskripsi Diri</label>
+                                        <label for="aboutMe" data-i18n="labelAboutMe">Deskripsi Diri</label>
                                         <textarea id="aboutMe" rows="4" class="form-textarea"
-                                            placeholder="Deskripsikan diri Anda..."></textarea>
+                                            placeholder="Deskripsikan diri Anda..." data-i18n-placeholder="phAboutMe"></textarea>
                                     </div>
                                 </div>
 
@@ -207,28 +211,28 @@
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-graduation-cap"></i>
-                                        Pendidikan
+                                        <span data-i18n="educationSection">Pendidikan</span>
                                     </h3>
                                     <div id="educationContainer">
                                         <div class="education-item">
                                             <div class="form-group">
-                                                <label>Institusi</label>
+                                                <label data-i18n="labelInstitution">Institusi</label>
                                                 <input type="text" class="form-input edu-institution"
-                                                    placeholder="Nama institusi">
+                                                    placeholder="Nama institusi" data-i18n-placeholder="phInstitution">
                                             </div>
                                             <div class="form-group">
-                                                <label>Jurusan / Program</label>
+                                                <label data-i18n="labelMajor">Jurusan / Program</label>
                                                 <input type="text" class="form-input edu-major"
-                                                    placeholder="Jurusan / Program studi">
+                                                    placeholder="Jurusan / Program studi" data-i18n-placeholder="phMajor">
                                             </div>
                                             <div class="form-row">
                                                 <div class="form-group">
-                                                    <label>Lokasi</label>
+                                                    <label data-i18n="labelLocation">Lokasi</label>
                                                     <input type="text" class="form-input edu-location"
-                                                        placeholder="Kota, Provinsi">
+                                                        placeholder="Kota, Provinsi" data-i18n-placeholder="phLocation">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Periode</label>
+                                                    <label data-i18n="labelPeriod">Periode</label>
                                                     <div class="period-picker">
                                                         <select class="form-input edu-period-start"></select>
                                                         <span class="period-sep">–</span>
@@ -236,67 +240,67 @@
                                                     </div>
                                                     <label class="period-ongoing-label">
                                                         <input type="checkbox" class="edu-period-ongoing">
-                                                        Masih berkuliah (Sekarang)
+                                                        <span data-i18n="ongoingStudy">Masih berkuliah (Sekarang)</span>
                                                     </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label>GPA / Prestasi (Opsional)</label>
+                                                <label data-i18n="labelGpa">GPA / Prestasi (Opsional)</label>
                                                 <input type="text" class="form-input edu-gpa"
-                                                    placeholder="GPA: 3.58 atau prestasi lainnya">
+                                                    placeholder="GPA: 3.58 atau prestasi lainnya" data-i18n-placeholder="phGpa">
                                             </div>
                                             <div class="form-group link-field-group">
-                                                <label>Link Ijazah (Opsional)</label>
+                                                <label data-i18n="labelLinkIjazah">Link Ijazah (Opsional)</label>
                                                 <input type="text" class="form-input edu-link-ijazah-title"
-                                                    placeholder="Judul link (contoh: Lihat Ijazah)">
+                                                    placeholder="Judul link (contoh: Lihat Ijazah)" data-i18n-placeholder="phLinkTitleCertificate">
                                                 <input type="url" class="form-input edu-link-ijazah"
-                                                    placeholder="Link Google Drive/Dropbox ke scan ijazah">
+                                                    placeholder="Link Google Drive/Dropbox ke scan ijazah" data-i18n-placeholder="phLinkCertificate">
                                             </div>
                                             <div class="form-group link-field-group">
-                                                <label>Link Transkrip Nilai (Opsional)</label>
+                                                <label data-i18n="labelLinkTranscript">Link Transkrip Nilai (Opsional)</label>
                                                 <input type="text" class="form-input edu-link-transkrip-title"
-                                                    placeholder="Judul link (contoh: Lihat Transkrip Nilai)">
+                                                    placeholder="Judul link (contoh: Lihat Transkrip Nilai)" data-i18n-placeholder="phLinkTranscriptTitle">
                                                 <input type="url" class="form-input edu-link-transkrip"
-                                                    placeholder="Link Google Drive/Dropbox ke scan transkrip">
+                                                    placeholder="Link Google Drive/Dropbox ke scan transkrip" data-i18n-placeholder="phLinkTranscript">
                                             </div>
                                             <button type="button" class="btn-remove-edu hidden">
-                                                <i class="fas fa-times"></i> Hapus
+                                                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
                                             </button>
                                         </div>
                                     </div>
                                     <button type="button" id="addEducationBtn" class="btn-add">
                                         <i class="fas fa-plus"></i>
-                                        Tambah Pendidikan
+                                        <span data-i18n="addEducation">Tambah Pendidikan</span>
                                     </button>
                                 </div>
 
-                                <!-- Internship Experience (Multi-entry, Opsional) -->
+                                <!-- Internship -->
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-laptop"></i>
-                                        Pengalaman Magang
-                                        <span class="optional-badge">Opsional</span>
+                                        <span data-i18n="internshipSection">Pengalaman Magang</span>
+                                        <span class="optional-badge" data-i18n="optional">Opsional</span>
                                     </h3>
                                     <div id="internshipContainer">
                                         <div class="internship-item">
                                             <div class="form-group">
-                                                <label>Perusahaan</label>
+                                                <label data-i18n="labelCompany">Perusahaan</label>
                                                 <input type="text" class="form-input int-company"
-                                                    placeholder="Nama perusahaan">
+                                                    placeholder="Nama perusahaan" data-i18n-placeholder="phCompany">
                                             </div>
                                             <div class="form-group">
-                                                <label>Posisi</label>
+                                                <label data-i18n="labelPosition">Posisi</label>
                                                 <input type="text" class="form-input int-position"
-                                                    placeholder="Posisi magang">
+                                                    placeholder="Posisi magang" data-i18n-placeholder="phPositionInternship">
                                             </div>
                                             <div class="form-row">
                                                 <div class="form-group">
-                                                    <label>Lokasi</label>
+                                                    <label data-i18n="labelLocation">Lokasi</label>
                                                     <input type="text" class="form-input int-location"
-                                                        placeholder="Kota, Provinsi">
+                                                        placeholder="Kota, Provinsi" data-i18n-placeholder="phLocation">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Periode</label>
+                                                    <label data-i18n="labelPeriod">Periode</label>
                                                     <div class="period-picker">
                                                         <input type="month" class="form-input int-period-start">
                                                         <span class="period-sep">–</span>
@@ -304,60 +308,60 @@
                                                     </div>
                                                     <label class="period-ongoing-label">
                                                         <input type="checkbox" class="int-period-ongoing">
-                                                        Masih magang (Sekarang)
+                                                        <span data-i18n="ongoingInternship">Masih magang (Sekarang)</span>
                                                     </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label>Deskripsi</label>
+                                                <label data-i18n="labelDescription">Deskripsi</label>
                                                 <textarea class="form-textarea int-description" rows="3"
-                                                    placeholder="Deskripsi pekerjaan..."></textarea>
+                                                    placeholder="Deskripsi pekerjaan..." data-i18n-placeholder="phDescription"></textarea>
                                             </div>
                                             <div class="form-group link-field-group">
-                                                <label>Link Sertifikat/Referensi Magang (Opsional)</label>
+                                                <label data-i18n="labelLinkInternship">Link Sertifikat/Referensi Magang (Opsional)</label>
                                                 <input type="text" class="form-input int-link-title"
-                                                    placeholder="Judul link (contoh: Lihat Sertifikat Magang)">
+                                                    placeholder="Judul link (contoh: Lihat Sertifikat Magang)" data-i18n-placeholder="phLinkInternshipTitle">
                                                 <input type="url" class="form-input int-link"
-                                                    placeholder="Link sertifikat/surat referensi magang">
+                                                    placeholder="Link sertifikat/surat referensi magang" data-i18n-placeholder="phLinkInternship">
                                             </div>
                                             <button type="button" class="btn-remove-int hidden">
-                                                <i class="fas fa-times"></i> Hapus
+                                                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
                                             </button>
                                         </div>
                                     </div>
                                     <button type="button" id="addInternshipBtn" class="btn-add">
                                         <i class="fas fa-plus"></i>
-                                        Tambah Pengalaman Magang
+                                        <span data-i18n="addInternship">Tambah Pengalaman Magang</span>
                                     </button>
                                 </div>
 
-                                <!-- Work Experience (Multi-entry, Opsional) -->
+                                <!-- Work Experience -->
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-briefcase"></i>
-                                        Pengalaman Kerja
-                                        <span class="optional-badge">Opsional</span>
+                                        <span data-i18n="workSection">Pengalaman Kerja</span>
+                                        <span class="optional-badge" data-i18n="optional">Opsional</span>
                                     </h3>
                                     <div id="workContainer">
                                         <div class="work-item">
                                             <div class="form-group">
-                                                <label>Perusahaan</label>
+                                                <label data-i18n="labelCompany">Perusahaan</label>
                                                 <input type="text" class="form-input work-company"
-                                                    placeholder="Nama perusahaan">
+                                                    placeholder="Nama perusahaan" data-i18n-placeholder="phCompany">
                                             </div>
                                             <div class="form-group">
-                                                <label>Posisi</label>
+                                                <label data-i18n="labelPosition">Posisi</label>
                                                 <input type="text" class="form-input work-position"
-                                                    placeholder="Posisi/jabatan">
+                                                    placeholder="Posisi/jabatan" data-i18n-placeholder="phPositionJob">
                                             </div>
                                             <div class="form-row">
                                                 <div class="form-group">
-                                                    <label>Lokasi</label>
+                                                    <label data-i18n="labelLocation">Lokasi</label>
                                                     <input type="text" class="form-input work-location"
-                                                        placeholder="Kota, Provinsi">
+                                                        placeholder="Kota, Provinsi" data-i18n-placeholder="phLocation">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Periode</label>
+                                                    <label data-i18n="labelPeriod">Periode</label>
                                                     <div class="period-picker">
                                                         <input type="month" class="form-input work-period-start">
                                                         <span class="period-sep">–</span>
@@ -365,60 +369,60 @@
                                                     </div>
                                                     <label class="period-ongoing-label">
                                                         <input type="checkbox" class="work-period-ongoing">
-                                                        Masih bekerja di sini (Sekarang)
+                                                        <span data-i18n="ongoingWork">Masih bekerja di sini (Sekarang)</span>
                                                     </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label>Deskripsi</label>
+                                                <label data-i18n="labelDescription">Deskripsi</label>
                                                 <textarea class="form-textarea work-description" rows="3"
-                                                    placeholder="Deskripsi pekerjaan..."></textarea>
+                                                    placeholder="Deskripsi pekerjaan..." data-i18n-placeholder="phDescription"></textarea>
                                             </div>
                                             <div class="form-group link-field-group">
-                                                <label>Link Referensi/Surat Kerja (Opsional)</label>
+                                                <label data-i18n="labelLinkWork">Link Referensi/Surat Kerja (Opsional)</label>
                                                 <input type="text" class="form-input work-link-title"
-                                                    placeholder="Judul link (contoh: Lihat Surat Referensi)">
+                                                    placeholder="Judul link (contoh: Lihat Surat Referensi)" data-i18n-placeholder="phLinkWorkTitle">
                                                 <input type="url" class="form-input work-link"
-                                                    placeholder="Link surat referensi/pengalaman kerja">
+                                                    placeholder="Link surat referensi/pengalaman kerja" data-i18n-placeholder="phLinkWork">
                                             </div>
                                             <button type="button" class="btn-remove-work hidden">
-                                                <i class="fas fa-times"></i> Hapus
+                                                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
                                             </button>
                                         </div>
                                     </div>
                                     <button type="button" id="addWorkBtn" class="btn-add">
                                         <i class="fas fa-plus"></i>
-                                        Tambah Pengalaman Kerja
+                                        <span data-i18n="addWork">Tambah Pengalaman Kerja</span>
                                     </button>
                                 </div>
 
-                                <!-- Organizational Experience (Multi-entry, Opsional) -->
+                                <!-- Organizational Experience -->
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-users"></i>
-                                        Pengalaman Organisasi
-                                        <span class="optional-badge">Opsional</span>
+                                        <span data-i18n="orgSection">Pengalaman Organisasi</span>
+                                        <span class="optional-badge" data-i18n="optional">Opsional</span>
                                     </h3>
                                     <div id="organizationContainer">
                                         <div class="organization-item">
                                             <div class="form-group">
-                                                <label>Organisasi</label>
+                                                <label data-i18n="labelOrganization">Organisasi</label>
                                                 <input type="text" class="form-input org-name" maxlength="60"
-                                                    placeholder="Nama organisasi (maks. 60 karakter)">
+                                                    placeholder="Nama organisasi (maks. 60 karakter)" data-i18n-placeholder="phOrganization">
                                             </div>
                                             <div class="form-group">
-                                                <label>Posisi</label>
+                                                <label data-i18n="labelPosition">Posisi</label>
                                                 <input type="text" class="form-input org-position" maxlength="60"
-                                                    placeholder="Posisi/jabatan">
+                                                    placeholder="Posisi/jabatan" data-i18n-placeholder="phPositionJob">
                                             </div>
                                             <div class="form-row">
                                                 <div class="form-group">
-                                                    <label>Lokasi</label>
+                                                    <label data-i18n="labelLocation">Lokasi</label>
                                                     <input type="text" class="form-input org-location" maxlength="60"
-                                                        placeholder="Kota, Provinsi">
+                                                        placeholder="Kota, Provinsi" data-i18n-placeholder="phLocation">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Periode</label>
+                                                    <label data-i18n="labelPeriod">Periode</label>
                                                     <div class="period-picker">
                                                         <input type="month" class="form-input org-period-start">
                                                         <span class="period-sep">–</span>
@@ -426,65 +430,65 @@
                                                     </div>
                                                     <label class="period-ongoing-label">
                                                         <input type="checkbox" class="org-period-ongoing">
-                                                        Masih berlangsung (Sekarang)
+                                                        <span data-i18n="ongoingOrg">Masih berlangsung (Sekarang)</span>
                                                     </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label>Deskripsi</label>
+                                                <label data-i18n="labelDescription">Deskripsi</label>
                                                 <textarea class="form-textarea org-description" rows="3"
-                                                    placeholder="Deskripsi kegiatan..."></textarea>
+                                                    placeholder="Deskripsi kegiatan..." data-i18n-placeholder="phDescriptionActivity"></textarea>
                                             </div>
                                             <button type="button" class="btn-remove-org hidden">
-                                                <i class="fas fa-times"></i> Hapus
+                                                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
                                             </button>
                                         </div>
                                     </div>
                                     <button type="button" id="addOrganizationBtn" class="btn-add">
                                         <i class="fas fa-plus"></i>
-                                        Tambah Pengalaman Organisasi
+                                        <span data-i18n="addOrg">Tambah Pengalaman Organisasi</span>
                                     </button>
                                 </div>
 
-                                <!-- Projects (Multi-entry, Opsional) -->
+                                <!-- Projects -->
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-laptop-code"></i>
-                                        Proyek
-                                        <span class="optional-badge">Opsional</span>
+                                        <span data-i18n="projectSection">Proyek</span>
+                                        <span class="optional-badge" data-i18n="optional">Opsional</span>
                                     </h3>
                                     <div id="projectContainer">
                                         <div class="project-item">
                                             <div class="form-group">
-                                                <label>Nama Proyek</label>
+                                                <label data-i18n="labelProjectName">Nama Proyek</label>
                                                 <input type="text" class="form-input project-name"
-                                                    placeholder="Nama proyek">
+                                                    placeholder="Nama proyek" data-i18n-placeholder="phProjectName">
                                             </div>
                                             <div class="form-group">
-                                                <label>Deskripsi</label>
+                                                <label data-i18n="labelDescription">Deskripsi</label>
                                                 <textarea class="form-textarea project-description" rows="3"
-                                                    placeholder="Deskripsi proyek..."></textarea>
+                                                    placeholder="Deskripsi proyek..." data-i18n-placeholder="phProjectDescription"></textarea>
                                             </div>
                                             <div class="form-group">
-                                                <label>Teknologi / Tools</label>
+                                                <label data-i18n="labelTech">Teknologi / Tools</label>
                                                 <input type="text" class="form-input project-tech"
-                                                    placeholder="Teknologi yang digunakan">
+                                                    placeholder="Teknologi yang digunakan" data-i18n-placeholder="phTech">
                                             </div>
                                             <div class="form-group link-field-group">
-                                                <label>Link Proyek (Opsional)</label>
+                                                <label data-i18n="labelLinkProject">Link Proyek (Opsional)</label>
                                                 <input type="text" class="form-input project-link-title"
-                                                    placeholder="Judul link (contoh: Lihat Demo / GitHub)">
+                                                    placeholder="Judul link (contoh: Lihat Demo / GitHub)" data-i18n-placeholder="phLinkProjectTitle">
                                                 <input type="url" class="form-input project-link"
-                                                    placeholder="Link demo/repository/live proyek">
+                                                    placeholder="Link demo/repository/live proyek" data-i18n-placeholder="phLinkProject">
                                             </div>
                                             <button type="button" class="btn-remove-project hidden">
-                                                <i class="fas fa-times"></i> Hapus
+                                                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
                                             </button>
                                         </div>
                                     </div>
                                     <button type="button" id="addProjectBtn" class="btn-add">
                                         <i class="fas fa-plus"></i>
-                                        Tambah Proyek
+                                        <span data-i18n="addProject">Tambah Proyek</span>
                                     </button>
                                 </div>
 
@@ -492,89 +496,89 @@
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-cogs"></i>
-                                        Skills
+                                        <span data-i18n="skillsSection">Skills</span>
                                     </h3>
                                     <div id="skillsContainer">
                                         <div class="skill-category-item">
                                             <div class="form-group">
-                                                <label>Kategori Skill</label>
+                                                <label data-i18n="labelSkillCategory">Kategori Skill</label>
                                                 <input type="text" class="form-input skill-category"
-                                                    placeholder="Contoh: Networking, Programming, IT Support, dll">
+                                                    placeholder="Contoh: Networking, Programming, IT Support, dll" data-i18n-placeholder="phSkillCategory">
                                             </div>
                                             <div class="form-group">
-                                                <label>Daftar Skill</label>
+                                                <label data-i18n="labelSkillItems">Daftar Skill</label>
                                                 <textarea class="form-textarea skill-items" rows="2"
-                                                    placeholder="Pisahkan dengan koma&#10;Contoh: Computer Networking, TCP/IP, Routing, Switching"></textarea>
+                                                    placeholder="Pisahkan dengan koma&#10;Contoh: Computer Networking, TCP/IP, Routing, Switching" data-i18n-placeholder="phSkillItems"></textarea>
                                             </div>
                                             <button type="button" class="btn-remove-skill hidden">
-                                                <i class="fas fa-times"></i> Hapus Kategori
+                                                <i class="fas fa-times"></i> <span data-i18n="deleteCategory">Hapus Kategori</span>
                                             </button>
                                         </div>
                                     </div>
                                     <button type="button" id="addSkillBtn" class="btn-add">
                                         <i class="fas fa-plus"></i>
-                                        Tambah Kategori Skill
+                                        <span data-i18n="addSkill">Tambah Kategori Skill</span>
                                     </button>
                                 </div>
 
-                                <!-- Certifications (Multi-entry, Opsional) -->
+                                <!-- Certifications -->
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-certificate"></i>
-                                        Sertifikasi
-                                        <span class="optional-badge">Opsional</span>
+                                        <span data-i18n="certSection">Sertifikasi</span>
+                                        <span class="optional-badge" data-i18n="optional">Opsional</span>
                                     </h3>
                                     <div id="certificationContainer">
                                         <div class="certification-item">
                                             <div class="form-group">
-                                                <label>Nama Sertifikasi</label>
+                                                <label data-i18n="labelCertName">Nama Sertifikasi</label>
                                                 <input type="text" class="form-input cert-name"
-                                                    placeholder="Nama sertifikasi">
+                                                    placeholder="Nama sertifikasi" data-i18n-placeholder="phCertName">
                                             </div>
                                             <div class="form-group">
-                                                <label>Penerbit</label>
+                                                <label data-i18n="labelIssuer">Penerbit</label>
                                                 <input type="text" class="form-input cert-issuer"
-                                                    placeholder="Lembaga penerbit">
+                                                    placeholder="Lembaga penerbit" data-i18n-placeholder="phIssuer">
                                             </div>
                                             <div class="form-group">
-                                                <label>Tahun</label>
+                                                <label data-i18n="labelYear">Tahun</label>
                                                 <select class="form-input cert-year"></select>
                                             </div>
                                             <div class="form-group link-field-group">
-                                                <label>Link Sertifikat/Verifikasi (Opsional)</label>
+                                                <label data-i18n="labelLinkCert">Link Sertifikat/Verifikasi (Opsional)</label>
                                                 <input type="text" class="form-input cert-link-title"
-                                                    placeholder="Judul link (contoh: Lihat Sertifikat)">
+                                                    placeholder="Judul link (contoh: Lihat Sertifikat)" data-i18n-placeholder="phLinkCertTitle">
                                                 <input type="url" class="form-input cert-link"
-                                                    placeholder="Link verifikasi/sertifikat online">
+                                                    placeholder="Link verifikasi/sertifikat online" data-i18n-placeholder="phLinkCert">
                                             </div>
                                             <div class="form-group">
-                                                <label>Upload Sertifikat (JPG, JPEG, PNG)</label>
+                                                <label data-i18n="labelUploadCert">Upload Sertifikat (JPG, JPEG, PNG)</label>
                                                 <div class="cert-upload-area">
                                                     <div class="cert-preview" id="certPreview_0">
                                                         <i class="fas fa-file-image"></i>
-                                                        <span>Belum ada gambar</span>
+                                                        <span data-i18n="noImage">Belum ada gambar</span>
                                                     </div>
                                                     <div class="cert-upload-controls">
                                                         <label class="btn-upload-cert">
                                                             <i class="fas fa-upload"></i>
-                                                            Pilih Gambar
+                                                            <span data-i18n="chooseImage">Pilih Gambar</span>
                                                             <input type="file" class="cert-file-input"
                                                                 accept="image/jpeg,image/jpg,image/png" hidden>
                                                         </label>
                                                         <button type="button" class="btn-remove-cert-image hidden">
-                                                            <i class="fas fa-trash"></i> Hapus
+                                                            <i class="fas fa-trash"></i> <span data-i18n="delete">Hapus</span>
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
                                             <button type="button" class="btn-remove-cert hidden">
-                                                <i class="fas fa-times"></i> Hapus Sertifikasi
+                                                <i class="fas fa-times"></i> <span data-i18n="deleteCert">Hapus Sertifikasi</span>
                                             </button>
                                         </div>
                                     </div>
                                     <button type="button" id="addCertificationBtn" class="btn-add">
                                         <i class="fas fa-plus"></i>
-                                        Tambah Sertifikasi
+                                        <span data-i18n="addCert">Tambah Sertifikasi</span>
                                     </button>
                                 </div>
                             </form>
@@ -583,7 +587,7 @@
                         <!-- Preview Panel -->
                         <div class="preview-panel">
                             <div class="preview-header">
-                                <h2><i class="fas fa-file-alt"></i> Preview CV</h2>
+                                <h2><i class="fas fa-file-alt"></i> <span data-i18n="previewCV">Preview CV</span></h2>
                                 <div class="preview-header-right">
                                     <div class="font-picker-group" title="Ubah font CV">
                                         <label for="fontPicker"><i class="fas fa-font"></i></label>
@@ -603,7 +607,7 @@
                                         </label>
                                         <input type="color" id="titleColorPicker" value="#a11d3d">
                                     </div>
-                                    <span class="badge">Live Preview</span>
+                                    <span class="badge" data-i18n="livePreview">Live Preview</span>
                                 </div>
                             </div>
                             <div id="cvPreview" class="cv-preview">
@@ -624,16 +628,20 @@
                                         title="Kembali ke Beranda">
                                         <i class="fas fa-arrow-left"></i>
                                     </button>
-                                    <h2><i class="fas fa-pen"></i> Edit CV Creative</h2>
+                                    <h2><i class="fas fa-pen"></i> <span data-i18n="editCVCreative">Edit CV Creative</span></h2>
                                 </div>
                                 <div class="form-actions">
                                     <button id="previewBtnCreative" class="btn-preview">
                                         <i class="fas fa-eye"></i>
-                                        Preview
+                                        <span data-i18n="preview">Preview</span>
+                                    </button>
+                                    <button id="downloadWordBtnCreative" class="btn-word">
+                                        <i class="fas fa-file-word"></i>
+                                        <span data-i18n="downloadWord">Word</span>
                                     </button>
                                     <button id="downloadPDFBtnCreative" class="btn-download">
                                         <i class="fas fa-file-pdf"></i>
-                                        Download PDF
+                                        <span data-i18n="downloadPDF">PDF</span>
                                     </button>
                                 </div>
                             </div>
@@ -642,63 +650,63 @@
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-user"></i>
-                                        Foto & Profil
+                                        <span data-i18n="photoProfile">Foto & Profil</span>
                                     </h3>
                                     <div class="form-group">
-                                        <label>Foto Profil</label>
+                                        <label data-i18n="labelPhotoProfile">Foto Profil</label>
                                         <div class="cert-upload-area">
                                             <div class="cert-preview" id="creativePhotoPreview">
                                                 <i class="fas fa-user"></i>
-                                                <span>Belum ada foto</span>
+                                                <span data-i18n="noPhoto">Belum ada foto</span>
                                             </div>
                                             <div class="cert-upload-controls">
                                                 <label class="btn-upload-cert">
                                                     <i class="fas fa-upload"></i>
-                                                    Pilih Foto
+                                                    <span data-i18n="choosePhoto">Pilih Foto</span>
                                                     <input type="file" id="creativePhotoInput"
                                                         accept="image/jpeg,image/jpg,image/png" hidden>
                                                 </label>
                                                 <button type="button" id="removeCreativePhotoBtn"
                                                     class="btn-remove-cert-image hidden">
-                                                    <i class="fas fa-trash"></i> Hapus
+                                                    <i class="fas fa-trash"></i> <span data-i18n="delete">Hapus</span>
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="creativeFullName">Nama Lengkap</label>
+                                        <label for="creativeFullName" data-i18n="labelFullName">Nama Lengkap</label>
                                         <input type="text" id="creativeFullName" placeholder="nama"
-                                            class="form-input">
+                                            class="form-input" data-i18n-placeholder="phFullName">
                                     </div>
                                     <div class="form-group">
-                                        <label for="creativePosition">Posisi / Jabatan</label>
+                                        <label for="creativePosition" data-i18n="labelPosition">Posisi / Jabatan</label>
                                         <input type="text" id="creativePosition"
-                                            placeholder="Contoh: Mahasiswa Teknik" class="form-input">
+                                            placeholder="Contoh: Mahasiswa Teknik" class="form-input" data-i18n-placeholder="phPositionCreative">
                                     </div>
                                     <div class="form-group">
-                                        <label for="creativePhone">Telepon</label>
+                                        <label for="creativePhone" data-i18n="labelPhone">Telepon</label>
                                         <input type="tel" id="creativePhone" placeholder="(+62)"
                                             class="form-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="creativeEmail">Email</label>
-                                        <input type="email" id="creativeEmail" placeholder="akun" class="form-input">
+                                        <label for="creativeEmail" data-i18n="labelEmail">Email</label>
+                                        <input type="email" id="creativeEmail" placeholder="akun" class="form-input" data-i18n-placeholder="phEmail">
                                     </div>
                                     <div class="form-group">
-                                        <label for="creativeLinkedin">LinkedIn</label>
+                                        <label for="creativeLinkedin" data-i18n="labelLinkedin">LinkedIn</label>
                                         <input type="text" id="creativeLinkedin" placeholder="linkedin.com/in/akun"
                                             class="form-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="creativeInstagram">Instagram</label>
+                                        <label for="creativeInstagram" data-i18n="labelInstagram">Instagram</label>
                                         <input type="text" id="creativeInstagram" placeholder="@username"
                                             class="form-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="creativeAddress">Alamat</label>
+                                        <label for="creativeAddress" data-i18n="labelAddress">Alamat</label>
                                         <input type="text" id="creativeAddress"
                                             placeholder="Contoh: Dsn. Bendungan Rt/Rw 04/02, Pesawahan, Porong"
-                                            class="form-input">
+                                            class="form-input" data-i18n-placeholder="phAddress">
                                     </div>
                                 </div>
 
@@ -706,41 +714,41 @@
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-user-edit"></i>
-                                        Profil Singkat
+                                        <span data-i18n="shortProfile">Profil Singkat</span>
                                     </h3>
                                     <div class="form-group">
-                                        <label for="creativeAboutMe">Deskripsi Diri</label>
+                                        <label for="creativeAboutMe" data-i18n="labelAboutMe">Deskripsi Diri</label>
                                         <textarea id="creativeAboutMe" rows="4" class="form-textarea"
-                                            placeholder="Deskripsikan diri Anda secara singkat, padat, dan jelas..."></textarea>
+                                            placeholder="Deskripsikan diri Anda secara singkat, padat, dan jelas..." data-i18n-placeholder="phAboutMeCreative"></textarea>
                                     </div>
                                 </div>
 
-                                <!-- Pengalaman (Multi-entry) -->
+                                <!-- Pengalaman -->
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-briefcase"></i>
-                                        Pengalaman
+                                        <span data-i18n="experienceSection">Pengalaman</span>
                                     </h3>
                                     <div id="creativeExperienceContainer">
                                         <div class="work-item">
                                             <div class="form-group">
-                                                <label>Perusahaan / Organisasi</label>
+                                                <label data-i18n="labelCompanyOrg">Perusahaan / Organisasi</label>
                                                 <input type="text" class="form-input creative-exp-company"
-                                                    placeholder="Nama perusahaan / organisasi">
+                                                    placeholder="Nama perusahaan / organisasi" data-i18n-placeholder="phCompanyOrg">
                                             </div>
                                             <div class="form-group">
-                                                <label>Posisi</label>
+                                                <label data-i18n="labelPosition">Posisi</label>
                                                 <input type="text" class="form-input creative-exp-position"
-                                                    placeholder="Posisi / jabatan">
+                                                    placeholder="Posisi / jabatan" data-i18n-placeholder="phPositionJob">
                                             </div>
                                             <div class="form-row">
                                                 <div class="form-group">
-                                                    <label>Lokasi</label>
+                                                    <label data-i18n="labelLocation">Lokasi</label>
                                                     <input type="text" class="form-input creative-exp-location"
-                                                        placeholder="Kota, Provinsi">
+                                                        placeholder="Kota, Provinsi" data-i18n-placeholder="phLocation">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Periode</label>
+                                                    <label data-i18n="labelPeriod">Periode</label>
                                                     <div class="period-picker">
                                                         <input type="month" class="form-input creative-exp-period-start">
                                                         <span class="period-sep">–</span>
@@ -748,52 +756,52 @@
                                                     </div>
                                                     <label class="period-ongoing-label">
                                                         <input type="checkbox" class="creative-exp-period-ongoing">
-                                                        Masih berlangsung (Sekarang)
+                                                        <span data-i18n="ongoingNow">Masih berlangsung (Sekarang)</span>
                                                     </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label>Deskripsi (satu poin per baris)</label>
+                                                <label data-i18n="labelDescriptionPerLine">Deskripsi (satu poin per baris)</label>
                                                 <textarea class="form-textarea creative-exp-description" rows="3"
-                                                    placeholder="Tuliskan tiap poin di baris baru..."></textarea>
+                                                    placeholder="Tuliskan tiap poin di baris baru..." data-i18n-placeholder="phDescriptionPerLine"></textarea>
                                             </div>
                                             <button type="button" class="btn-remove-work hidden">
-                                                <i class="fas fa-times"></i> Hapus
+                                                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
                                             </button>
                                         </div>
                                     </div>
                                     <button type="button" id="addCreativeExperienceBtn" class="btn-add">
                                         <i class="fas fa-plus"></i>
-                                        Tambah Pengalaman
+                                        <span data-i18n="addExperience">Tambah Pengalaman</span>
                                     </button>
                                 </div>
 
-                                <!-- Pendidikan (Multi-entry) -->
+                                <!-- Pendidikan -->
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-graduation-cap"></i>
-                                        Pendidikan
+                                        <span data-i18n="educationSection">Pendidikan</span>
                                     </h3>
                                     <div id="creativeEducationContainer">
                                         <div class="education-item">
                                             <div class="form-group">
-                                                <label>Jurusan / Program</label>
+                                                <label data-i18n="labelMajor">Jurusan / Program</label>
                                                 <input type="text" class="form-input creative-edu-major"
-                                                    placeholder="Jurusan / Program studi">
+                                                    placeholder="Jurusan / Program studi" data-i18n-placeholder="phMajor">
                                             </div>
                                             <div class="form-group">
-                                                <label>Institusi</label>
+                                                <label data-i18n="labelInstitution">Institusi</label>
                                                 <input type="text" class="form-input creative-edu-institution"
-                                                    placeholder="Nama institusi">
+                                                    placeholder="Nama institusi" data-i18n-placeholder="phInstitution">
                                             </div>
                                             <div class="form-row">
                                                 <div class="form-group">
-                                                    <label>Lokasi</label>
+                                                    <label data-i18n="labelLocation">Lokasi</label>
                                                     <input type="text" class="form-input creative-edu-location"
-                                                        placeholder="Kota, Provinsi">
+                                                        placeholder="Kota, Provinsi" data-i18n-placeholder="phLocation">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Periode</label>
+                                                    <label data-i18n="labelPeriod">Periode</label>
                                                     <div class="period-picker">
                                                         <select class="form-input creative-edu-period-start"></select>
                                                         <span class="period-sep">–</span>
@@ -801,47 +809,47 @@
                                                     </div>
                                                     <label class="period-ongoing-label">
                                                         <input type="checkbox" class="creative-edu-period-ongoing">
-                                                        Masih berkuliah (Sekarang)
+                                                        <span data-i18n="ongoingStudy">Masih berkuliah (Sekarang)</span>
                                                     </label>
                                                 </div>
                                             </div>
                                             <button type="button" class="btn-remove-edu hidden">
-                                                <i class="fas fa-times"></i> Hapus
+                                                <i class="fas fa-times"></i> <span data-i18n="delete">Hapus</span>
                                             </button>
                                         </div>
                                     </div>
                                     <button type="button" id="addCreativeEducationBtn" class="btn-add">
                                         <i class="fas fa-plus"></i>
-                                        Tambah Pendidikan
+                                        <span data-i18n="addEducation">Tambah Pendidikan</span>
                                     </button>
                                 </div>
 
-                                <!-- Keahlian (Multi-entry kategori) -->
+                                <!-- Keahlian -->
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-cogs"></i>
-                                        Keahlian
+                                        <span data-i18n="skillsSection">Keahlian</span>
                                     </h3>
                                     <div id="creativeSkillsContainer">
                                         <div class="skill-category-item">
                                             <div class="form-group">
-                                                <label>Kategori Skill</label>
+                                                <label data-i18n="labelSkillCategory">Kategori Skill</label>
                                                 <input type="text" class="form-input creative-skill-category"
-                                                    placeholder="Contoh: IoT, Pemrograman, dll (boleh dikosongkan)">
+                                                    placeholder="Contoh: IoT, Pemrograman, dll (boleh dikosongkan)" data-i18n-placeholder="phSkillCategoryCreative">
                                             </div>
                                             <div class="form-group">
-                                                <label>Daftar Skill</label>
+                                                <label data-i18n="labelSkillItems">Daftar Skill</label>
                                                 <textarea class="form-textarea creative-skill-items" rows="2"
-                                                    placeholder="Pisahkan dengan koma"></textarea>
+                                                    placeholder="Pisahkan dengan koma" data-i18n-placeholder="phSkillItemsShort"></textarea>
                                             </div>
                                             <button type="button" class="btn-remove-skill hidden">
-                                                <i class="fas fa-times"></i> Hapus Kategori
+                                                <i class="fas fa-times"></i> <span data-i18n="deleteCategory">Hapus Kategori</span>
                                             </button>
                                         </div>
                                     </div>
                                     <button type="button" id="addCreativeSkillBtn" class="btn-add">
                                         <i class="fas fa-plus"></i>
-                                        Tambah Kategori Skill
+                                        <span data-i18n="addSkill">Tambah Kategori Skill</span>
                                     </button>
                                 </div>
 
@@ -849,12 +857,12 @@
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-language"></i>
-                                        Bahasa
+                                        <span data-i18n="languageSection">Bahasa</span>
                                     </h3>
                                     <div class="form-group">
-                                        <label for="creativeLanguages">Daftar Bahasa (satu per baris)</label>
+                                        <label for="creativeLanguages" data-i18n="labelLanguagesPerLine">Daftar Bahasa (satu per baris)</label>
                                         <textarea id="creativeLanguages" rows="2" class="form-textarea"
-                                            placeholder="Bahasa Indonesia&#10;Bahasa Inggris"></textarea>
+                                            placeholder="Bahasa Indonesia&#10;Bahasa Inggris" data-i18n-placeholder="phLanguages"></textarea>
                                     </div>
                                 </div>
 
@@ -862,12 +870,12 @@
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-chalkboard-teacher"></i>
-                                        Pelatihan
+                                        <span data-i18n="trainingSection">Pelatihan</span>
                                     </h3>
                                     <div class="form-group">
-                                        <label for="creativeTraining">Daftar Pelatihan (satu per baris)</label>
+                                        <label for="creativeTraining" data-i18n="labelTrainingPerLine">Daftar Pelatihan (satu per baris)</label>
                                         <textarea id="creativeTraining" rows="2" class="form-textarea"
-                                            placeholder="Digital Talent Scholarship - 2026"></textarea>
+                                            placeholder="Digital Talent Scholarship - 2026" data-i18n-placeholder="phTraining"></textarea>
                                     </div>
                                 </div>
 
@@ -875,12 +883,12 @@
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-certificate"></i>
-                                        Sertifikasi
+                                        <span data-i18n="certSection">Sertifikasi</span>
                                     </h3>
                                     <div class="form-group">
-                                        <label for="creativeCertifications">Daftar Sertifikasi (satu per baris)</label>
+                                        <label for="creativeCertifications" data-i18n="labelCertsPerLine">Daftar Sertifikasi (satu per baris)</label>
                                         <textarea id="creativeCertifications" rows="2" class="form-textarea"
-                                            placeholder="EPrT (English Proficiency Test) - 2025"></textarea>
+                                            placeholder="EPrT (English Proficiency Test) - 2025" data-i18n-placeholder="phCerts"></textarea>
                                     </div>
                                 </div>
 
@@ -888,12 +896,12 @@
                                 <div class="form-section">
                                     <h3 class="section-title">
                                         <i class="fas fa-trophy"></i>
-                                        Pencapaian
+                                        <span data-i18n="achievementSection">Pencapaian</span>
                                     </h3>
                                     <div class="form-group">
-                                        <label for="creativeAchievements">Daftar Pencapaian (satu per baris)</label>
+                                        <label for="creativeAchievements" data-i18n="labelAchievementPerLine">Daftar Pencapaian (satu per baris)</label>
                                         <textarea id="creativeAchievements" rows="2" class="form-textarea"
-                                            placeholder="Juara 2 Lomba Karya Tulis Ilmiah Tingkat Provinsi"></textarea>
+                                            placeholder="Juara 2 Lomba Karya Tulis Ilmiah Tingkat Provinsi" data-i18n-placeholder="phAchievements"></textarea>
                                     </div>
                                 </div>
                             </form>
@@ -902,7 +910,7 @@
                         <!-- Preview Panel -->
                         <div class="preview-panel">
                             <div class="preview-header">
-                                <h2><i class="fas fa-file-alt"></i> Preview CV Creative</h2>
+                                <h2><i class="fas fa-file-alt"></i> <span data-i18n="previewCVCreative">Preview CV Creative</span></h2>
                                 <div class="preview-header-right">
                                     <div class="color-picker-group" title="Ubah warna aksen CV (sidebar, judul bagian)">
                                         <label for="creativeColorPicker">
@@ -910,7 +918,7 @@
                                         </label>
                                         <input type="color" id="creativeColorPicker" value="#14b8a6">
                                     </div>
-                                    <span class="badge">Live Preview</span>
+                                    <span class="badge" data-i18n="livePreview">Live Preview</span>
                                 </div>
                             </div>
                             <div id="creativeCvPreview" class="cv-preview creative-cv-preview">
@@ -932,26 +940,27 @@
 
     <!-- Toast Notification -->
     <div id="toastContainer" class="toast-container"></div>
-    <!-- Welcome Popup: muncul otomatis saat pertama kali membuka website -->
-<div id="welcomeModal" class="modal-overlay hidden">
-    <div class="modal-box">
-        <button id="closeWelcomeModal" class="modal-close" aria-label="Tutup">
-            <i class="fas fa-times"></i>
-        </button>
-        <h2 class="modal-title">🙏 Terima Kasih Sudah Mampir!</h2>
-        <p class="modal-subtitle">
-            Website ini bisa digunakan sepenuhnya <strong>gratis</strong>, semoga bermanfaat
-            dan membawa keberkahan untuk perjalanan karier Anda.<br><br>
-            Semua data CV Anda diproses langsung di browser sendiri — tidak disimpan
-            maupun dikirim ke server atau repository mana pun, jadi privasi Anda
-            sepenuhnya terjaga.
-        </p>
-        <button type="button" id="welcomeModalOkBtn" class="btn-primary">
-            <i class="fas fa-check"></i>
-            Mengerti, Mulai Sekarang
-        </button>
+
+    <!-- Welcome Popup -->
+    <div id="welcomeModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <button id="closeWelcomeModal" class="modal-close" aria-label="Tutup">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="modal-title" data-i18n="welcomeModalTitle">🙏 Terima Kasih Sudah Mampir!</h2>
+            <p class="modal-subtitle" data-i18n-html="welcomeModalBody">
+                Website ini bisa digunakan sepenuhnya <strong>gratis</strong>, semoga bermanfaat
+                dan membawa keberkahan untuk perjalanan karier Anda.<br><br>
+                Semua data CV Anda diproses langsung di browser sendiri — tidak disimpan
+                maupun dikirim ke server atau repository mana pun, jadi privasi Anda
+                sepenuhnya terjaga.
+            </p>
+            <button type="button" id="welcomeModalOkBtn" class="btn-primary">
+                <i class="fas fa-check"></i>
+                <span data-i18n="welcomeModalOk">Mengerti, Mulai Sekarang</span>
+            </button>
+        </div>
     </div>
-</div>
 
     <!-- CV Type Selection Modal -->
     <div id="cvTypeModal" class="modal-overlay hidden">
@@ -959,34 +968,34 @@
             <button id="closeCvTypeModal" class="modal-close" aria-label="Tutup">
                 <i class="fas fa-times"></i>
             </button>
-            <h2 class="modal-title">Pilih Jenis CV</h2>
-            <p class="modal-subtitle">Mau bikin CV yang seperti apa hari ini?</p>
+            <h2 class="modal-title" data-i18n="cvTypeTitle">Pilih Jenis CV</h2>
+            <p class="modal-subtitle" data-i18n="cvTypeSubtitle">Mau bikin CV yang seperti apa hari ini?</p>
             <div class="cv-type-options">
                 <button type="button" class="cv-type-card" data-type="ats">
                     <div class="cv-type-icon">
                         <i class="fas fa-file-lines"></i>
                     </div>
-                    <h3>CV ATS</h3>
-                    <p>Format standar tanpa desain berlebihan, ramah untuk sistem pelacakan lamaran (ATS) perusahaan.
-                    </p>
+                    <h3 data-i18n="cvTypeAtsTitle">CV ATS</h3>
+                    <p data-i18n="cvTypeAtsDesc">Format standar tanpa desain berlebihan, ramah untuk sistem pelacakan lamaran (ATS) perusahaan.</p>
                 </button>
                 <button type="button" class="cv-type-card" data-type="creative">
                     <div class="cv-type-icon">
                         <i class="fas fa-palette"></i>
                     </div>
-                    <h3>CV Creative</h3>
-                    <p>Desain satu halaman lebih visual dengan foto profil, cocok untuk portofolio dan industri
-                        kreatif.</p>
+                    <h3 data-i18n="cvTypeCreativeTitle">CV Creative</h3>
+                    <p data-i18n="cvTypeCreativeDesc">Desain satu halaman lebih visual dengan foto profil, cocok untuk portofolio dan industri kreatif.</p>
                 </button>
             </div>
         </div>
     </div>
 
+    <script src="js/i18n.js"></script>
     <script src="js/main.js"></script>
     <script src="js/cvBuilder.js"></script>
     <script src="js/cvUploader.js"></script>
     <script src="js/creativeCvBuilder.js"></script>
     <script src="js/pdfGenerator.js"></script>
+    <script src="js/wordGenerator.js"></script>
 </body>
 
 </html>
