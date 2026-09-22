@@ -180,7 +180,9 @@ class CVBuilderApp {
             email: '',
             phone: '',
             linkedin: '',
+            linkedinTitle: '',
             portfolio: '',
+            portfolioTitle: '',
             domicile: '',
             aboutMe: '',
             education: [
@@ -206,7 +208,9 @@ class CVBuilderApp {
         document.getElementById('email').value = sampleData.email;
         document.getElementById('phone').value = sampleData.phone;
         document.getElementById('linkedin').value = sampleData.linkedin;
+        document.getElementById('linkedinTitle').value = sampleData.linkedinTitle;
         document.getElementById('portfolio').value = sampleData.portfolio;
+        document.getElementById('portfolioTitle').value = sampleData.portfolioTitle;
         document.getElementById('domicile').value = sampleData.domicile;
         document.getElementById('aboutMe').value = sampleData.aboutMe;
 
@@ -1256,8 +1260,8 @@ class CVBuilderApp {
         if (formData.domicile) contactLines.push(`<div class="contact-line"><span class="contact-label">Alamat</span><span>: ${this.escapeHtml(formData.domicile)}</span></div>`);
         if (formData.phone) contactLines.push(`<div class="contact-line"><span class="contact-label">Handphone</span><span>: ${this.escapeHtml(formData.phone)}</span></div>`);
         if (formData.email) contactLines.push(`<div class="contact-line"><span class="contact-label">Email</span><span>: ${this.escapeHtml(formData.email)}</span></div>`);
-        if (formData.linkedin) contactLines.push(`<div class="contact-line"><span class="contact-label">LinkedIn</span><span>: <a href="${this.formatLinkUrl(formData.linkedin)}" target="_blank" rel="noopener">${this.escapeHtml(formData.linkedin)}</a></span></div>`);
-        if (formData.portfolio) contactLines.push(`<div class="contact-line"><span class="contact-label">Portofolio</span><span>: <a href="${this.formatLinkUrl(formData.portfolio)}" target="_blank" rel="noopener">${this.escapeHtml(formData.portfolio)}</a></span></div>`);
+        if (formData.linkedin) contactLines.push(`<div class="contact-line"><span class="contact-label">LinkedIn</span><span>: <a href="${this.formatLinkUrl(formData.linkedin)}" target="_blank" rel="noopener"><i class="fas fa-link"></i> ${this.escapeHtml(formData.linkedinTitle) || this.escapeHtml(formData.linkedin)}</a></span></div>`);
+        if (formData.portfolio) contactLines.push(`<div class="contact-line"><span class="contact-label">Portofolio</span><span>: <a href="${this.formatLinkUrl(formData.portfolio)}" target="_blank" rel="noopener"><i class="fas fa-link"></i> ${this.escapeHtml(formData.portfolioTitle) || this.escapeHtml(formData.portfolio)}</a></span></div>`);
 
         // Header photo box - only rendered when the user picked "Dengan Foto"
         // and actually uploaded one, so the layout stays a plain text header
@@ -1439,7 +1443,9 @@ class CVBuilderApp {
             email: document.getElementById('email').value,
             phone: document.getElementById('phone').value,
             linkedin: document.getElementById('linkedin').value,
+            linkedinTitle: document.getElementById('linkedinTitle').value,
             portfolio: document.getElementById('portfolio').value,
+            portfolioTitle: document.getElementById('portfolioTitle').value,
             domicile: document.getElementById('domicile').value,
             aboutMe: document.getElementById('aboutMe').value,
             education: education,
