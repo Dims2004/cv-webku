@@ -581,3 +581,14 @@ body.dark-theme .creative-skills-list {
         display: none !important;
     }
 }
+/* Word button di Creative screen (sudah ada base style di responsive.css) */
+.btn-word {
+    background: #2b579a;
+    color: white;
+}
+
+.btn-word:hover {
+    background: #1e3f73;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
