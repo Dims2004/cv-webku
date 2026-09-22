@@ -1267,16 +1267,18 @@ class CVBuilderApp {
             : '';
 
         let html = `
-            <div class="cv-preview-content">
                 <div class="preview-header-main">
-                    ${photoHTML}
-                    <div class="preview-header-text">
-                        <h1>${this.escapeHtml(formData.fullName || 'NAMA LENGKAP')}</h1>
-                        ${formData.position ? `<div class="preview-position">${this.escapeHtml(formData.position)}</div>` : ''}
-                        <div class="preview-contact-row">
-                            ${contactLines.join('')}
+                    <div class="preview-header-top">
+                        ${photoHTML}
+                        <div class="preview-header-text">
+                            <h1>${this.escapeHtml(formData.fullName || 'NAMA LENGKAP')}</h1>
+                            ${formData.position ? `<div class="preview-position">${this.escapeHtml(formData.position)}</div>` : ''}
                         </div>
                     </div>
+                    <div class="preview-contact-row">
+                        ${contactLines.join('')}
+                    </div>
+                </div>
                 </div>
 
                 ${formData.aboutMe ? `
