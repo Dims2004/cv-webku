@@ -753,13 +753,20 @@ body.dark-theme .preview-header-main {
 
 .preview-header-top {
     display: flex;
-    align-items: stretch;
+    align-items: flex-start;
     gap: 20px;
 }
 
+/* Ukuran tinggi dibuat tetap (bukan mengandalkan align-items: stretch +
+   height:100% pada gambarnya) supaya posisi foto konsisten sejajar dengan
+   baris nama, baik di layar maupun saat di-capture html2canvas untuk PDF.
+   Sebelumnya box ini tidak punya tinggi pasti, sehingga saat html2canvas
+   tidak mendukung penuh "stretch" pada flex item bertinggi auto, foto bisa
+   ter-render melebihi batas atas header ketika PDF diunduh. */
 .preview-photo-box {
     flex-shrink: 0;
     width: 96px;
+    height: 96px;
     border-radius: 4px;
     overflow: hidden;
     background: #e2e8f0;
