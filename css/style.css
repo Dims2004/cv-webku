@@ -783,7 +783,7 @@ body.dark-theme .preview-header-main h1 {
 .preview-header-main .preview-position {
     font-size: 13px;
     font-weight: 600;
-    font-style: normal;
+    font-style: normal !important;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: #4a5568;
@@ -959,11 +959,49 @@ body.dark-theme .preview-exp-item .exp-company {
 .preview-exp-item .exp-position {
     font-weight: 600;
     font-size: 13px;
+    font-style: normal;
     color: #2d3748;
 }
 
 body.dark-theme .preview-exp-item .exp-position {
     color: #cbd5e0;
+}
+
+/* ============ DOCUMENT / REFERENCE LINKS (Ijazah, Transkrip, Sertifikat,
+   Link Proyek, dll) - dipakai di Pendidikan, Magang, Kerja, Proyek,
+   Sertifikasi supaya semuanya konsisten dengan LinkedIn/Portofolio. ============ */
+.preview-doc-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin-top: 3px;
+}
+
+.preview-doc-links a,
+.preview-doc-link-inline {
+    font-size: 12px;
+    font-weight: 600;
+    font-style: normal;
+    color: var(--primary-color, #2563eb);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.preview-doc-links a i,
+.preview-doc-link-inline i {
+    font-size: 11px;
+}
+
+.preview-doc-links a:hover,
+.preview-doc-link-inline:hover {
+    text-decoration: underline;
+}
+
+body.dark-theme .preview-doc-links a,
+body.dark-theme .preview-doc-link-inline {
+    color: #60a5fa;
 }
 
 .preview-exp-item .exp-meta {
