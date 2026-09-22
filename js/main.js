@@ -4,17 +4,12 @@ class CVBuilderApp {
         this.currentScreen = 'welcome';
         this.theme = 'light';
         this.certImageCounter = 0;
-        // ATS profile photo state: kept separately from the form fields
-        // (like the certificate images) since it isn't a plain text input.
         this.atsPhotoDataUrl = null;
         this.atsPhotoOption = 'none';
         this.initializeApp();
     }
 
     initializeApp() {
-        // Base history entry: without this, the browser's Back button has
-        // nowhere inside the app to return to and just navigates away from
-        // the site entirely once the user goes into the CV builder.
         history.replaceState({ screen: 'welcome' }, '', window.location.pathname + window.location.search);
 
         this.hideLoading();
@@ -24,7 +19,6 @@ class CVBuilderApp {
         this.loadCvFont();
         this.setupFileUpload();
         this.setupATSPhotoUpload();
-        // Initialize with sample data for demo
         this.populateSampleData();
     }
 
@@ -47,8 +41,6 @@ class CVBuilderApp {
     }
 
     bindEvents() {
-        // --- Core ATS builder bindings (must always run, even if the new
-        // CV-type modal / creative screen markup isn't present yet) ---
         document.getElementById('backToHomeBtn').addEventListener('click', () => this.showWelcomeScreen());
         document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
         document.getElementById('previewBtn').addEventListener('click', () => this.updatePreview());
@@ -56,9 +48,6 @@ class CVBuilderApp {
         document.getElementById('titleColorPicker').addEventListener('input', (e) => this.setTitleColor(e.target.value));
         document.getElementById('fontPicker').addEventListener('change', (e) => this.setCvFont(e.target.value));
 
-        // "Buat CV Baru" opens the CV type modal if it exists on the page,
-        // otherwise falls back to going straight into the ATS builder so the
-        // button never ends up doing nothing.
         const createCVBtn = document.getElementById('createCVBtn');
         if (createCVBtn) {
             createCVBtn.addEventListener('click', () => {
@@ -70,20 +59,16 @@ class CVBuilderApp {
             });
         }
 
-        // Handle the browser's Back/Forward buttons so they navigate
-        // between the app's own screens instead of leaving the site.
         window.addEventListener('popstate', (e) => {
             const screen = e.state && e.state.screen ? e.state.screen : 'welcome';
             this.navigateToScreen(screen, false);
         });
 
-        // Form inputs - auto update preview
         document.querySelectorAll('#cvForm input:not(.cert-file-input), #cvForm textarea, #cvForm select').forEach(input => {
             input.addEventListener('input', () => this.updatePreview());
             input.addEventListener('change', () => this.updatePreview());
         });
 
-        // Add buttons
         document.getElementById('addEducationBtn').addEventListener('click', () => this.addEducation());
         document.getElementById('addInternshipBtn').addEventListener('click', () => this.addInternship());
         document.getElementById('addWorkBtn').addEventListener('click', () => this.addWork());
@@ -92,7 +77,6 @@ class CVBuilderApp {
         document.getElementById('addCertificationBtn').addEventListener('click', () => this.addCertification());
         document.getElementById('addSkillBtn').addEventListener('click', () => this.addSkillCategory());
 
-        // --- CV type selection modal (only wired up if present in the DOM) ---
         const closeCvTypeModalBtn = document.getElementById('closeCvTypeModal');
         if (closeCvTypeModalBtn) {
             closeCvTypeModalBtn.addEventListener('click', () => this.closeCvTypeModal());
@@ -115,25 +99,16 @@ class CVBuilderApp {
             });
         });
 
-        // --- Creative CV builder screen back button (guarded: only exists
-        // if the creative builder section has been added to the page) ---
         const backToHomeBtnCreative = document.getElementById('backToHomeBtnCreative');
         if (backToHomeBtnCreative) {
             backToHomeBtnCreative.addEventListener('click', () => this.showWelcomeScreen());
         }
 
-        // Checkbox "Masih berlangsung/Sekarang" pada tiap section periode:
-        // pakai event delegation di level container supaya berlaku baik
-        // untuk item bawaan (statis di index.html) maupun item yang
-        // ditambah lewat tombol "Tambah...".
         this.setupOngoingCheckbox('educationContainer', '.education-item', 'edu-period-ongoing', 'edu-period-end');
         this.setupOngoingCheckbox('internshipContainer', '.internship-item', 'int-period-ongoing', 'int-period-end');
         this.setupOngoingCheckbox('workContainer', '.work-item', 'work-period-ongoing', 'work-period-end');
         this.setupOngoingCheckbox('organizationContainer', '.organization-item', 'org-period-ongoing', 'org-period-end');
 
-        // Klik gambar sertifikat di preview untuk membukanya di tab baru.
-        // Pakai event delegation karena elemen ini di-render ulang tiap kali
-        // updatePreview() dipanggil.
         const cvPreview = document.getElementById('cvPreview');
         if (cvPreview) {
             cvPreview.addEventListener('click', (e) => {
@@ -147,14 +122,13 @@ class CVBuilderApp {
             });
         }
 
-        // --- Welcome popup (muncul sekali per browser saat pertama kali buka) ---
         const welcomeModal = document.getElementById('welcomeModal');
         if (welcomeModal) {
             const WELCOME_KEY = 'cvbuilder_welcome_shown';
             if (!localStorage.getItem(WELCOME_KEY)) {
                 setTimeout(() => {
                     welcomeModal.classList.remove('hidden');
-                }, 1300); // muncul setelah loading screen selesai
+                }, 1300);
             }
 
             const closeWelcome = () => {
@@ -171,9 +145,6 @@ class CVBuilderApp {
     }
 
     populateSampleData() {
-        // Form dimulai kosong (tidak ada data contoh/dummy). Setiap section
-        // multi-entry tetap diberi satu baris kosong supaya user langsung
-        // tahu di mana harus mengetik, tapi tanpa isi apa pun di dalamnya.
         const sampleData = {
             fullName: '',
             position: '',
@@ -202,7 +173,6 @@ class CVBuilderApp {
             ]
         };
 
-        // Populate form
         document.getElementById('fullName').value = sampleData.fullName;
         document.getElementById('position').value = sampleData.position;
         document.getElementById('email').value = sampleData.email;
@@ -214,7 +184,6 @@ class CVBuilderApp {
         document.getElementById('domicile').value = sampleData.domicile;
         document.getElementById('aboutMe').value = sampleData.aboutMe;
 
-        // Add education
         const eduContainer = document.getElementById('educationContainer');
         eduContainer.innerHTML = '';
         sampleData.education.forEach((edu, index) => {
@@ -225,7 +194,6 @@ class CVBuilderApp {
             }
         });
 
-        // Add internships
         const intContainer = document.getElementById('internshipContainer');
         intContainer.innerHTML = '';
         sampleData.internships.forEach((int, index) => {
@@ -236,7 +204,6 @@ class CVBuilderApp {
             }
         });
 
-        // Add skills with categories
         const skillsContainer = document.getElementById('skillsContainer');
         skillsContainer.innerHTML = '';
         sampleData.skills.forEach((skill, index) => {
@@ -247,7 +214,6 @@ class CVBuilderApp {
             }
         });
 
-        // Add certifications with images
         const certContainer = document.getElementById('certificationContainer');
         certContainer.innerHTML = '';
         sampleData.certifications.forEach((cert, index) => {
@@ -261,7 +227,6 @@ class CVBuilderApp {
         this.updatePreview();
     }
 
-    // ============ EDUCATION ============
     createEducationItem(data = { institution: '', major: '', location: '', periodStart: '', periodEnd: '', ongoing: false, gpa: '', linkIjazah: '', linkIjazahTitle: '', linkTranskrip: '', linkTranskripTitle: '' }) {
         const div = document.createElement('div');
         div.className = 'education-item';
@@ -339,7 +304,6 @@ class CVBuilderApp {
         this.showToast('Pendidikan ditambahkan', 'success');
     }
 
-    // ============ INTERNSHIP ============
     createInternshipItem(data = { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '', link: '', linkTitle: '' }) {
         const div = document.createElement('div');
         div.className = 'internship-item';
@@ -412,7 +376,6 @@ class CVBuilderApp {
         this.showToast('Pengalaman magang ditambahkan', 'success');
     }
 
-    // ============ WORK EXPERIENCE ============
     createWorkItem(data = { company: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '', link: '', linkTitle: '' }) {
         const div = document.createElement('div');
         div.className = 'work-item';
@@ -485,7 +448,6 @@ class CVBuilderApp {
         this.showToast('Pengalaman kerja ditambahkan', 'success');
     }
 
-    // ============ ORGANIZATION ============
     createOrganizationItem(data = { name: '', position: '', location: '', periodStart: '', periodEnd: '', ongoing: false, description: '' }) {
         const div = document.createElement('div');
         div.className = 'organization-item';
@@ -552,7 +514,6 @@ class CVBuilderApp {
         this.showToast('Pengalaman organisasi ditambahkan', 'success');
     }
 
-    // ============ PROJECTS ============
     createProjectItem(data = { name: '', description: '', tech: '', link: '', linkTitle: '' }) {
         const div = document.createElement('div');
         div.className = 'project-item';
@@ -605,7 +566,6 @@ class CVBuilderApp {
         this.showToast('Proyek ditambahkan', 'success');
     }
 
-    // ============ SKILLS WITH CATEGORIES ============
     createSkillCategoryItem(data = { category: '', items: '' }) {
         const div = document.createElement('div');
         div.className = 'skill-category-item';
@@ -649,7 +609,6 @@ class CVBuilderApp {
         this.showToast('Kategori skill ditambahkan', 'success');
     }
 
-    // ============ CERTIFICATIONS WITH IMAGE UPLOAD ============
     createCertificationItem(data = { name: '', issuer: '', year: '', image: null, link: '', linkTitle: '' }) {
         const index = this.certImageCounter++;
         const div = document.createElement('div');
@@ -700,7 +659,6 @@ class CVBuilderApp {
             </button>
         `;
         
-        // Handle image upload
         const fileInput = div.querySelector('.cert-file-input');
         const preview = div.querySelector('.cert-preview');
         const removeBtn = div.querySelector('.btn-remove-cert-image');
@@ -709,7 +667,6 @@ class CVBuilderApp {
             const file = e.target.files[0];
             if (!file) return;
 
-            // Validate file type
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
             if (!validTypes.includes(file.type)) {
                 this.showToast('Format file tidak didukung. Gunakan JPG, JPEG, atau PNG', 'error');
@@ -717,9 +674,6 @@ class CVBuilderApp {
                 return;
             }
 
-            // Batas ukuran file asli sebelum dikompres. Foto sertifikat dari
-            // kamera HP biasanya 3-8MB, jadi batas dinaikkan ke 15MB. Gambar
-            // tetap akan dikompres/diperkecil otomatis di bawah supaya ringan.
             if (file.size > 15 * 1024 * 1024) {
                 this.showToast('Ukuran file terlalu besar. Maksimal 15MB', 'error');
                 fileInput.value = '';
@@ -741,7 +695,6 @@ class CVBuilderApp {
             }
         });
         
-        // Handle remove image
         removeBtn.addEventListener('click', () => {
             preview.innerHTML = `<i class="fas fa-file-image"></i><span>Belum ada gambar</span>`;
             removeBtn.classList.add('hidden');
@@ -750,7 +703,6 @@ class CVBuilderApp {
             this.showToast('Gambar sertifikat dihapus', 'info');
         });
         
-        // Handle remove certification item
         div.querySelector('.btn-remove-cert').addEventListener('click', () => {
             if (document.querySelectorAll('#cvForm .certification-item').length > 1) {
                 div.remove();
@@ -761,7 +713,6 @@ class CVBuilderApp {
             }
         });
         
-        // Auto update preview on input
         div.querySelectorAll('input:not(.cert-file-input), textarea, select').forEach(input => {
             input.addEventListener('input', () => this.updatePreview());
             input.addEventListener('change', () => this.updatePreview());
@@ -779,7 +730,6 @@ class CVBuilderApp {
         this.showToast('Sertifikasi ditambahkan', 'success');
     }
 
-    // ============ ONGOING CHECKBOX ("Masih berlangsung / Sekarang") ============
     setupOngoingCheckbox(containerId, itemSelector, ongoingClass, endClass) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -793,7 +743,6 @@ class CVBuilderApp {
         });
     }
 
-    // ============ YEAR DROPDOWN ============
     buildYearOptions(selectedValue = '') {
         const currentYear = new Date().getFullYear();
         const fromYear = currentYear + 1;
@@ -812,7 +761,6 @@ class CVBuilderApp {
         return startYear || end || '';
     }
 
-    // ============ PERIOD FORMATTING (date picker -> teks "Bulan YYYY") ============
     formatMonthID(value) {
         if (!value) return '';
         const bulanID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -830,7 +778,6 @@ class CVBuilderApp {
         return start || end || '';
     }
 
-    // ============ IMAGE COMPRESSION ============
     compressImageFile(file, maxWidth = 1200, quality = 0.82) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -861,7 +808,6 @@ class CVBuilderApp {
         });
     }
 
-    // ============ HELPER METHODS ============
     escapeHtml(text) {
         if (!text) return '';
         const div = document.createElement('div');
@@ -869,29 +815,22 @@ class CVBuilderApp {
         return div.innerHTML;
     }
 
-    // Normalisasi URL: pastikan selalu punya protokol supaya bisa diklik.
-    // Mengembalikan '' kalau input kosong / hanya spasi.
     formatLinkUrl(url) {
         if (url === null || url === undefined) return '';
         const trimmed = String(url).trim();
         if (!trimmed) return '';
 
-        // Sudah punya protokol (http/https/mailto/tel) — biarkan apa adanya
         if (/^(https?:|mailto:|tel:)/i.test(trimmed)) return trimmed;
 
-        // Email tanpa mailto:
         if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return `mailto:${trimmed}`;
 
-        // Nomor telepon (hanya digit, +, -, spasi, kurung)
         if (/^[+\d][\d\s\-()]{6,}$/.test(trimmed)) {
             return `tel:${trimmed.replace(/[^\d+]/g, '')}`;
         }
 
-        // Default: asumsikan web URL
         return `https://${trimmed}`;
     }
 
-    // Turns a multi-line description textarea into a proper bullet list
     buildDescriptionListHTML(description) {
         if (!description) return '';
         const lines = description.split('\n').map(l => l.trim()).filter(l => l.length > 0);
@@ -923,7 +862,6 @@ class CVBuilderApp {
         this.navigateToScreen('welcome', true);
     }
 
-    // ============ CV TYPE MODAL ============
     openCvTypeModal() {
         document.getElementById('cvTypeModal').classList.remove('hidden');
     }
@@ -1006,7 +944,6 @@ class CVBuilderApp {
         }
     }
 
-    // ============ CV TITLE COLOR ============
     setTitleColor(color) {
         document.documentElement.style.setProperty('--cv-title-color', color);
         localStorage.setItem('cvTitleColor', color);
@@ -1021,7 +958,6 @@ class CVBuilderApp {
         if (picker) picker.value = color;
     }
 
-    // ============ CV FONT ============
     setCvFont(fontFamily) {
         document.documentElement.style.setProperty('--cv-font-family', fontFamily);
         localStorage.setItem('cvFontFamily', fontFamily);
@@ -1038,7 +974,6 @@ class CVBuilderApp {
 
     setupFileUpload() {}
 
-    // ============ ATS PHOTO ============
     setupATSPhotoUpload() {
         const radios = document.querySelectorAll('input[name="photoOption"]');
         const uploadArea = document.getElementById('atsPhotoUploadArea');
@@ -1097,12 +1032,10 @@ class CVBuilderApp {
         });
     }
 
-    // ============ UPDATE PREVIEW ============
     updatePreview() {
         const preview = document.getElementById('cvPreview');
         const formData = this.collectFormData();
         
-        // Build education HTML
         let educationHTML = '';
         formData.education.forEach(edu => {
             if (edu.institution || edu.major) {
@@ -1131,7 +1064,6 @@ class CVBuilderApp {
             }
         });
 
-        // Build internships HTML
         let internshipHTML = '';
         formData.internships.forEach(int => {
             if (int.company || int.position) {
@@ -1152,7 +1084,6 @@ class CVBuilderApp {
             }
         });
 
-        // Build work experiences HTML
         let workHTML = '';
         formData.workExperiences.forEach(work => {
             if (work.company || work.position) {
@@ -1173,7 +1104,6 @@ class CVBuilderApp {
             }
         });
 
-        // Build organizations HTML
         let orgHTML = '';
         formData.organizations.forEach(org => {
             if (org.name || org.position) {
@@ -1190,7 +1120,6 @@ class CVBuilderApp {
             }
         });
 
-        // Build projects HTML
         let projectHTML = '';
         formData.projects.forEach(project => {
             if (project.name) {
@@ -1208,7 +1137,6 @@ class CVBuilderApp {
             }
         });
 
-        // Build skills HTML
         let skillsHTML = '';
         if (formData.skills && formData.skills.length > 0) {
             const validSkills = formData.skills.filter(s => s.category || s.items);
@@ -1231,7 +1159,6 @@ class CVBuilderApp {
             }
         }
 
-        // Build certifications HTML
         let certHTML = '';
         formData.certifications.forEach(cert => {
             if (cert.name) {
@@ -1290,15 +1217,11 @@ class CVBuilderApp {
         let html = `
             <div class="cv-preview-content">
                 <div class="preview-header-main">
-                    <div class="preview-header-top">
-                        ${photoHTML}
-                        <div class="preview-header-text">
-                            <h1>${this.escapeHtml(formData.fullName || 'NAMA LENGKAP')}</h1>
-                            ${formData.position ? `<div class="preview-position">${this.escapeHtml(formData.position)}</div>` : ''}
-                        </div>
-                    </div>
-                    <div class="preview-contact-row">
-                        ${contactLines.join('')}
+                    ${photoHTML}
+                    <div class="preview-header-text">
+                        <h1>${this.escapeHtml(formData.fullName || 'NAMA LENGKAP')}</h1>
+                        ${formData.position ? `<div class="preview-position">${this.escapeHtml(formData.position)}</div>` : ''}
+                        ${contactLines.length ? `<div class="preview-contact-row">${contactLines.join('')}</div>` : ''}
                     </div>
                 </div>
 
@@ -1351,7 +1274,6 @@ class CVBuilderApp {
         preview.innerHTML = html;
     }
 
-    // ============ COLLECT FORM DATA ============
     collectFormData() {
         const education = [];
         document.querySelectorAll('#cvForm .education-item').forEach(item => {
@@ -1477,7 +1399,6 @@ class CVBuilderApp {
         };
     }
 
-    // ============ DOWNLOAD PDF ============
     downloadPDF() {
         if (typeof PDFGenerator === 'undefined') {
             this.showToast('Fitur PDF tidak tersedia. Silakan refresh halaman.', 'error');
@@ -1522,7 +1443,6 @@ class CVBuilderApp {
         }
     }
 
-    // ============ TOAST NOTIFICATIONS ============
     showToast(message, type = 'info') {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
@@ -1549,7 +1469,6 @@ class CVBuilderApp {
     }
 }
 
-// Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new CVBuilderApp();
 });
