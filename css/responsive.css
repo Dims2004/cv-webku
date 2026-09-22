@@ -205,15 +205,19 @@
 
     .preview-contact-row {
         font-size: 11px !important;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
     }
 
-    .preview-contact-row span,
-    .preview-contact-row a {
-        display: block;
-        text-align: center;
+    .preview-contact-row .contact-label {
+        min-width: 68px;
+    }
+
+    .preview-header-main {
+        gap: 12px;
+    }
+
+    .preview-photo-box {
+        width: 72px;
+        height: 90px;
     }
 
     .preview-section-title {
