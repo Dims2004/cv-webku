@@ -1185,7 +1185,7 @@ class CVBuilderApp {
             }
         });
 
-        // Build contact lines — semua link dipastikan bisa diklik
+        // Build contact lines — TANPA ikon di link (sesuai permintaan user)
         const contactLines = [];
 
         if (formData.domicile) {
@@ -1201,12 +1201,12 @@ class CVBuilderApp {
         if (formData.linkedin) {
             const href = this.formatLinkUrl(formData.linkedin);
             const label = this.escapeHtml(formData.linkedinTitle) || this.escapeHtml(formData.linkedin);
-            contactLines.push(`<div class="contact-line"><span class="contact-label">LinkedIn</span><span>: <a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-link"></i> ${label}</a></span></div>`);
+            contactLines.push(`<div class="contact-line"><span class="contact-label">LinkedIn</span><span>: <a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a></span></div>`);
         }
         if (formData.portfolio) {
             const href = this.formatLinkUrl(formData.portfolio);
             const label = this.escapeHtml(formData.portfolioTitle) || this.escapeHtml(formData.portfolio);
-            contactLines.push(`<div class="contact-line"><span class="contact-label">Portofolio</span><span>: <a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-link"></i> ${label}</a></span></div>`);
+            contactLines.push(`<div class="contact-line"><span class="contact-label">Portofolio</span><span>: <a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a></span></div>`);
         }
 
         // Header photo — hanya tampil kalau opsi "Dengan Foto" dipilih
@@ -1226,10 +1226,7 @@ class CVBuilderApp {
                 </div>
 
                 ${formData.aboutMe ? `
-                <div class="preview-section">
-                    <div class="preview-section-title">Tentang Saya</div>
-                    <div class="preview-about">${this.escapeHtml(formData.aboutMe)}</div>
-                </div>` : ''}
+                <div class="preview-about">${this.escapeHtml(formData.aboutMe)}</div>` : ''}
 
                 ${educationHTML ? `
                 <div class="preview-section">
