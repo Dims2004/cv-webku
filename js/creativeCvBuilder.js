@@ -32,9 +32,7 @@ class CreativeCvBuilder {
             this.loadAccentColor();
         }
 
-        // Checkbox "Masih berlangsung/Sekarang" pada Periode: pakai event
-        // delegation di level container supaya berlaku baik untuk item
-        // bawaan (statis) maupun item yang ditambah lewat tombol "Tambah...".
+        // Checkbox "Masih berlangsung/Sekarang" pada Periode
         this.setupOngoingCheckbox('creativeExperienceContainer', '.work-item', 'creative-exp-period-ongoing', 'creative-exp-period-end');
         this.setupOngoingCheckbox('creativeEducationContainer', '.education-item', 'creative-edu-period-ongoing', 'creative-edu-period-end');
 
@@ -42,9 +40,6 @@ class CreativeCvBuilder {
     }
 
     // ============ SAMPLE DATA ============
-    // Form Creative CV dimulai kosong, tanpa data contoh apa pun. Tiap
-    // section multi-entry tetap diberi satu baris kosong (bukan dihapus
-    // total) supaya user langsung tahu di mana harus mengisi.
     populateSampleData() {
         document.getElementById('creativeFullName').value = '';
         document.getElementById('creativePosition').value = '';
@@ -285,9 +280,6 @@ class CreativeCvBuilder {
                 return;
             }
 
-            // Batas ukuran file ASLI (sebelum dikompres) dinaikkan ke 15MB
-            // karena foto dari kamera HP wajar berukuran beberapa MB.
-            // Gambar tetap otomatis diperkecil di bawah supaya tetap ringan.
             if (file.size > 15 * 1024 * 1024) {
                 this.showToast('Ukuran file terlalu besar. Maksimal 15MB', 'error');
                 fileInput.value = '';
@@ -320,9 +312,6 @@ class CreativeCvBuilder {
     }
 
     // ============ IMAGE COMPRESSION ============
-    // Membaca sebuah File gambar, memperkecil sisi terpanjangnya ke maxWidth,
-    // lalu mengekspornya sebagai JPEG dengan kualitas tertentu supaya foto
-    // besar dari kamera HP tidak membuat halaman berat atau gagal diproses.
     compressImageFile(file, maxWidth = 800, quality = 0.85) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -353,9 +342,7 @@ class CreativeCvBuilder {
         });
     }
 
-    // ============ ONGOING CHECKBOX ("Masih berlangsung / Sekarang") ============
-    // Event delegation di level container supaya berlaku baik untuk item
-    // bawaan (statis di index.html) maupun item yang ditambah lewat tombol.
+    // ============ ONGOING CHECKBOX ============
     setupOngoingCheckbox(containerId, itemSelector, ongoingClass, endClass) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -369,9 +356,7 @@ class CreativeCvBuilder {
         });
     }
 
-    // ============ YEAR DROPDOWN (untuk Periode Pendidikan) ============
-    // Membuat daftar <option> tahun otomatis (dari tahun depan mundur ke
-    // belakang) supaya user tinggal memilih, tidak perlu mengetik manual.
+    // ============ YEAR DROPDOWN ============
     buildYearOptions(selectedValue = '') {
         const currentYear = new Date().getFullYear();
         const fromYear = currentYear + 1;
@@ -384,9 +369,7 @@ class CreativeCvBuilder {
         return options;
     }
 
-    // ============ PERIOD FORMATTING (date picker -> teks "Bulan YYYY") ============
-    // Input type="month" mengembalikan nilai format "YYYY-MM". Fungsi ini
-    // mengubahnya jadi teks berbahasa Indonesia, misalnya "2023-08" -> "Agustus 2023".
+    // ============ PERIOD FORMATTING ============
     formatMonthID(value) {
         if (!value) return '';
         const bulanID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -397,8 +380,6 @@ class CreativeCvBuilder {
         return `${bulanID[idx]} ${year}`;
     }
 
-    // Menggabungkan tanggal mulai/selesai (atau "Sekarang" jika masih
-    // berlangsung) jadi satu string periode, misalnya "Agustus 2023 - Sekarang".
     formatPeriodID(startValue, endValue, ongoing) {
         const start = this.formatMonthID(startValue);
         const end = ongoing ? 'Sekarang' : this.formatMonthID(endValue);
@@ -406,8 +387,6 @@ class CreativeCvBuilder {
         return start || end || '';
     }
 
-    // Menggabungkan tahun mulai/selesai (atau "Sekarang" jika masih
-    // berlangsung) jadi satu string periode, misalnya "2020 - 2024".
     formatYearPeriodID(startYear, endYear, ongoing) {
         const end = ongoing ? 'Sekarang' : (endYear || '');
         if (startYear && end) return `${startYear} - ${end}`;
@@ -422,17 +401,25 @@ class CreativeCvBuilder {
         return div.innerHTML;
     }
 
-    // Memecah textarea "satu item per baris" (Bahasa, Pelatihan, Sertifikasi,
-    // Pencapaian) menjadi array string bersih, tanpa baris kosong.
+    // Normalisasi URL: pastikan selalu punya protokol supaya bisa diklik.
+    formatLinkUrl(url) {
+        if (url === null || url === undefined) return '';
+        const trimmed = String(url).trim();
+        if (!trimmed) return '';
+        if (/^(https?:|mailto:|tel:)/i.test(trimmed)) return trimmed;
+        if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return `mailto:${trimmed}`;
+        if (/^[+\d][\d\s\-()]{6,}$/.test(trimmed)) {
+            return `tel:${trimmed.replace(/[^\d+]/g, '')}`;
+        }
+        return `https://${trimmed}`;
+    }
+
     parseLines(text) {
         if (!text) return [];
         return text.split('\n').map(l => l.trim()).filter(l => l);
     }
 
-    // ============ WARNA AKSEN (sidebar, judul bagian) ============
-    // Sama seperti CV ATS: warna disimpan lewat CSS custom property supaya
-    // gampang dipakai di banyak selector CSS sekaligus, dan disimpan ke
-    // localStorage supaya pilihan warna tidak hilang saat refresh.
+    // ============ WARNA AKSEN ============
     setAccentColor(color) {
         document.documentElement.style.setProperty('--creative-accent-color', color);
         localStorage.setItem('creativeAccentColor', color);
@@ -506,27 +493,60 @@ class CreativeCvBuilder {
     }
 
     // ============ UPDATE PREVIEW ============
-    // Layout: sidebar berwarna di kiri (foto, kontak, skills, bahasa,
-    // pencapaian) + konten utama putih di kanan (nama, tentang saya,
-    // pendidikan, pengalaman kerja, pelatihan, sertifikasi). Warna sidebar
-    // diatur lewat --creative-accent-color (lihat setAccentColor) supaya
-    // bisa diganti bebas dari color picker, bukan warna teal yang di-hardcode.
     updatePreview() {
         const preview = document.getElementById('creativeCvPreview');
         if (!preview) return;
         const data = this.collectFormData();
 
-        // Kontak (sidebar, satu baris per item dengan ikon)
+        // Kontak (sidebar) — LinkedIn & Instagram jadi link yang bisa diklik.
+        // Email & telepon juga dijadikan link (mailto: / tel:) supaya konsisten.
         const contactParts = [];
-        if (data.email) contactParts.push(`<li><i class="fas fa-envelope"></i> <span>${this.escapeHtml(data.email)}</span></li>`);
-        if (data.phone) contactParts.push(`<li><i class="fas fa-phone"></i> <span>${this.escapeHtml(data.phone)}</span></li>`);
-        if (data.address) contactParts.push(`<li><i class="fas fa-map-marker-alt"></i> <span>${this.escapeHtml(data.address)}</span></li>`);
-        if (data.linkedin) contactParts.push(`<li><i class="fab fa-linkedin"></i> <span>${this.escapeHtml(data.linkedin)}</span></li>`);
-        if (data.instagram) contactParts.push(`<li><i class="fab fa-instagram"></i> <span>${this.escapeHtml(data.instagram)}</span></li>`);
 
-        // Keahlian (sidebar): jika kategori diisi, tampil "Kategori: item".
-        // Jika kategori kosong, tiap skill jadi bullet tersendiri (flat list,
-        // seperti contoh referensi) alih-alih digabung dalam satu baris.
+        if (data.email) {
+            const safe = this.escapeHtml(data.email);
+            const mailHref = this.formatLinkUrl(data.email);
+            contactParts.push(
+                `<li><i class="fas fa-envelope"></i> ` +
+                `<span><a href="${mailHref}" class="creative-sidebar-link">${safe}</a></span></li>`
+            );
+        }
+
+        if (data.phone) {
+            const safe = this.escapeHtml(data.phone);
+            const tel = data.phone.replace(/[^\d+]/g, '');
+            contactParts.push(
+                `<li><i class="fas fa-phone"></i> ` +
+                `<span><a href="tel:${tel}" class="creative-sidebar-link">${safe}</a></span></li>`
+            );
+        }
+
+        if (data.address) {
+            contactParts.push(
+                `<li><i class="fas fa-map-marker-alt"></i> ` +
+                `<span>${this.escapeHtml(data.address)}</span></li>`
+            );
+        }
+
+        if (data.linkedin) {
+            const href = this.formatLinkUrl(data.linkedin);
+            const label = this.escapeHtml(data.linkedin);
+            contactParts.push(
+                `<li><i class="fab fa-linkedin"></i> ` +
+                `<span><a href="${href}" target="_blank" rel="noopener noreferrer" class="creative-sidebar-link">${label}</a></span></li>`
+            );
+        }
+
+        if (data.instagram) {
+            const raw = data.instagram.trim().replace(/^@/, '');
+            const href = `https://instagram.com/${encodeURIComponent(raw)}`;
+            const label = this.escapeHtml(data.instagram);
+            contactParts.push(
+                `<li><i class="fab fa-instagram"></i> ` +
+                `<span><a href="${href}" target="_blank" rel="noopener noreferrer" class="creative-sidebar-link">${label}</a></span></li>`
+            );
+        }
+
+        // Keahlian (sidebar)
         let skillsHTML = '';
         data.skills.forEach(skill => {
             if (!skill.category && !skill.items) return;
@@ -655,13 +675,6 @@ class CreativeCvBuilder {
     }
 
     // ============ SAMAKAN TINGGI SIDEBAR & KONTEN UTAMA ============
-    // html2canvas (dipakai saat export PDF) tidak selalu mendukung
-    // "align-items: stretch" milik CSS flexbox untuk sibling yang tingginya
-    // auto — akibatnya sidebar berwarna bisa berhenti pendek sesuai isinya
-    // sendiri, bukan mengikuti kolom kanan yang lebih panjang (persis bug
-    // yang bikin PDF-nya terlihat pincang). Diperbaiki di sini dengan
-    // memaksa kedua kolom punya tinggi yang sama secara eksplisit lewat
-    // JavaScript, setelah browser selesai satu kali layout/paint.
     syncSidebarHeight() {
         requestAnimationFrame(() => {
             const sidebar = document.querySelector('#creativeCvPreview .creative-sidebar');
@@ -675,10 +688,6 @@ class CreativeCvBuilder {
             sidebar.style.minHeight = tallest + 'px';
             main.style.minHeight = tallest + 'px';
 
-            // Foto profil kadang belum selesai di-decode browser saat frame
-            // ini berjalan; begitu selesai, ukurannya bisa berubah sedikit
-            // dan tinggi hasil sync di atas jadi tidak akurat lagi. Sync
-            // ulang sekali begitu foto benar-benar siap.
             const photoImg = sidebar.querySelector('.creative-sidebar-photo img');
             if (photoImg && !photoImg.complete) {
                 photoImg.addEventListener('load', () => this.syncSidebarHeight(), { once: true });
