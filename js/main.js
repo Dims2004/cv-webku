@@ -780,10 +780,6 @@ class CVBuilderApp {
     }
 
     // ============ ONGOING CHECKBOX ("Masih berlangsung / Sekarang") ============
-    // Dipasang lewat event delegation di level container (bukan langsung di
-    // tiap item) supaya tetap berfungsi untuk item bawaan yang statis di
-    // index.html maupun item yang baru ditambahkan lewat tombol "Tambah...".
-    // Saat dicentang: field tanggal akhir dinonaktifkan & dikosongkan.
     setupOngoingCheckbox(containerId, itemSelector, ongoingClass, endClass) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -797,9 +793,7 @@ class CVBuilderApp {
         });
     }
 
-    // ============ YEAR DROPDOWN (untuk Periode Pendidikan & Tahun Sertifikasi) ============
-    // Membuat daftar <option> tahun secara otomatis (dari tahun depan mundur
-    // ke belakang) supaya user tinggal memilih, tidak perlu mengetik manual.
+    // ============ YEAR DROPDOWN ============
     buildYearOptions(selectedValue = '') {
         const currentYear = new Date().getFullYear();
         const fromYear = currentYear + 1;
@@ -812,8 +806,6 @@ class CVBuilderApp {
         return options;
     }
 
-    // Menggabungkan tahun mulai/selesai (atau "Sekarang" jika masih
-    // berlangsung) jadi satu string periode, misalnya "2020 - 2024".
     formatYearPeriodID(startYear, endYear, ongoing) {
         const end = ongoing ? 'Sekarang' : (endYear || '');
         if (startYear && end) return `${startYear} - ${end}`;
@@ -821,8 +813,6 @@ class CVBuilderApp {
     }
 
     // ============ PERIOD FORMATTING (date picker -> teks "Bulan YYYY") ============
-    // Input type="month" mengembalikan nilai format "YYYY-MM". Fungsi ini
-    // mengubahnya jadi teks berbahasa Indonesia, misalnya "2023-08" -> "Agustus 2023".
     formatMonthID(value) {
         if (!value) return '';
         const bulanID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -833,8 +823,6 @@ class CVBuilderApp {
         return `${bulanID[idx]} ${year}`;
     }
 
-    // Menggabungkan tanggal mulai/selesai (atau "Sekarang" jika masih berlangsung)
-    // jadi satu string periode, misalnya "Agustus 2023 - Sekarang".
     formatPeriodID(startValue, endValue, ongoing) {
         const start = this.formatMonthID(startValue);
         const end = ongoing ? 'Sekarang' : this.formatMonthID(endValue);
@@ -843,10 +831,6 @@ class CVBuilderApp {
     }
 
     // ============ IMAGE COMPRESSION ============
-    // Membaca sebuah File gambar, memperkecil sisi terpanjangnya ke maxWidth,
-    // lalu mengekspornya sebagai JPEG dengan kualitas tertentu. Ini mencegah
-    // foto besar dari kamera HP (beberapa MB) membuat halaman berat atau
-    // gagal diproses, tanpa harus menolak upload penggunanya.
     compressImageFile(file, maxWidth = 1200, quality = 0.82) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -885,21 +869,29 @@ class CVBuilderApp {
         return div.innerHTML;
     }
 
-    // Normalisasi URL supaya link selalu bisa diklik dengan benar, baik user
-    // mengetik "linkedin.com/in/nama" maupun "https://linkedin.com/in/nama"
-    // (mencegah URL ganda seperti "https://https://...").
+    // Normalisasi URL: pastikan selalu punya protokol supaya bisa diklik.
+    // Mengembalikan '' kalau input kosong / hanya spasi.
     formatLinkUrl(url) {
-        if (!url) return '';
-        const trimmed = url.trim();
+        if (url === null || url === undefined) return '';
+        const trimmed = String(url).trim();
         if (!trimmed) return '';
-        if (/^https?:\/\//i.test(trimmed)) return trimmed;
+
+        // Sudah punya protokol (http/https/mailto/tel) — biarkan apa adanya
+        if (/^(https?:|mailto:|tel:)/i.test(trimmed)) return trimmed;
+
+        // Email tanpa mailto:
+        if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return `mailto:${trimmed}`;
+
+        // Nomor telepon (hanya digit, +, -, spasi, kurung)
+        if (/^[+\d][\d\s\-()]{6,}$/.test(trimmed)) {
+            return `tel:${trimmed.replace(/[^\d+]/g, '')}`;
+        }
+
+        // Default: asumsikan web URL
         return `https://${trimmed}`;
     }
 
     // Turns a multi-line description textarea into a proper bullet list
-    // (one <li> per non-empty line) instead of a single <br>-separated
-    // paragraph, matching how job/organization duties are listed on a
-    // classic ATS resume.
     buildDescriptionListHTML(description) {
         if (!description) return '';
         const lines = description.split('\n').map(l => l.trim()).filter(l => l.length > 0);
@@ -908,8 +900,6 @@ class CVBuilderApp {
         return `<ul class="exp-description">${items}</ul>`;
     }
 
-    // Joins location + period with " • " only when both are present, so a
-    // lone "•" doesn't show up when one of the two fields is left empty.
     joinMeta(location, period) {
         const parts = [location, period].map(p => (p || '').trim()).filter(p => p.length > 0);
         return this.escapeHtml(parts.join(' • '));
@@ -942,10 +932,6 @@ class CVBuilderApp {
         document.getElementById('cvTypeModal').classList.add('hidden');
     }
 
-    // Switches the visible screen. pushHistory=true adds a new browser
-    // history entry (normal navigation, e.g. clicking "Buat CV Baru").
-    // pushHistory=false is used when responding to popstate (the user
-    // pressed Back/Forward) so we don't push a duplicate entry.
     navigateToScreen(screen, pushHistory) {
         const welcomeScreen = document.getElementById('welcomeScreen');
         const cvBuilderScreen = document.getElementById('cvBuilderScreen');
@@ -1020,7 +1006,7 @@ class CVBuilderApp {
         }
     }
 
-    // ============ CV TITLE COLOR (name + section headings) ============
+    // ============ CV TITLE COLOR ============
     setTitleColor(color) {
         document.documentElement.style.setProperty('--cv-title-color', color);
         localStorage.setItem('cvTitleColor', color);
@@ -1035,7 +1021,7 @@ class CVBuilderApp {
         if (picker) picker.value = color;
     }
 
-    // ============ CV FONT (Calibri, Arial, Georgia, dst) ============
+    // ============ CV FONT ============
     setCvFont(fontFamily) {
         document.documentElement.style.setProperty('--cv-font-family', fontFamily);
         localStorage.setItem('cvFontFamily', fontFamily);
@@ -1052,7 +1038,7 @@ class CVBuilderApp {
 
     setupFileUpload() {}
 
-    // ============ ATS PHOTO (dengan foto / tanpa foto) ============
+    // ============ ATS PHOTO ============
     setupATSPhotoUpload() {
         const radios = document.querySelectorAll('input[name="photoOption"]');
         const uploadArea = document.getElementById('atsPhotoUploadArea');
@@ -1121,8 +1107,16 @@ class CVBuilderApp {
         formData.education.forEach(edu => {
             if (edu.institution || edu.major) {
                 const eduLinks = [];
-                if (edu.linkIjazah) eduLinks.push(`<a href="${this.formatLinkUrl(edu.linkIjazah)}" target="_blank" rel="noopener"><i class="fas fa-file-alt"></i> ${this.escapeHtml(edu.linkIjazahTitle) || 'Lihat Ijazah'}</a>`);
-                if (edu.linkTranskrip) eduLinks.push(`<a href="${this.formatLinkUrl(edu.linkTranskrip)}" target="_blank" rel="noopener"><i class="fas fa-file-alt"></i> ${this.escapeHtml(edu.linkTranskripTitle) || 'Lihat Transkrip Nilai'}</a>`);
+                if (edu.linkIjazah) {
+                    const href = this.formatLinkUrl(edu.linkIjazah);
+                    const label = this.escapeHtml(edu.linkIjazahTitle) || 'Lihat Ijazah';
+                    eduLinks.push(`<a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-file-alt"></i> ${label}</a>`);
+                }
+                if (edu.linkTranskrip) {
+                    const href = this.formatLinkUrl(edu.linkTranskrip);
+                    const label = this.escapeHtml(edu.linkTranskripTitle) || 'Lihat Transkrip Nilai';
+                    eduLinks.push(`<a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-file-alt"></i> ${label}</a>`);
+                }
                 educationHTML += `
                     <div class="preview-education-item">
                         <div class="edu-header">
@@ -1141,6 +1135,9 @@ class CVBuilderApp {
         let internshipHTML = '';
         formData.internships.forEach(int => {
             if (int.company || int.position) {
+                const href = int.link ? this.formatLinkUrl(int.link) : '';
+                const label = this.escapeHtml(int.linkTitle) || 'Lihat Sertifikat/Referensi';
+                const linkHTML = href ? `<div class="preview-doc-links"><a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-link"></i> ${label}</a></div>` : '';
                 internshipHTML += `
                     <div class="preview-exp-item">
                         <div class="exp-header">
@@ -1149,7 +1146,7 @@ class CVBuilderApp {
                         </div>
                         <div class="exp-position">${this.escapeHtml(int.position || '')}</div>
                         ${this.buildDescriptionListHTML(int.description)}
-                        ${int.link ? `<div class="preview-doc-links"><a href="${this.formatLinkUrl(int.link)}" target="_blank" rel="noopener"><i class="fas fa-link"></i> ${this.escapeHtml(int.linkTitle) || 'Lihat Sertifikat/Referensi'}</a></div>` : ''}
+                        ${linkHTML}
                     </div>
                 `;
             }
@@ -1159,6 +1156,9 @@ class CVBuilderApp {
         let workHTML = '';
         formData.workExperiences.forEach(work => {
             if (work.company || work.position) {
+                const href = work.link ? this.formatLinkUrl(work.link) : '';
+                const label = this.escapeHtml(work.linkTitle) || 'Lihat Referensi/Surat Kerja';
+                const linkHTML = href ? `<div class="preview-doc-links"><a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-link"></i> ${label}</a></div>` : '';
                 workHTML += `
                     <div class="preview-exp-item">
                         <div class="exp-header">
@@ -1167,7 +1167,7 @@ class CVBuilderApp {
                         </div>
                         <div class="exp-position">${this.escapeHtml(work.position || '')}</div>
                         ${this.buildDescriptionListHTML(work.description)}
-                        ${work.link ? `<div class="preview-doc-links"><a href="${this.formatLinkUrl(work.link)}" target="_blank" rel="noopener"><i class="fas fa-link"></i> ${this.escapeHtml(work.linkTitle) || 'Lihat Referensi/Surat Kerja'}</a></div>` : ''}
+                        ${linkHTML}
                     </div>
                 `;
             }
@@ -1194,20 +1194,21 @@ class CVBuilderApp {
         let projectHTML = '';
         formData.projects.forEach(project => {
             if (project.name) {
+                const href = project.link ? this.formatLinkUrl(project.link) : '';
+                const label = this.escapeHtml(project.linkTitle) || 'Lihat Proyek';
+                const linkHTML = href ? `<div class="preview-doc-links"><a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-link"></i> ${label}</a></div>` : '';
                 projectHTML += `
                     <div class="preview-project-item">
                         <div class="project-name">${this.escapeHtml(project.name || '')}</div>
                         ${project.description ? `<div class="project-desc">${this.escapeHtml(project.description)}</div>` : ''}
                         ${project.tech ? `<div class="project-tech"><strong>Teknologi:</strong> ${this.escapeHtml(project.tech)}</div>` : ''}
-                        ${project.link ? `<div class="preview-doc-links"><a href="${this.formatLinkUrl(project.link)}" target="_blank" rel="noopener"><i class="fas fa-link"></i> ${this.escapeHtml(project.linkTitle) || 'Lihat Proyek'}</a></div>` : ''}
+                        ${linkHTML}
                     </div>
                 `;
             }
         });
 
-        // Build skills HTML: one column per category (e.g. "Hard Skills" /
-        // "Soft Skills"), each rendered as its own bullet list - mirrors the
-        // classic two-column "KEMAMPUAN" layout on a printed ATS resume.
+        // Build skills HTML
         let skillsHTML = '';
         if (formData.skills && formData.skills.length > 0) {
             const validSkills = formData.skills.filter(s => s.category || s.items);
@@ -1230,14 +1231,18 @@ class CVBuilderApp {
             }
         }
 
-        // Build certifications HTML as a plain bullet list, e.g.
-        // "• Microsoft Office" or "• Pelatihan Kurikulum Merdeka - Kemendikbud (2025)"
+        // Build certifications HTML
         let certHTML = '';
         formData.certifications.forEach(cert => {
             if (cert.name) {
                 const issuerPart = cert.issuer ? ` - ${this.escapeHtml(cert.issuer)}` : '';
                 const yearPart = cert.year ? ` (${this.escapeHtml(cert.year)})` : '';
-                const linkPart = cert.link ? ` <a href="${this.formatLinkUrl(cert.link)}" target="_blank" rel="noopener" class="preview-doc-link-inline"><i class="fas fa-link"></i> ${this.escapeHtml(cert.linkTitle) || 'Lihat Sertifikat'}</a>` : '';
+                let linkPart = '';
+                if (cert.link) {
+                    const href = this.formatLinkUrl(cert.link);
+                    const label = this.escapeHtml(cert.linkTitle) || 'Lihat Sertifikat';
+                    linkPart = ` <a href="${href}" target="_blank" rel="noopener noreferrer" class="preview-doc-link-inline"><i class="fas fa-link"></i> ${label}</a>`;
+                }
                 certHTML += `
                     <li class="preview-cert-item">
                         <span class="cert-info">
@@ -1253,24 +1258,37 @@ class CVBuilderApp {
             }
         });
 
-        // Build contact lines - one labeled line per field, e.g.
-        // "Alamat : Yogyakarta" / "Handphone : 08xxxxxxxxxx" / "Email : ..."
-        // instead of an icon row, matching a classic single-column ATS resume.
+        // Build contact lines — semua link dipastikan bisa diklik
         const contactLines = [];
-        if (formData.domicile) contactLines.push(`<div class="contact-line"><span class="contact-label">Alamat</span><span>: ${this.escapeHtml(formData.domicile)}</span></div>`);
-        if (formData.phone) contactLines.push(`<div class="contact-line"><span class="contact-label">Handphone</span><span>: ${this.escapeHtml(formData.phone)}</span></div>`);
-        if (formData.email) contactLines.push(`<div class="contact-line"><span class="contact-label">Email</span><span>: ${this.escapeHtml(formData.email)}</span></div>`);
-        if (formData.linkedin) contactLines.push(`<div class="contact-line"><span class="contact-label">LinkedIn</span><span>: <a href="${this.formatLinkUrl(formData.linkedin)}" target="_blank" rel="noopener"><i class="fas fa-link"></i> ${this.escapeHtml(formData.linkedinTitle) || this.escapeHtml(formData.linkedin)}</a></span></div>`);
-        if (formData.portfolio) contactLines.push(`<div class="contact-line"><span class="contact-label">Portofolio</span><span>: <a href="${this.formatLinkUrl(formData.portfolio)}" target="_blank" rel="noopener"><i class="fas fa-link"></i> ${this.escapeHtml(formData.portfolioTitle) || this.escapeHtml(formData.portfolio)}</a></span></div>`);
 
-        // Header photo box - only rendered when the user picked "Dengan Foto"
-        // and actually uploaded one, so the layout stays a plain text header
-        // (no empty box) whenever "Tanpa Foto" is selected.
+        if (formData.domicile) {
+            contactLines.push(`<div class="contact-line"><span class="contact-label">Alamat</span><span>: ${this.escapeHtml(formData.domicile)}</span></div>`);
+        }
+        if (formData.phone) {
+            contactLines.push(`<div class="contact-line"><span class="contact-label">Handphone</span><span>: ${this.escapeHtml(formData.phone)}</span></div>`);
+        }
+        if (formData.email) {
+            const emailHref = this.formatLinkUrl(formData.email);
+            contactLines.push(`<div class="contact-line"><span class="contact-label">Email</span><span>: <a href="${emailHref}">${this.escapeHtml(formData.email)}</a></span></div>`);
+        }
+        if (formData.linkedin) {
+            const href = this.formatLinkUrl(formData.linkedin);
+            const label = this.escapeHtml(formData.linkedinTitle) || this.escapeHtml(formData.linkedin);
+            contactLines.push(`<div class="contact-line"><span class="contact-label">LinkedIn</span><span>: <a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-link"></i> ${label}</a></span></div>`);
+        }
+        if (formData.portfolio) {
+            const href = this.formatLinkUrl(formData.portfolio);
+            const label = this.escapeHtml(formData.portfolioTitle) || this.escapeHtml(formData.portfolio);
+            contactLines.push(`<div class="contact-line"><span class="contact-label">Portofolio</span><span>: <a href="${href}" target="_blank" rel="noopener noreferrer"><i class="fas fa-link"></i> ${label}</a></span></div>`);
+        }
+
+        // Header photo — hanya tampil kalau opsi "Dengan Foto" dipilih
         const photoHTML = (formData.photoOption === 'with' && formData.photo)
             ? `<div class="preview-photo-box"><img src="${formData.photo}" alt="Foto profil"></div>`
             : '';
 
         let html = `
+            <div class="cv-preview-content">
                 <div class="preview-header-main">
                     <div class="preview-header-top">
                         ${photoHTML}
@@ -1282,7 +1300,6 @@ class CVBuilderApp {
                     <div class="preview-contact-row">
                         ${contactLines.join('')}
                     </div>
-                </div>
                 </div>
 
                 ${formData.aboutMe ? `
@@ -1460,57 +1477,50 @@ class CVBuilderApp {
         };
     }
 
-// ============ DOWNLOAD PDF ============
-downloadPDF() {
-    // Check if PDFGenerator is available
-    if (typeof PDFGenerator === 'undefined') {
-        this.showToast('Fitur PDF tidak tersedia. Silakan refresh halaman.', 'error');
-        return;
-    }
-    
-    // Create PDFGenerator instance
-    const pdfGenerator = new PDFGenerator();
-    
-    // Check if libraries are loaded
-    if (!pdfGenerator.checkLibraries()) {
-        return;
-    }
-    
-    const formData = this.collectFormData();
-    
-    // Check if there is data to export
-    const hasData = formData.fullName || formData.position || formData.aboutMe || 
-                    formData.education.length > 0 || formData.skills.length > 0;
-    
-    if (!hasData) {
-        this.showToast('Tidak ada data CV untuk diekspor. Silakan isi formulir terlebih dahulu.', 'error');
-        return;
-    }
-    
-    try {
-        // Show loading state
-        const downloadBtn = document.getElementById('downloadPDFBtn');
-        const originalText = downloadBtn.innerHTML;
-        downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
-        downloadBtn.disabled = true;
+    // ============ DOWNLOAD PDF ============
+    downloadPDF() {
+        if (typeof PDFGenerator === 'undefined') {
+            this.showToast('Fitur PDF tidak tersedia. Silakan refresh halaman.', 'error');
+            return;
+        }
         
-        pdfGenerator.generatePDF(formData);
+        const pdfGenerator = new PDFGenerator();
         
-        // Reset button after delay
-        setTimeout(() => {
-            downloadBtn.innerHTML = originalText;
+        if (!pdfGenerator.checkLibraries()) {
+            return;
+        }
+        
+        const formData = this.collectFormData();
+        
+        const hasData = formData.fullName || formData.position || formData.aboutMe || 
+                        formData.education.length > 0 || formData.skills.length > 0;
+        
+        if (!hasData) {
+            this.showToast('Tidak ada data CV untuk diekspor. Silakan isi formulir terlebih dahulu.', 'error');
+            return;
+        }
+        
+        try {
+            const downloadBtn = document.getElementById('downloadPDFBtn');
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            downloadBtn.disabled = true;
+            
+            pdfGenerator.generatePDF(formData);
+            
+            setTimeout(() => {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            }, 5000);
+        } catch (error) {
+            console.error('PDF download error:', error);
+            this.showToast('Gagal download PDF: ' + error.message, 'error');
+            
+            const downloadBtn = document.getElementById('downloadPDFBtn');
+            downloadBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF';
             downloadBtn.disabled = false;
-        }, 5000);
-    } catch (error) {
-        console.error('PDF download error:', error);
-        this.showToast('Gagal download PDF: ' + error.message, 'error');
-        
-        // Reset button
-        const downloadBtn = document.getElementById('downloadPDFBtn');
-        downloadBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF';
-        downloadBtn.disabled = false;
+        }
     }
-}
 
     // ============ TOAST NOTIFICATIONS ============
     showToast(message, type = 'info') {
