@@ -109,6 +109,45 @@
                                 </div>
                             </div>
                             <form id="cvForm" class="cv-form">
+                                <!-- Photo Section -->
+                                <div class="form-section">
+                                    <h3 class="section-title">
+                                        <i class="fas fa-image"></i>
+                                        Foto Profil
+                                        <span class="optional-badge">Opsional</span>
+                                    </h3>
+                                    <div class="photo-option-toggle" role="radiogroup" aria-label="Pilihan foto pada CV">
+                                        <label class="photo-option-btn">
+                                            <input type="radio" name="photoOption" id="photoOptionNone" value="none" checked>
+                                            <span><i class="fas fa-file-alt"></i> Tanpa Foto</span>
+                                        </label>
+                                        <label class="photo-option-btn">
+                                            <input type="radio" name="photoOption" id="photoOptionWith" value="with">
+                                            <span><i class="fas fa-camera"></i> Dengan Foto</span>
+                                        </label>
+                                    </div>
+                                    <div id="atsPhotoUploadArea" class="cert-upload-area hidden">
+                                        <div class="cert-preview" id="atsPhotoPreview">
+                                            <i class="fas fa-user"></i>
+                                            <span>Belum ada foto</span>
+                                        </div>
+                                        <div class="cert-upload-controls">
+                                            <label class="btn-upload-cert">
+                                                <i class="fas fa-upload"></i>
+                                                Pilih Foto
+                                                <input type="file" id="atsPhotoInput"
+                                                    accept="image/jpeg,image/jpg,image/png" hidden>
+                                            </label>
+                                            <button type="button" id="removeAtsPhotoBtn" class="btn-remove-cert-image hidden">
+                                                <i class="fas fa-trash"></i> Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p class="form-hint">
+                                        Gunakan foto formal berlatar polos. Beberapa perusahaan justru lebih menyukai CV ATS tanpa foto, jadi pilih sesuai kebutuhan lowongan yang dituju.
+                                    </p>
+                                </div>
+
                                 <!-- Header Section -->
                                 <div class="form-section">
                                     <h3 class="section-title">
