@@ -27,32 +27,18 @@
 
 /* ============ MOBILE SCREENS ============ */
 @media (max-width: 768px) {
-    .container {
-        padding: 0 16px;
-    }
+    .container { padding: 0 16px; }
 
-    /* Header */
     .header-content {
         flex-direction: row;
         justify-content: space-between;
     }
 
-    .logo {
-        font-size: 20px;
-    }
+    .logo { font-size: 20px; }
+    .logo i { font-size: 22px; }
 
-    .logo i {
-        font-size: 22px;
-    }
-
-    /* Welcome Screen */
-    .welcome-content h1 {
-        font-size: 32px;
-    }
-
-    .welcome-content p {
-        font-size: 16px;
-    }
+    .welcome-content h1 { font-size: 32px; }
+    .welcome-content p { font-size: 16px; }
 
     .welcome-actions {
         flex-direction: column;
@@ -72,20 +58,15 @@
         gap: 12px;
     }
 
-    .welcome-icon {
-        font-size: 60px;
-    }
+    .welcome-icon { font-size: 60px; }
 
-    /* Form */
     .form-header {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
     }
 
-    .form-header h2 {
-        font-size: 18px;
-    }
+    .form-header h2 { font-size: 18px; }
 
     .form-actions {
         flex-direction: column;
@@ -104,13 +85,8 @@
         gap: 12px;
     }
 
-    .form-section {
-        margin-bottom: 20px;
-    }
-
-    .section-title {
-        font-size: 16px;
-    }
+    .form-section { margin-bottom: 20px; }
+    .section-title { font-size: 16px; }
 
     .form-input,
     .form-textarea {
@@ -174,10 +150,7 @@
         background: #7f1d1d;
     }
 
-    /* Preview */
-    .preview-panel {
-        padding: 16px;
-    }
+    .preview-panel { padding: 16px; }
 
     .preview-header {
         flex-direction: column;
@@ -185,9 +158,7 @@
         gap: 8px;
     }
 
-    .preview-header h2 {
-        font-size: 18px;
-    }
+    .preview-header h2 { font-size: 18px; }
 
     .cv-preview {
         padding: 16px;
@@ -195,7 +166,6 @@
     }
 
     /* ===== Preview Content - Mobile ===== */
-    /* Header ATS: foto tetap di kiri, ukurannya dikecilkan proporsional */
     .preview-header-main {
         gap: 12px;
         flex-wrap: nowrap;
@@ -222,17 +192,11 @@
         line-height: 1.4;
     }
 
-    .preview-contact-row .contact-label {
-        min-width: 60px;
-    }
+    .preview-contact-row .contact-label { min-width: 60px; }
 
-    .preview-section-title {
-        font-size: 14px !important;
-    }
+    .preview-about { font-size: 12px !important; }
 
-    .preview-about {
-        font-size: 12px !important;
-    }
+    .preview-section-title { font-size: 14px !important; }
 
     .preview-education-item .edu-header,
     .preview-exp-item .exp-header {
@@ -242,55 +206,28 @@
     }
 
     .preview-education-item .edu-institution,
-    .preview-exp-item .exp-company {
-        font-size: 13px !important;
-    }
+    .preview-exp-item .exp-company { font-size: 13px !important; }
 
     .preview-education-item .edu-major,
-    .preview-exp-item .exp-position {
-        font-size: 12px !important;
-    }
+    .preview-exp-item .exp-position { font-size: 12px !important; }
 
     .preview-education-item .edu-meta,
-    .preview-exp-item .exp-meta {
-        font-size: 11px !important;
-    }
+    .preview-exp-item .exp-meta { font-size: 11px !important; }
 
     .preview-exp-item .exp-description {
         font-size: 12px !important;
         padding-left: 8px;
     }
 
-    .preview-project-item .project-name {
-        font-size: 13px !important;
-    }
-
-    .preview-project-item .project-desc {
-        font-size: 12px !important;
-    }
-
-    .preview-project-item .project-tech {
-        font-size: 11px !important;
-    }
-
-    .preview-skills-categories {
-        gap: 8px;
-    }
-
-    .preview-skill-category {
-        padding: 8px 10px;
-    }
-
-    .preview-skills-list {
-        gap: 4px;
-    }
+    .preview-project-item .project-name { font-size: 13px !important; }
+    .preview-project-item .project-desc { font-size: 12px !important; }
+    .preview-project-item .project-tech { font-size: 11px !important; }
 
     .preview-skill-tag {
         font-size: 11px !important;
         padding: 2px 8px !important;
     }
 
-    /* Certificate */
     .cert-upload-area {
         flex-direction: column;
         align-items: center;
@@ -314,15 +251,9 @@
         justify-content: center;
     }
 
-    .preview-cert-image {
-        max-width: 100%;
-    }
+    .preview-cert-image { max-width: 100%; }
+    .preview-cert-image img { max-height: 120px; }
 
-    .preview-cert-image img {
-        max-height: 120px;
-    }
-
-    /* Toast */
     .toast {
         min-width: auto;
         width: 90%;
@@ -337,14 +268,12 @@
         top: 10px;
     }
 
-    /* Footer */
     .app-footer {
         font-size: 12px;
         padding: 16px 0;
         margin-top: 20px;
     }
 
-    /* Optional badges */
     .optional-badge {
         font-size: 10px;
         padding: 1px 8px;
@@ -353,21 +282,11 @@
 
 /* ============ SMALL MOBILE SCREENS ============ */
 @media (max-width: 480px) {
-    .container {
-        padding: 0 12px;
-    }
+    .container { padding: 0 12px; }
 
-    .welcome-content h1 {
-        font-size: 26px;
-    }
-
-    .welcome-icon {
-        font-size: 48px;
-    }
-
-    .welcome-content p {
-        font-size: 14px;
-    }
+    .welcome-content h1 { font-size: 26px; }
+    .welcome-icon { font-size: 48px; }
+    .welcome-content p { font-size: 14px; }
 
     .btn-primary,
     .btn-secondary {
@@ -376,17 +295,10 @@
     }
 
     .form-panel,
-    .preview-panel {
-        padding: 14px;
-    }
+    .preview-panel { padding: 14px; }
 
-    .form-header h2 {
-        font-size: 16px;
-    }
-
-    .section-title {
-        font-size: 15px;
-    }
+    .form-header h2 { font-size: 16px; }
+    .section-title { font-size: 15px; }
 
     .form-input,
     .form-textarea {
@@ -394,18 +306,14 @@
         font-size: 12px;
     }
 
-    .form-group label {
-        font-size: 12px;
-    }
+    .form-group label { font-size: 12px; }
 
     .cv-preview {
         padding: 12px;
         min-height: 300px;
     }
 
-    .preview-header-main h1 {
-        font-size: 15px !important;
-    }
+    .preview-header-main h1 { font-size: 15px !important; }
 
     .preview-photo-box {
         flex: 0 0 60px;
@@ -418,13 +326,9 @@
         gap: 2px;
     }
 
-    .preview-contact-row .contact-label {
-        min-width: 55px;
-    }
+    .preview-contact-row .contact-label { min-width: 55px; }
 
-    .preview-section-title {
-        font-size: 13px !important;
-    }
+    .preview-section-title { font-size: 13px !important; }
 
     .education-item,
     .internship-item,
@@ -469,18 +373,14 @@
 
 /* ============ LANDSCAPE MOBILE ============ */
 @media (max-height: 600px) and (orientation: landscape) {
-    .app-header {
-        padding: 10px 0;
-    }
+    .app-header { padding: 10px 0; }
 
     .welcome-screen {
         min-height: 60vh;
         padding: 20px 0;
     }
 
-    .welcome-content h1 {
-        font-size: 28px;
-    }
+    .welcome-content h1 { font-size: 28px; }
 
     .welcome-icon {
         font-size: 40px;
@@ -503,31 +403,22 @@
         gap: 16px;
     }
 
-    .form-panel {
-        max-height: 60vh;
-    }
-
-    .preview-panel {
-        max-height: 60vh;
-    }
+    .form-panel { max-height: 60vh; }
+    .preview-panel { max-height: 60vh; }
 
     .cv-preview {
         min-height: 250px;
         padding: 12px;
     }
 
-    .form-section {
-        margin-bottom: 16px;
-    }
+    .form-section { margin-bottom: 16px; }
 
     .section-title {
         font-size: 15px;
         margin-bottom: 10px;
     }
 
-    .form-group {
-        margin-bottom: 10px;
-    }
+    .form-group { margin-bottom: 10px; }
 
     .form-input,
     .form-textarea {
@@ -560,17 +451,10 @@
     }
 
     .form-panel,
-    .preview-panel {
-        max-height: 70vh;
-    }
+    .preview-panel { max-height: 70vh; }
 
-    .form-panel {
-        padding: 20px;
-    }
-
-    .preview-panel {
-        padding: 20px;
-    }
+    .form-panel { padding: 20px; }
+    .preview-panel { padding: 20px; }
 }
 
 /* ============ LARGE SCREENS ============ */
@@ -580,27 +464,17 @@
         padding: 0 40px;
     }
 
-    .cv-builder-layout {
-        gap: 32px;
-    }
-
+    .cv-builder-layout { gap: 32px; }
     .form-panel,
-    .preview-panel {
-        padding: 32px;
-    }
+    .preview-panel { padding: 32px; }
 
-    .preview-header-main h1 {
-        font-size: 32px !important;
-    }
+    .preview-header-main h1 { font-size: 32px !important; }
 
-    .cv-preview {
-        padding: 40px;
-    }
+    .cv-preview { padding: 40px; }
 }
 
 /* ============ DARK THEME RESPONSIVE ============ */
 @media (max-width: 768px) {
-
     body.dark-theme .btn-remove-edu,
     body.dark-theme .btn-remove-int,
     body.dark-theme .btn-remove-work,
@@ -642,9 +516,7 @@
         border-color: #60a5fa;
     }
 
-    body.dark-theme .cert-upload-area {
-        border-color: #334155;
-    }
+    body.dark-theme .cert-upload-area { border-color: #334155; }
 
     body.dark-theme .cert-preview {
         background: #1e293b;
@@ -654,21 +526,13 @@
 
 /* ============ PRINT RESPONSIVE ============ */
 @media print and (max-width: 768px) {
-    .cv-preview {
-        padding: 12px !important;
-    }
+    .cv-preview { padding: 12px !important; }
 
-    .preview-header-main h1 {
-        font-size: 18px !important;
-    }
+    .preview-header-main h1 { font-size: 18px !important; }
 
-    .preview-contact-row {
-        font-size: 11px !important;
-    }
+    .preview-contact-row { font-size: 11px !important; }
 
-    .preview-section-title {
-        font-size: 14px !important;
-    }
+    .preview-section-title { font-size: 14px !important; }
 
     .preview-education-item .edu-institution,
     .preview-exp-item .exp-company {
